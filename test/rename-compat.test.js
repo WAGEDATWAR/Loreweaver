@@ -19,14 +19,14 @@ function createMemoryStorage(entries = {}) {
   return storage;
 }
 
-test("maps legacy storage keys to the current namespace", () => {
+test("maps legacy storage keys to the current namespace", async () => {
   assert.equal(storageKey("project:v1"), "loreweaver:project:v1");
   assert.equal(legacyKeyToCurrent("lorebook-studio:project:v1"), "loreweaver:project:v1");
   assert.equal(legacyKeyToCurrent("loreweaver:project:v1"), null);
   assert.equal(legacyKeyToCurrent("unrelated"), null);
 });
 
-test("migrates legacy localStorage keys without overwriting current ones", () => {
+test("migrates legacy localStorage keys without overwriting current ones", async () => {
   const storage = createMemoryStorage({
     "lorebook-studio:sort:v1": "title",
     "lorebook-studio:onboarded:v1": "1",
@@ -44,8 +44,8 @@ test("migrates legacy localStorage keys without overwriting current ones", () =>
   assert.equal(storage.getItem("unrelated:key"), "keep");
 });
 
-test("still imports legacy native project files", () => {
-  const parsed = parseProject(JSON.stringify({
+test("still imports legacy native project files", async () => {
+  const parsed = await parseProject(JSON.stringify({
     app: LEGACY_APP_ID,
     version: 2,
     books: [{
@@ -59,7 +59,7 @@ test("still imports legacy native project files", () => {
   assert.equal(parsed.project.books[0].name, "Legacy Book");
 });
 
-test("serializes native projects with the current app id and filename", () => {
+test("serializes native projects with the current app id and filename", async () => {
   const book = createProject({
     books: [{ name: "Harbor Secrets", entries: [{ title: "Harbor", content: "Content" }] }]
   }).books[0];

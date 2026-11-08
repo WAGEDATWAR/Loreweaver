@@ -30,14 +30,18 @@ function snapshot() {
   return {
     activeBookId: state.activeBookId,
     activeEntryId: state.activeEntryId,
-    books: clone(state.books)
+    activeCardId: state.activeCardId ?? null,
+    books: clone(state.books),
+    cards: clone(state.cards ?? [])
   };
 }
 
 function restore(snapshotValue) {
   state.activeBookId = snapshotValue.activeBookId;
   state.activeEntryId = snapshotValue.activeEntryId;
+  state.activeCardId = snapshotValue.activeCardId ?? null;
   state.books = clone(snapshotValue.books);
+  state.cards = clone(snapshotValue.cards ?? []);
   ensureSelections();
 }
 
@@ -126,8 +130,7 @@ function normalizeSelection() {
   }
 }
 
-function nextCopyTitle(title, entries) {
-  const base = title.trim() || "Untitled entry";
+function nextCopyTitle(title, entries) {  const base = title.trim() || "Untitled entry";
   const first = `${base} (copy)`;
 
   if (!entries.some((entry) => entry.title === first)) {
@@ -328,11 +331,19 @@ export function ensureSelections() {
     state.books.push(createBook({ name: "Untitled Lorebook" }));
   }
 
+  if (!Array.isArray(state.cards)) {
+    state.cards = [];
+  }
+
   const activeBook = state.books.find((book) => book.id === state.activeBookId) ?? state.books[0];
   state.activeBookId = activeBook.id;
 
   if (!activeBook.entries.some((entry) => entry.id === state.activeEntryId)) {
     state.activeEntryId = activeBook.entries[0]?.id ?? null;
+  }
+
+  if (state.activeCardId && !state.cards.some((card) => card.id === state.activeCardId)) {
+    state.activeCardId = null;
   }
 
   normalizeSelection();
@@ -874,4 +885,88 @@ export function replaceProject(project) {
   clearSelection();
   ensureSelections();
   return state;
+}
+
+export function getCards() {
+  return state?.cards ?? [];
+}
+
+export function getCard(id) {
+  return (state?.cards ?? []).find((card) => card.id === id) ?? null;
+}
+
+export function getActiveCard() {
+  if (!state?.activeCardId) {
+    return null;
+  }
+
+  return getCard(state.activeCardId);
+}
+
+export function addCard(card) {
+  if (!state || !card) {
+    return null;
+  }
+
+  captureHistory("add-card", false);
+  state.cards = state.cards ?? [];
+  state.cards.push(card);
+  state.activeCardId = card.id;
+  return card;
+}
+
+export function updateCard(id, patch) {
+  const card = getCard(id);
+
+  if (!card) {
+    return null;
+  }
+
+  captureHistory(`update-card:${id}:${Object.keys(patch).join(",")}`);
+  Object.assign(card, patch, { updatedAt: Date.now() });
+  return card;
+}
+
+export function deleteCard(id) {
+  if (!state?.cards) {
+    return false;
+  }
+
+  const index = state.cards.findIndex((card) => card.id === id);
+
+  if (index === -1) {
+    return false;
+  }
+
+  captureHistory("delete-card", false);
+  state.cards.splice(index, 1);
+
+  if (state.activeCardId === id) {
+    state.activeCardId = state.cards[Math.min(index, state.cards.length - 1)]?.id ?? null;
+  }
+
+  return true;
+}
+
+export function setActiveCard(id) {
+  if (id === null || (state?.cards ?? []).some((card) => card.id === id)) {
+    state.activeCardId = id;
+  }
+}
+
+export function linkCardBook(cardId, bookId) {
+  const card = getCard(cardId);
+
+  if (!card) {
+    return false;
+  }
+
+  if (bookId !== null && !state.books.some((book) => book.id === bookId)) {
+    return false;
+  }
+
+  captureHistory("link-card-book", false);
+  card.bookId = bookId;
+  card.updatedAt = Date.now();
+  return true;
 }

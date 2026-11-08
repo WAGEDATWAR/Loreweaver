@@ -51,7 +51,8 @@ test("replace returns the imported project and counts every book and entry", () 
     booksAdded: 2,
     booksMatched: 0,
     entriesAdded: 3,
-    entriesUpdated: 0
+    entriesUpdated: 0,
+    cardsAdded: 0
   });
 });
 

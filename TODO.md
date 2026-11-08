@@ -56,14 +56,6 @@ Planned in `docs/LOREWEAVER.md` 7. Each gate is measured; a regression blocks th
 
 Ordered by value per effort. Nothing here is outside the current phase.
 
-- [ ] `M` `P5` **Cards: the metadata record** — the hub the container adapters project onto (DEF-084).
-- [ ] `H` `P5` **Cards: PNG text-chunk read/write** (DEF-085).
-- [ ] `M` `P5` **Cards: extract an embedded book on import** (DEF-088).
-- [ ] `M` `P5` **Cards: bind a book to a card and export together** (DEF-089).
-- [ ] `H` `P5` **Cards: CHARX container** (DEF-086).
-- [ ] `M` `P5` **Cards: V2/V3 detection and validation** (DEF-087).
-- [ ] `M` `P5` **Cards: the card library and avatar preview** (DEF-090).
-- [ ] `L` `P5` Card field parity checklist (DEF-091).
 - [ ] `M` `P5` Entry links `[[Title]]` with broken-link validation (DEF-007).
 - [ ] `L` `P5` Suggested trigger keys from title and content (DEF-008).
 - [ ] `M` `P5` Per-entry token/word/character limits (DEF-005).
@@ -75,19 +67,12 @@ Ordered by value per effort. Nothing here is outside the current phase.
 - [ ] `L` `P5` A "Reset filters" action and a "Clear search" affordance (DEF-115, DEF-116).
 - [ ] `L` `P5` Remember the last active entry per lorebook (DEF-114).
 
-## Character cards (P5)
+## Character cards (P5, built v0.8.0)
 
-Cards are a first-class record (G-16); the container is an adapter (A-8). See `DEFERRALS.md` K.
+Cards are a first-class record (G-16); the container is an adapter (A-8). Record, PNG and CHARX
+adapters, validation, extraction, linking, the library and the parity section all shipped. See
+`DEFERRALS.md` K and `docs/CARDS.md`.
 
-- [ ] `M` `P5` The card metadata record: name, personality, scenario, greetings, examples, creator
-      notes, tags, avatar (DEF-084).
-- [ ] `H` `P5` Read and write PNG `tEXt`/`zTXt` card chunks (DEF-085).
-- [ ] `M` `P5` Extract an embedded character book into a lorebook on import, previewed (DEF-088).
-- [ ] `M` `P5` Bind a lorebook to a card and export both together (DEF-089).
-- [ ] `H` `P5` Import and export the CHARX zip container (DEF-086).
-- [ ] `M` `P5` Detect and validate card spec V2/V3, warning instead of guessing (DEF-087).
-- [ ] `M` `P5` A card library with preview and avatar (DEF-090).
-- [ ] `L` `P5` Extend the parity checklist to card fields (DEF-091).
 
 ## Editor and authoring
 
@@ -178,7 +163,8 @@ Cards are a first-class record (G-16); the container is an adapter (A-8). See `D
 
 ## Recently landed
 
-- P5 opened with character cards as its first workstream (v0.8.0).
+- Character cards end to end: record, PNG `ccv3` chunks, CHARX, detection and validation, book
+  extraction and linking, the card library and editor, and card export with its book (v0.8.0+).
 - P4 closed: virtualized list, three benchmark profiles, persisted undo, bulk find/replace, select-by-size,
   the activation graph, `.lwproj` files, lossy-export warnings and the no-FSA fallback (v0.8.0).
 - Milestone preview APKs (`npm run apk`) and a mobile safe-area pass (v0.8.0).
@@ -187,3 +173,4 @@ Cards are a first-class record (G-16); the container is an adapter (A-8). See `D
 - The product rename to Loreweaver, with a namespace migration and legacy-file import (v0.7.4+).
 - Book duplicate, split and merge with id and source-UID remapping.
 - The documentation set reshaped to the topic-owner standard.
+

@@ -30,8 +30,8 @@ function canonicalProject(project) {
   }));
 }
 
-test("imports dual-written Chub entries", () => {
-  const result = parseProject(JSON.stringify({
+test("imports dual-written Chub entries", async () => {
+  const result = await parseProject(JSON.stringify({
     name: "Chub Book",
     description: "Dual-written fixture",
     scan_depth: 20,
@@ -78,8 +78,8 @@ test("imports dual-written Chub entries", () => {
   assert.deepEqual(entry.extensions.sourceFields.extensions, { depth: 4 });
 });
 
-test("imports SillyTavern World Info fields", () => {
-  const result = parseProject(JSON.stringify({
+test("imports SillyTavern World Info fields", async () => {
+  const result = await parseProject(JSON.stringify({
     name: "SillyTavern Book",
     scan_depth: 4,
     entries: {
@@ -121,8 +121,8 @@ test("imports SillyTavern World Info fields", () => {
   assert.equal(entry.extensions.sourceFields.selectiveLogic, 1);
 });
 
-test("imports lorebook_v3 character books", () => {
-  const result = parseProject(JSON.stringify({
+test("imports lorebook_v3 character books", async () => {
+  const result = await parseProject(JSON.stringify({
     spec: "lorebook_v3",
     data: {
       name: "Card Book",
@@ -159,8 +159,8 @@ test("imports lorebook_v3 character books", () => {
   assert.equal(entry.extensions.sourceId, "3");
 });
 
-test("remaps duplicate source UIDs during import", () => {
-  const imported = parseProject(JSON.stringify({
+test("remaps duplicate source UIDs during import", async () => {
+  const imported = await parseProject(JSON.stringify({
     name: "Duplicate UIDs",
     entries: {
       "1": {
@@ -202,8 +202,8 @@ test("remaps duplicate source UIDs during import", () => {
   assert.deepEqual(Object.keys(exported.data.entries), ["7", "8", "9"]);
 });
 
-test("round-trips native projects with source metadata", () => {
-  const imported = parseProject(JSON.stringify({
+test("round-trips native projects with source metadata", async () => {
+  const imported = await parseProject(JSON.stringify({
     name: "Roundtrip Book",
     extensions: { chub: true },
     entries: {
@@ -224,7 +224,7 @@ test("round-trips native projects with source metadata", () => {
     }
   }));
 
-  const restored = parseProject(JSON.stringify(buildExport(imported.project)));
+  const restored = await parseProject(JSON.stringify(buildExport(imported.project)));
 
   assert.equal(restored.ok, true);
   assert.equal(restored.format, "Loreweaver project");
@@ -232,8 +232,8 @@ test("round-trips native projects with source metadata", () => {
   assert.deepEqual(restored.project.books[0].entries[0].extensions, imported.project.books[0].entries[0].extensions);
 });
 
-test("round-trips a SillyTavern World Info fixture", () => {
-  const imported = parseProject(readFixture("sillytavern-world-info.json"), {
+test("round-trips a SillyTavern World Info fixture", async () => {
+  const imported = await parseProject(readFixture("sillytavern-world-info.json"), {
     filename: "sillytavern-world-info.json"
   });
 
@@ -253,7 +253,7 @@ test("round-trips a SillyTavern World Info fixture", () => {
   assert.equal(exported.data.entries["11"].position, 2);
   assert.equal(exported.data.entries["7"].disable, true);
 
-  const restored = parseProject(JSON.stringify(exported.data), {
+  const restored = await parseProject(JSON.stringify(exported.data), {
     filename: exported.filename
   });
 
@@ -266,8 +266,8 @@ test("round-trips a SillyTavern World Info fixture", () => {
   );
 });
 
-test("round-trips a Chub lorebook fixture with dual fields", () => {
-  const imported = parseProject(readFixture("chub-lorebook.json"), {
+test("round-trips a Chub lorebook fixture with dual fields", async () => {
+  const imported = await parseProject(readFixture("chub-lorebook.json"), {
     filename: "chub-lorebook.json"
   });
 
@@ -286,7 +286,7 @@ test("round-trips a Chub lorebook fixture with dual fields", () => {
   assert.equal(exported.data.entries["1"].match_whole_words, true);
   assert.equal(exported.data.entries["5"].enabled, false);
 
-  const restored = parseProject(JSON.stringify(exported.data), {
+  const restored = await parseProject(JSON.stringify(exported.data), {
     filename: exported.filename
   });
 
@@ -300,8 +300,8 @@ test("round-trips a Chub lorebook fixture with dual fields", () => {
   );
 });
 
-test("imports a wrapped lorebook_v3 data block and preserves its wrapper fields", () => {
-  const imported = parseProject(readFixture("chub-wrapped-lorebook-v3.json"), {
+test("imports a wrapped lorebook_v3 data block and preserves its wrapper fields", async () => {
+  const imported = await parseProject(readFixture("chub-wrapped-lorebook-v3.json"), {
     filename: "chub-wrapped-lorebook-v3.json"
   });
 
@@ -317,8 +317,8 @@ test("imports a wrapped lorebook_v3 data block and preserves its wrapper fields"
   assert.equal(book.extensions.sourceFields.id, "wrapped-book");
 });
 
-test("exports one active book as a native project and reimports it", () => {
-  const imported = parseProject(readFixture("sillytavern-world-info.json"));
+test("exports one active book as a native project and reimports it", async () => {
+  const imported = await parseProject(readFixture("sillytavern-world-info.json"));
   const book = imported.project.books[0];
   const exported = serializeLorebook("native", book);
 
@@ -327,14 +327,14 @@ test("exports one active book as a native project and reimports it", () => {
   assert.equal(exported.data.books.length, 1);
   assert.equal(exported.data.books[0].name, "Harbor Secrets");
 
-  const restored = parseProject(JSON.stringify(exported.data));
+  const restored = await parseProject(JSON.stringify(exported.data));
 
   assert.equal(restored.ok, true);
   assert.equal(restored.formatId, "native");
   assert.deepEqual(canonicalProject(restored.project), canonicalProject(imported.project));
 });
 
-test("keeps author notes in native data and out of interchange exports", () => {
+test("keeps author notes in native data and out of interchange exports", async () => {
   const project = createProject({
     books: [{
       name: "Notes Book",
@@ -357,14 +357,14 @@ test("keeps author notes in native data and out of interchange exports", () => {
   assert.equal(native.data.books[0].entries[0].notes, "Private author notes");
   assert.equal(buildExport(project).books[0].entries[0].notes, "Private author notes");
 
-  const restored = parseProject(JSON.stringify(native.data));
+  const restored = await parseProject(JSON.stringify(native.data));
 
   assert.equal(restored.ok, true);
   assert.equal(restored.project.books[0].entries[0].notes, "Private author notes");
 });
 
-test("exports a standalone character book and reimports it", () => {
-  const imported = parseProject(readFixture("sillytavern-world-info.json"));
+test("exports a standalone character book and reimports it", async () => {
+  const imported = await parseProject(readFixture("sillytavern-world-info.json"));
   const book = imported.project.books[0];
   const exported = serializeLorebook("characterbook", book);
 
@@ -377,7 +377,7 @@ test("exports a standalone character book and reimports it", () => {
   assert.equal(exported.data.scan_depth, 4);
   assert.equal(exported.data.token_budget, 2048);
 
-  const restored = parseProject(JSON.stringify(exported.data));
+  const restored = await parseProject(JSON.stringify(exported.data));
 
   assert.equal(restored.ok, true);
   assert.equal(restored.formatId, "chub");
@@ -387,7 +387,7 @@ test("exports a standalone character book and reimports it", () => {
   assert.equal(restored.project.books[0].entries[0].content, book.entries[0].content);
 });
 
-test("falls back unsupported character book positions to before the character", () => {
+test("falls back unsupported character book positions to before the character", async () => {
   const project = createProject({
     books: [{
       name: "Depth Book",
@@ -402,7 +402,7 @@ test("falls back unsupported character book positions to before the character", 
   assert.ok(exported.warnings.some((warning) => /doesn't support/.test(warning)));
 });
 
-test("warns that tags and notes do not survive interchange formats", () => {
+test("warns that tags and notes do not survive interchange formats", async () => {
   const project = createProject({
     books: [{
       name: "Tagged",
@@ -426,7 +426,7 @@ test("warns that tags and notes do not survive interchange formats", () => {
   }
 });
 
-test("native export stays lossless and warning-free", () => {
+test("native export stays lossless and warning-free", async () => {
   const project = createProject({
     books: [{
       name: "Tagged",
@@ -440,7 +440,7 @@ test("native export stays lossless and warning-free", () => {
   assert.deepEqual(exported.warnings, []);
 });
 
-test("publishes export capabilities for every book format", () => {
+test("publishes export capabilities for every book format", async () => {
   assert.deepEqual(
     EXPORT_FORMATS.map((format) => format.id),
     ["sillytavern", "native", "chub", "characterbook"]
@@ -454,8 +454,8 @@ test("publishes export capabilities for every book format", () => {
   }
 });
 
-test("rejects unrelated JSON with a clear message", () => {
-  const result = parseProject(JSON.stringify({ hello: "world" }));
+test("rejects unrelated JSON with a clear message", async () => {
+  const result = await parseProject(JSON.stringify({ hello: "world" }));
 
   assert.equal(result.ok, false);
   assert.match(result.error, /isn't a supported lorebook/);

@@ -4,8 +4,8 @@
 > mapping and the card-to-book link. The adapter contract is `docs/INTEROP.md` 2; the canonical model is
 > `docs/ARCHITECTURE.md` 5; the surface is `docs/UI.md`.
 
-**Status:** designed, unscheduled. Owned by `DEFERRALS.md` K. Decided by G-16 (a card is a record) and
-A-8 (a container is an adapter).
+**Status:** built. Decided by G-16 (a card is a record) and A-8 (a container is an adapter). Modules:
+`cardCodec.js`, `cardPng.js`, `zip.js`, `formats/card.js`, `ui/cards.js`.
 
 ---
 
@@ -75,12 +75,14 @@ lands in `source.unknownFields` and round-trips unchanged (I-2).
 
 ## 7. Known gaps
 
-- No card library or avatar preview yet (DEF-090).
-- Card field parity is not audited yet (DEF-091).
-- Artwork editing stays out of scope.
+- Artwork editing stays out of scope (G-16, charter non-goal).
+- `zTXt`/`iTXt` card chunks are read only when uncompressed; a compressed chunk falls back to `tEXt`
+  or reports the card unreadable.
+- CHARX entries are written uncompressed (stored) rather than deflated.
 
 ## 8. Definition of done
 
 An adapter ships with its PNG and CHARX fixtures round-tripping unknown fields and bytes, a warning for
 every lossy field, a browser scenario for import, extract and export, and the card in `e2e/a11y.mjs` when
 its surface lands.
+

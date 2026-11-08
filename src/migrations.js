@@ -14,6 +14,18 @@ const MIGRATIONS = [
         books: (Array.isArray(data.books) ? data.books : []).map(migrateBook)
       };
     }
+  },
+  {
+    from: 2,
+    to: 3,
+    description: "Add the character card collection.",
+    migrate(data) {
+      return {
+        ...data,
+        version: 3,
+        cards: Array.isArray(data.cards) ? data.cards : []
+      };
+    }
   }
 ];
 

@@ -86,6 +86,10 @@ const states = [
     await page.click("#about-guide-btn");
     await page.waitFor('document.querySelector("#guide-dialog")?.open');
   } },
+  { name: "card dialog", setup: async (page) => {
+    await page.click("#new-card-btn");
+    await page.waitFor('document.querySelector("#card-dialog")?.open');
+  } },
   { name: "replace dialog", setup: async (page) => {
     await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "h", ctrlKey: true, bubbles: true, cancelable: true })); true');
     await page.waitFor('document.querySelector("#replace-dialog")?.open');

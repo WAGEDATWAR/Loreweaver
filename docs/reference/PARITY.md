@@ -48,3 +48,20 @@ catch.
 - Chub wrappers beyond `lorebook_v3` are absent (DEF-013).
 - RisuAI has no adapter (DEF-014).
 - `warn` coverage is thin in current serializers (DEF-016); closing it is a P4 gate item.
+
+## Character card (V2/V3)
+
+| Field | Class | Note |
+|---|---|---|
+| `name` | edit | - |
+| `personality` | edit | - |
+| `scenario` | edit | - |
+| `first_mes` | edit | - |
+| `mes_example` | edit | - |
+| `system_prompt` / `post_history_instructions` | edit | - |
+| `creator` / `creator_notes` / `character_version` | edit | - |
+| `alternate_greetings` | keep | round-trips, edited only through import |
+| `tags` | keep | round-trips, edited only through import |
+| `character_book` | edit | extracted to a linked lorebook |
+| `avatar` | keep | image bytes preserved, never painted (G-16) |
+| unknown `data` keys | keep | preserved in `extensions.sourceFields` |

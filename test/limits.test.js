@@ -9,18 +9,18 @@ import {
   checkProjectLimits
 } from "../src/limits.js";
 
-test("rejects import text over the size limit", () => {
+test("rejects import text over the size limit", async () => {
   const result = checkImportText("x".repeat(MAX_IMPORT_BYTES + 1));
 
   assert.equal(result.ok, false);
   assert.match(result.error, /too large/);
 });
 
-test("accepts import text within the size limit", () => {
+test("accepts import text within the size limit", async () => {
   assert.equal(checkImportText("{}").ok, true);
 });
 
-test("rejects projects over the book limit", () => {
+test("rejects projects over the book limit", async () => {
   const books = Array.from({ length: MAX_IMPORT_BOOKS + 1 }, (_, index) => ({ name: `Book ${index}` }));
   const result = checkProjectLimits({ books });
 
@@ -28,7 +28,7 @@ test("rejects projects over the book limit", () => {
   assert.match(result.error, /too many lorebooks/);
 });
 
-test("rejects projects over the entry limit", () => {
+test("rejects projects over the entry limit", async () => {
   const entries = Array.from({ length: MAX_IMPORT_ENTRIES + 1 }, () => ({ title: "Entry" }));
   const result = checkProjectLimits({ books: [{ name: "Big", entries }] });
 
@@ -36,8 +36,8 @@ test("rejects projects over the entry limit", () => {
   assert.match(result.error, /too many entries/);
 });
 
-test("parseProject enforces the size limit before parsing", () => {
-  const result = parseProject("x".repeat(MAX_IMPORT_BYTES + 1));
+test("parseProject enforces the size limit before parsing", async () => {
+  const result = await parseProject("x".repeat(MAX_IMPORT_BYTES + 1));
 
   assert.equal(result.ok, false);
   assert.match(result.error, /too large/);

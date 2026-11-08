@@ -25,21 +25,22 @@ function versionOneProject() {
   };
 }
 
-test("recognizes migratable project data", () => {
+test("recognizes migratable project data", async () => {
   assert.equal(isMigratableProject({ books: [] }), true);
   assert.equal(isMigratableProject({ entries: {} }), false);
   assert.equal(isMigratableProject([]), false);
   assert.equal(isMigratableProject(null), false);
 });
 
-test("upgrades a version 1 project to the current schema", () => {
+test("upgrades a version 1 project to the current schema", async () => {
   const result = migrateProjectData(versionOneProject());
 
   assert.equal(result.isProject, true);
   assert.equal(result.from, 1);
   assert.equal(result.newer, false);
-  assert.equal(result.applied.length, 1);
+  assert.equal(result.applied.length, 2);
   assert.equal(result.data.version, SCHEMA_VERSION);
+  assert.deepEqual(result.data.cards, []);
   assert.deepEqual(result.data.books[0].tags, []);
   assert.equal(result.data.books[0].tokenBudget, 0);
   assert.equal(result.data.books[0].entries[0].notes, "");
@@ -47,15 +48,15 @@ test("upgrades a version 1 project to the current schema", () => {
   assert.equal(result.data.books[0].entries[0].title, "Old Entry");
 });
 
-test("treats unversioned project data as the baseline version", () => {
+test("treats unversioned project data as the baseline version", async () => {
   const result = migrateProjectData({ books: [{ name: "Unversioned", entries: [] }] });
 
   assert.equal(result.from, 1);
-  assert.equal(result.applied.length, 1);
+  assert.equal(result.applied.length, 2);
   assert.equal(result.data.version, SCHEMA_VERSION);
 });
 
-test("leaves a current project unchanged and flags newer versions", () => {
+test("leaves a current project unchanged and flags newer versions", async () => {
   const current = migrateProjectData({ version: SCHEMA_VERSION, books: [] });
   assert.equal(current.applied.length, 0);
   assert.equal(current.newer, false);
@@ -66,7 +67,7 @@ test("leaves a current project unchanged and flags newer versions", () => {
   assert.equal(newer.newer, true);
 });
 
-test("does not migrate interchange data", () => {
+test("does not migrate interchange data", async () => {
   const data = { entries: { "1": { key: ["a"], content: "x" } } };
   const result = migrateProjectData(data);
 
@@ -74,18 +75,18 @@ test("does not migrate interchange data", () => {
   assert.equal(result.data, data);
 });
 
-test("parseProject upgrades a stored project and reports the migration", () => {
-  const result = parseProject(JSON.stringify(versionOneProject()));
+test("parseProject upgrades a stored project and reports the migration", async () => {
+  const result = await parseProject(JSON.stringify(versionOneProject()));
 
   assert.equal(result.ok, true);
   assert.equal(result.project.version, SCHEMA_VERSION);
   assert.deepEqual(result.project.books[0].tags, []);
   assert.ok(result.warnings.some((warning) => /Upgraded project schema 1/.test(warning)));
-  assert.equal(result.migrations.length, 1);
+  assert.equal(result.migrations.length, 2);
 });
 
-test("parseProject warns about projects from a newer schema", () => {
-  const result = parseProject(JSON.stringify({
+test("parseProject warns about projects from a newer schema", async () => {
+  const result = await parseProject(JSON.stringify({
     app: "lorebook-studio",
     version: SCHEMA_VERSION + 5,
     books: [{ name: "Future", entries: [] }]

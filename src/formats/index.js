@@ -1,4 +1,5 @@
 import { slugify } from "../utils.js";
+import { cardAdapter } from "./card.js";
 import { characterBookAdapter } from "./characterBook.js";
 import { chubAdapter } from "./chub.js";
 import { isRecord } from "./helpers.js";
@@ -6,6 +7,8 @@ import { nativeAdapter } from "./native.js";
 import { sillyTavernAdapter } from "./sillytavern.js";
 
 const adapters = [nativeAdapter, chubAdapter, sillyTavernAdapter, characterBookAdapter];
+
+export const CARD_ADAPTER = cardAdapter;
 
 export const EXPORT_FORMATS = adapters
   .filter((adapter) => adapter.capabilities?.bookExport)
@@ -18,12 +21,14 @@ export const EXPORT_FORMATS = adapters
   }))
   .sort((left, right) => Number(right.primary) - Number(left.primary));
 
-export function parseLorebookData(input, options = {}) {
-  if (!isRecord(input)) {
+export async function parseLorebookData(input, options = {}) {
+  const binary = input instanceof ArrayBuffer || ArrayBuffer.isView(input);
+
+  if (!binary && !isRecord(input)) {
     return { ok: false, error: "That JSON file doesn't contain a lorebook." };
   }
 
-  const candidates = adapters
+  const candidates = [...adapters, cardAdapter]
     .map((adapter, index) => ({
       adapter,
       index,
@@ -35,11 +40,13 @@ export function parseLorebookData(input, options = {}) {
   if (!candidates.length) {
     return {
       ok: false,
-      error: "That file isn't a supported lorebook. Try a Loreweaver project, SillyTavern World Info, or Chub lorebook."
+      error: binary
+        ? "That file isn't a supported card or container."
+        : "That file isn't a supported lorebook. Try a Loreweaver project, SillyTavern World Info, Chub lorebook or a character card."
     };
   }
 
-  const parsed = candidates[0].adapter.parse(input, options);
+  const parsed = await candidates[0].adapter.parse(input, options);
 
   if (!parsed.ok) {
     return parsed;

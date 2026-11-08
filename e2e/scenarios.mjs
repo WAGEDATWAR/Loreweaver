@@ -368,6 +368,72 @@ export const scenarios = [
     }
   },
   {
+    name: "imports a PNG card and extracts its book",
+    async run(page, context) {
+      await resetApp(page);
+      await page.setFileInput("#import-input", [context.fixture("card-mara.png")]);
+      await page.waitFor('document.querySelector("#diff-dialog")?.open');
+
+      const message = await page.evaluate('document.querySelector("#diff-message").textContent');
+      assert.match(message, /character card/i);
+      const details = await page.evaluate('document.querySelector("#diff-detail-list").textContent');
+      assert.match(details, /Mara Voss/);
+
+      await page.click("#diff-accept");
+      await page.waitFor('!document.querySelector("#diff-dialog")?.open');
+      await page.waitFor('document.querySelectorAll(".card-item").length === 1');
+      const name = await page.evaluate('document.querySelector(".card-item-name").textContent');
+      assert.equal(name, "Mara Voss");
+      const meta = await page.evaluate('document.querySelector(".card-item-meta").textContent');
+      assert.match(meta, /Mara Book/);
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "creates, links and exports a character card",
+    async run(page) {
+      await resetApp(page);
+      await page.click("#new-card-btn");
+      await page.waitFor('document.querySelector("#card-dialog")?.open');
+
+      await setValue(page, "#card-name", "Mara Voss");
+      await setValue(page, "#card-personality", "Gruff and careful");
+      await setValue(page, "#card-first-message", "Tide's turning.");
+      await page.evaluate(`(() => {
+        const select = document.querySelector("#card-link-book");
+        select.value = select.options[1].value;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        return true;
+      })()`);
+      await page.click("#card-save");
+      await page.waitFor('!document.querySelector("#card-dialog")?.open');
+
+      await page.waitFor('document.querySelectorAll(".card-item").length === 1');
+      const name = await page.evaluate('document.querySelector(".card-item-name").textContent');
+      assert.equal(name, "Mara Voss");
+      const meta = await page.evaluate('document.querySelector(".card-item-meta").textContent');
+      assert.match(meta, /Aurora Vale/);
+
+      await page.evaluate(`(() => {
+        window.__downloads = [];
+        const original = URL.createObjectURL;
+        URL.createObjectURL = (blob) => {
+          window.__downloads.push({ type: blob.type, size: blob.size });
+          return original.call(URL, blob);
+        };
+        return true;
+      })()`);
+      await page.evaluate('document.querySelector(".card-item").click(); true');
+      await page.waitFor('document.querySelector("#card-dialog")?.open');
+      await page.click("#card-export");
+      await page.waitFor('document.querySelector("#card-status")?.textContent.length >= 0');
+      await sleep(150);
+      const download = await page.evaluate('window.__downloads?.[0] ?? null');
+      assert.equal(download?.type, "application/json");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "bulk replaces with a preview and undo",
     async run(page) {
       await resetApp(page);

@@ -1,6 +1,8 @@
 import {
+  CARD_ADAPTER,
   EXPORT_FORMATS,
   buildExport,
+  downloadBytes,
   downloadJson,
   parseProject,
   serializeLorebook
@@ -53,7 +55,14 @@ import {
   updateActiveBookDescription,
   updateActiveBookTags,
   updateActiveBookTokenBudget,
-  updateActiveEntry
+  updateActiveEntry,
+  addCard,
+  getActiveCard,
+  getCards,
+  updateCard,
+  deleteCard,
+  setActiveCard,
+  linkCardBook
 } from "./store.js";
 import {
   getProjectBackupInfo,
@@ -77,7 +86,7 @@ import { MAX_IMPORT_BYTES } from "./limits.js";
 import { parseHistory, serializeHistory } from "./history.js";
 import { IMPORT_STRATEGIES, mergeProject } from "./merge.js";
 import { createSampleProject } from "./sample.js";
-import { createProject, normalizeTagList } from "./schema.js";
+import { createCard, createProject, normalizeTagList } from "./schema.js";
 import { searchProject } from "./search.js";
 import { storageKey } from "./storage/namespace.js";
 import {
@@ -99,6 +108,7 @@ import { renderEditor, syncEntryStats } from "./ui/editor.js";
 import { createKeyChips } from "./ui/keyChips.js";
 import { confirmAction, toast } from "./ui/overlays.js";
 import { getVisibleEntryIds, renderSidebar } from "./ui/sidebar.js";
+import { fillCardForm, readCardForm, renderCardList } from "./ui/cards.js";
 import { clamp } from "./utils.js";
 import { selectEntriesByTokenSize } from "./bulk.js";
 import { applyReplace, parseReplaceQuery, planReplace } from "./replace.js";
@@ -117,6 +127,28 @@ const refs = {
   bookTagsInput: document.querySelector("#book-tags-input"),
   bookTokenBudget: document.querySelector("#book-token-budget"),
   bookBudgetStatus: document.querySelector("#book-budget-status"),
+  cardList: document.querySelector("#card-list"),
+  cardCount: document.querySelector("#card-count"),
+  newCardBtn: document.querySelector("#new-card-btn"),
+  cardDialog: document.querySelector("#card-dialog"),
+  cardName: document.querySelector("#card-name"),
+  cardPersonality: document.querySelector("#card-personality"),
+  cardScenario: document.querySelector("#card-scenario"),
+  cardFirstMessage: document.querySelector("#card-first-message"),
+  cardExampleMessages: document.querySelector("#card-example-messages"),
+  cardSystemPrompt: document.querySelector("#card-system-prompt"),
+  cardPostHistory: document.querySelector("#card-post-history"),
+  cardCreator: document.querySelector("#card-creator"),
+  cardVersion: document.querySelector("#card-version"),
+  cardCreatorNotes: document.querySelector("#card-creator-notes"),
+  cardLinkBook: document.querySelector("#card-link-book"),
+  cardAvatar: document.querySelector("#card-avatar"),
+  cardAvatarInput: document.querySelector("#card-avatar-input"),
+  cardStatus: document.querySelector("#card-status"),
+  cardDelete: document.querySelector("#card-delete"),
+  cardExport: document.querySelector("#card-export"),
+  cardCancel: document.querySelector("#card-cancel"),
+  cardSave: document.querySelector("#card-save"),
   saveState: document.querySelector("#save-state"),
   storageBanner: document.querySelector("#storage-banner"),
   storageBannerMessage: document.querySelector("#storage-banner-message"),
@@ -1173,6 +1205,7 @@ function buildCommands() {
     { title: "Lorebook actions", keywords: ["duplicate", "merge", "split", "book"], run: openBookActionsDialog },
     { title: "Select entries by token size", keywords: ["bulk", "select", "tokens", "size"], run: openBulkSizeDialog },
     { title: "Bulk find and replace", hint: "Ctrl+H", keywords: ["replace", "bulk", "find"], run: openReplaceDialog },
+    { title: "New character card", keywords: ["card", "character", "avatar"], run: () => openCardDialog() },
     { title: "Save project", hint: "Ctrl+S", keywords: ["persist"], run: async () => {
       if (await flushSave()) {
         toast("Project saved", "success");
@@ -1368,6 +1401,7 @@ function renderAll() {
   updateBookDescriptionPreview(book?.description ?? "");
   refs.bookTagChips?.setKeys(book?.tags ?? []);
   renderSidebar(refs);
+  renderCardList(refs);
   renderEditor(refs);
   updateHistoryButtons();
   updateValidationIndicator();
@@ -1943,11 +1977,12 @@ function createExportOption({ id, title, description, meta }) {
 }
 
 function renderExportOptions() {
+  const card = getActiveCard();
   const options = [
     createExportOption({
       id: "project",
       title: "Project backup",
-      description: "Every lorebook and setting in one restorable file.",
+      description: "Every lorebook, card and setting in one restorable file.",
       meta: "Project"
     }),
     ...EXPORT_FORMATS.map((format) => createExportOption({
@@ -1957,6 +1992,25 @@ function renderExportOptions() {
       meta: format.primary ? "Book \u00b7 primary" : "Book"
     }))
   ];
+
+  if (card) {
+    const label = card.name.trim() || "Untitled card";
+    options.push(createExportOption({
+      id: "card-png",
+      title: `Card PNG \u00b7 ${label}`,
+      description: card.bookId
+        ? "The card PNG with its linked lorebook embedded."
+        : "The card PNG without a linked lorebook.",
+      meta: "Card"
+    }));
+
+    options.push(createExportOption({
+      id: "card-charx",
+      title: `Card CHARX \u00b7 ${label}`,
+      description: "The card as a CHARX zip with its image and linked lorebook.",
+      meta: "Card"
+    }));
+  }
 
   refs.exportOptions.replaceChildren(...options);
 }
@@ -2285,10 +2339,61 @@ function saveProjectDownload() {
   toast("Project downloaded", "success");
 }
 
+async function exportActiveCard(asCharx = false) {
+  const card = getActiveCard();
+
+  if (!card) {
+    toast("There is no active card to export.", "error");
+    return;
+  }
+
+  const label = card.name.trim() || "Untitled card";
+  const book = card.bookId ? getState().books.find((item) => item.id === card.bookId) : null;
+  const exported = asCharx
+    ? CARD_ADAPTER.serializeCharx(card, { book })
+    : CARD_ADAPTER.serialize(card, { book });
+
+  if (!exported.ok) {
+    toast(exported.error, "error");
+    return;
+  }
+
+  if (exported.warnings.length) {
+    refs.exportDialog.close();
+    const accepted = await confirmAction({
+      title: `Export ${label}?`,
+      message: "The card exports with what it has. Some abilities stay unavailable in this build.",
+      warnings: exported.warnings,
+      confirmLabel: "Export anyway",
+      tone: "primary"
+    });
+
+    if (!accepted) {
+      openExportDialog();
+      return;
+    }
+  } else {
+    refs.exportDialog.close();
+  }
+
+  if (exported.dataUrl) {
+    downloadJson(JSON.parse(exported.json), exported.filename);
+  } else {
+    downloadBytes(exported.bytes, exported.filename, exported.type);
+  }
+
+  toast(`Exported ${label}`, "success");
+}
+
 async function handleExport(formatId) {
   if (formatId === "project") {
     exportProjectBackup();
     refs.exportDialog.close();
+    return;
+  }
+
+  if (formatId === "card-png" || formatId === "card-charx") {
+    await exportActiveCard(formatId === "card-charx");
     return;
   }
 
@@ -2960,7 +3065,11 @@ async function handleBulkDelete() {
   toast(`${ids.length} ${ids.length === 1 ? "entry" : "entries"} deleted`);
 }
 
-function importStrategyMessage(strategy, fileName) {
+function importStrategyMessage(strategy, fileName, isCard = false) {
+  if (isCard) {
+    return `"${fileName}" is a character card and is added to the project; an embedded lorebook is extracted with it. The current project is saved as a local backup first.`;
+  }
+
   if (strategy === "append") {
     return `"${fileName}" is ready to append. Existing lorebooks are kept and imported entries are added after matching ones. The current project will be saved as a local backup first.`;
   }
@@ -3007,6 +3116,135 @@ function importResultMessage(strategy, parsed, stats, entryCount) {
   return `Imported ${parsed.format}: ${entryCount} ${entryCount === 1 ? "entry" : "entries"}`;
 }
 
+let editingCardId = null;
+let editingAvatarDataUrl = "";
+
+function openCardDialog(cardId = null) {
+  const card = cardId ? getCards().find((item) => item.id === cardId) : null;
+  editingCardId = card?.id ?? null;
+  editingAvatarDataUrl = card?.avatarDataUrl ?? "";
+  refs.cardDialog.querySelector("#card-title").textContent = card ? "Edit card" : "New character card";
+  refs.cardDelete.hidden = !card;
+  refs.cardExport.hidden = !card;
+  refs.cardStatus.textContent = "";
+  fillCardForm(refs, card ?? {});
+  refs.cardDialog.showModal();
+  refs.cardName.focus();
+}
+
+function closeCardDialog() {
+  refs.cardDialog.close();
+  editingCardId = null;
+  editingAvatarDataUrl = "";
+}
+
+async function readAvatarFile(file) {
+  if (!file) {
+    return "";
+  }
+
+  if (!/^image\/(png|webp|jpeg)$/.test(file.type)) {
+    toast("Choose a PNG, WebP or JPEG image.", "error");
+    return null;
+  }
+
+  if (file.size > 8 * 1024 * 1024) {
+    toast("That image is too large (8 MB limit).", "error");
+    return null;
+  }
+
+  const dataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ""));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  }).catch(() => "");
+
+  if (!dataUrl) {
+    toast("Couldn't read that image.", "error");
+    return null;
+  }
+
+  return dataUrl;
+}
+
+function handleSaveCard() {
+  const values = readCardForm(refs);
+
+  if (!values.name.trim()) {
+    refs.cardStatus.textContent = "Give the card a name first.";
+    refs.cardName.focus();
+    return;
+  }
+
+  if (editingCardId) {
+    updateCard(editingCardId, { ...values, avatarDataUrl: editingAvatarDataUrl });
+    toast("Card saved", "success");
+  } else {
+    const card = addCard(createCard({ ...values, avatarDataUrl: editingAvatarDataUrl }));
+
+    if (card) {
+      toast("Card added", "success");
+    }
+  }
+
+  closeCardDialog();
+  renderAll();
+  scheduleSave();
+}
+
+async function handleDeleteCard() {
+  const card = editingCardId ? getCards().find((item) => item.id === editingCardId) : null;
+
+  if (!card) {
+    return;
+  }
+
+  const accepted = await confirmAction({
+    title: "Delete card?",
+    message: `"${card.name.trim() || "Untitled card"}" will be permanently removed. Its linked lorebook stays.`,
+    confirmLabel: "Delete card"
+  });
+
+  if (!accepted) {
+    return;
+  }
+
+  deleteCard(card.id);
+  closeCardDialog();
+  renderAll();
+  scheduleSave();
+  toast("Card deleted");
+}
+
+async function handleExportCard() {
+  const card = editingCardId ? getCards().find((item) => item.id === editingCardId) : null;
+
+  if (!card) {
+    return;
+  }
+
+  const values = readCardForm(refs);
+  const book = values.bookId ? getState().books.find((item) => item.id === values.bookId) : null;
+  const exported = CARD_ADAPTER.serialize(
+    { ...card, ...values, avatarDataUrl: editingAvatarDataUrl },
+    { book, avatarDataUrl: editingAvatarDataUrl }
+  );
+
+  if (!exported.ok) {
+    refs.cardStatus.textContent = exported.error;
+    return;
+  }
+
+  if (exported.dataUrl) {
+    downloadJson(JSON.parse(exported.json), exported.filename);
+  } else {
+    downloadBytes(exported.bytes, exported.filename, exported.type);
+  }
+
+  toast(`Exported ${values.name.trim()} as a card`, "success");
+}
+
 async function handleImport(file, { fileHandle = null } = {}) {
   if (!file) {
     return;
@@ -3017,16 +3255,17 @@ async function handleImport(file, { fileHandle = null } = {}) {
     return;
   }
 
-  let text;
+  const isCardContainer = /\.(png|charx|webp|jpg|jpeg)$/i.test(file.name);
+  let payload;
 
   try {
-    text = await file.text();
+    payload = isCardContainer ? await file.arrayBuffer() : await file.text();
   } catch {
     toast("Couldn't read that file.", "error");
     return;
   }
 
-  const parsed = parseProject(text, { filename: file.name });
+  const parsed = await parseProject(payload, { filename: file.name });
 
   if (!parsed.ok) {
     toast(parsed.error, "error");
@@ -3035,19 +3274,26 @@ async function handleImport(file, { fileHandle = null } = {}) {
 
   const bookCount = parsed.project.books.length;
   const entryCount = parsed.project.books.reduce((total, book) => total + book.entries.length, 0);
-  let strategy = "replace";
+  const cardCount = parsed.project.cards?.length ?? 0;
+  const cardName = parsed.project.cards?.[0]?.name?.trim() ?? "";
+  let strategy = parsed.formatId === "card" ? "append" : "replace";
   const buildImportReview = (value) => {
     const merged = mergeProject(getState(), parsed.project, value);
+    const details = [
+      { label: "Format", value: parsed.format },
+      { label: "File", value: file.name }
+    ];
+
+    if (cardCount) {
+      details.push({ label: "Character card", value: cardName || "Untitled card" });
+    }
+
+    details.push({ label: "Lorebooks", value: String(bookCount) }, { label: "Entries", value: String(entryCount) });
 
     return {
       diff: diffProjects(getState(), merged.project),
-      message: importStrategyMessage(value, file.name),
-      details: [
-        { label: "Format", value: parsed.format },
-        { label: "File", value: file.name },
-        { label: "Lorebooks", value: String(bookCount) },
-        { label: "Entries", value: String(entryCount) }
-      ],
+      message: importStrategyMessage(value, file.name, cardCount > 0),
+      details,
       warnings: parsed.warnings || [],
       confirmLabel: importConfirmLabel(value)
     };
@@ -3124,6 +3370,59 @@ refs.newBookBtn.addEventListener("click", () => {
 
 refs.deleteBookBtn.addEventListener("click", () => {
   handleDeleteBook();
+});
+
+refs.newCardBtn.addEventListener("click", () => {
+  openCardDialog();
+});
+
+refs.cardList.addEventListener("click", (event) => {
+  const item = event.target.closest("[data-card-id]");
+
+  if (item) {
+    openCardDialog(item.dataset.cardId);
+  }
+});
+
+refs.cardList.addEventListener("keydown", (event) => {
+  const item = event.target.closest("[data-card-id]");
+
+  if (!item) {
+    return;
+  }
+
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    openCardDialog(item.dataset.cardId);
+  }
+});
+
+refs.cardAvatarInput.addEventListener("change", async (event) => {
+  const dataUrl = await readAvatarFile(event.target.files?.[0]);
+  event.target.value = "";
+
+  if (!dataUrl) {
+    return;
+  }
+
+  editingAvatarDataUrl = dataUrl;
+  refs.cardAvatar.replaceChildren();
+
+  const img = document.createElement("img");
+  img.alt = "Card image";
+  img.src = dataUrl;
+  refs.cardAvatar.append(img);
+});
+
+refs.cardCancel.addEventListener("click", closeCardDialog);
+refs.cardSave.addEventListener("click", handleSaveCard);
+refs.cardDelete.addEventListener("click", handleDeleteCard);
+refs.cardExport.addEventListener("click", handleExportCard);
+
+refs.cardDialog.addEventListener("click", (event) => {
+  if (event.target === refs.cardDialog) {
+    closeCardDialog();
+  }
 });
 
 refs.bookActionsBtn.addEventListener("click", () => {

@@ -4,6 +4,7 @@ import {
   APP_ID,
   SCHEMA_VERSION,
   createBook,
+  createCard,
   createEntry,
   createProject,
   normalizeKeyList
@@ -144,5 +145,24 @@ test("creates an empty project when no books are supplied", () => {
 
 test("exposes the canonical app identity", () => {
   assert.equal(APP_ID, "loreweaver");
-  assert.equal(SCHEMA_VERSION, 2);
+  assert.equal(SCHEMA_VERSION, 3);
+});
+
+
+
+test("normalizes a card record with defaults", () => {
+  const card = createCard({ name: "Mara", alternateGreetings: ["Hi", "Hello"], tags: ["npc", "npc"] });
+  assert.match(card.id, /^card_/);
+  assert.equal(card.name, "Mara");
+  assert.deepEqual(card.alternateGreetings, ["Hi", "Hello"]);
+  assert.deepEqual(card.tags, ["npc"]);
+  assert.equal(card.bookId, null);
+  assert.equal(card.avatarDataUrl, "");
+  assert.equal(card.personality, "");
+});
+
+test("keeps cards on a project", () => {
+  const project = createProject({ books: [], cards: [{ name: "One" }, { name: "Two", bookId: "book_1" }] });
+  assert.equal(project.cards.length, 2);
+  assert.equal(project.cards[1].bookId, "book_1");
 });

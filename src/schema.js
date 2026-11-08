@@ -2,7 +2,7 @@ import { clamp, createId } from "./utils.js";
 
 export const APP_ID = "loreweaver";
 export const LEGACY_APP_ID = "lorebook-studio";
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export const POSITIONS = [
   { value: "before_char", label: "Before character" },
@@ -87,18 +87,49 @@ export function createBook(patch = {}) {
   };
 }
 
+export function createCard(patch = {}) {
+  const now = Date.now();
+
+  return {
+    id: typeof patch.id === "string" && patch.id ? patch.id : createId("card"),
+    name: typeof patch.name === "string" ? patch.name : "",
+    personality: typeof patch.personality === "string" ? patch.personality : "",
+    scenario: typeof patch.scenario === "string" ? patch.scenario : "",
+    firstMessage: typeof patch.firstMessage === "string" ? patch.firstMessage : "",
+    alternateGreetings: Array.isArray(patch.alternateGreetings)
+      ? patch.alternateGreetings.map((greeting) => String(greeting)).filter(Boolean)
+      : [],
+    exampleMessages: typeof patch.exampleMessages === "string" ? patch.exampleMessages : "",
+    systemPrompt: typeof patch.systemPrompt === "string" ? patch.systemPrompt : "",
+    postHistoryInstructions: typeof patch.postHistoryInstructions === "string"
+      ? patch.postHistoryInstructions
+      : "",
+    creator: typeof patch.creator === "string" ? patch.creator : "",
+    creatorNotes: typeof patch.creatorNotes === "string" ? patch.creatorNotes : "",
+    characterVersion: typeof patch.characterVersion === "string" ? patch.characterVersion : "",
+    tags: normalizeTagList(patch.tags),
+    avatarDataUrl: typeof patch.avatarDataUrl === "string" ? patch.avatarDataUrl : "",
+    bookId: typeof patch.bookId === "string" && patch.bookId ? patch.bookId : null,
+    createdAt: Number.isFinite(patch.createdAt) ? patch.createdAt : now,
+    updatedAt: Number.isFinite(patch.updatedAt) ? patch.updatedAt : now,
+    extensions: normalizeExtensions(patch.extensions)
+  };
+}
+
 export function createProject(patch = {}) {
   const books = Array.isArray(patch.books) ? patch.books.map((book) => createBook(book)) : [];
   const activeBook = books.find((book) => book.id === patch.activeBookId) ?? books[0] ?? null;
   const activeEntry = activeBook?.entries.find((entry) => entry.id === patch.activeEntryId)
     ?? activeBook?.entries[0]
     ?? null;
+  const cards = Array.isArray(patch.cards) ? patch.cards.map((card) => createCard(card)) : [];
 
   return {
     version: SCHEMA_VERSION,
     activeBookId: activeBook?.id ?? null,
     activeEntryId: activeEntry?.id ?? null,
     ui: { searchQuery: "" },
-    books
+    books,
+    cards
   };
 }

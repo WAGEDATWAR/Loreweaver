@@ -36,7 +36,7 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 
 | # | Item | Notes | Owner | Status |
 |---|---|---|---|---|
-| DEF-012 | Character card containers (PNG/CHARX) and embedded books | tracked in detail as the K series (DEF-084 to DEF-091); this row closes with them | P5 | scheduled |
+| DEF-012 | Character card containers (PNG/CHARX) and embedded books | delivered by the K series | P5 | done |
 | DEF-013 | Chub wrapper variants beyond `lorebook_v3` | wrapped `data` block fixture imports with wrapper fields preserved | P4 | done |
 | DEF-014 | RisuAI-native export | - | P5 | scheduled |
 | DEF-015 | Editable advanced SillyTavern and Chub fields | - | P5 | scheduled |
@@ -53,14 +53,14 @@ never learns a card quirk.
 
 | # | Item | Notes | Owner | Status |
 |---|---|---|---|---|
-| DEF-084 | A card metadata record (name, personality, scenario, greetings, examples, creator notes, tags, avatar) | the hub the container adapters project onto | P5 | scheduled |
-| DEF-085 | Read PNG tEXt/zTXt card chunks | V2/V3 card JSON rides in PNG text chunks | P5 | scheduled |
-| DEF-086 | CHARX (zip) card import and export | zip container around the card and its assets | P5 | scheduled |
-| DEF-087 | Card spec V2/V3 detection and validation | warn on a malformed card instead of guessing | P5 | scheduled |
-| DEF-088 | Extract an embedded character book into a lorebook on card import | the book stays linked; extraction is previewed | P5 | scheduled |
-| DEF-089 | Bind a lorebook to a card and export them together | one flow writes the card and its book | P5 | scheduled |
-| DEF-090 | A card library with preview and avatar | cards are picked beside books, not a separate app | P5 | scheduled |
-| DEF-091 | Card field parity checklist | extends `docs/reference/PARITY.md` to card fields | P5 | scheduled |
+| DEF-084 | A card metadata record | `createCard`, schema v3 and migration | P5 | done |
+| DEF-085 | Read PNG tEXt/zTXt card chunks | `cardPng.js`; ccv3 wins over chara, stale key removed on write | P5 | done |
+| DEF-086 | CHARX (zip) card import and export | `zip.js` stored read/write, avatar carried | P5 | done |
+| DEF-087 | Card spec V2/V3 detection and validation | `cardCodec.js`; unknown spec rejected, missing name/first message warned | P5 | done |
+| DEF-088 | Extract an embedded character book on card import | previewed in the import dialog, linked on confirm | P5 | done |
+| DEF-089 | Bind a lorebook to a card and export them together | card dialog book select; PNG and CHARX write the book | P5 | done |
+| DEF-090 | A card library with preview and avatar | sidebar card list, avatar thumbnails, editor dialog | P5 | done |
+| DEF-091 | Card field parity checklist | `docs/reference/PARITY.md` C section | P5 | done |
 
 
 ## O. Organization
@@ -187,5 +187,6 @@ may delay a v1 phase.
 | DEF-062 | An embedding and vendoring guide with the licence note | asks A-1/C-3 | post-v1 | scheduled |
 | DEF-063 | Extract the pure core into a new component repository | asks A-1 to A-6; the v1 tag is the precondition | post-v1 | scheduled |
 | DEF-065 | Run-level budget arbitration across attached books | ask B-9; the run budget is the outer bound | post-v1 | scheduled |
+
 
 

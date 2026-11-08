@@ -127,12 +127,20 @@ function finalizeProject(books, current, incoming, strategy) {
   const activeEntryId = activeBook?.entries.some((entry) => entry.id === requestedEntryId)
     ? requestedEntryId
     : activeBook?.entries[0]?.id ?? null;
+  const cards = strategy === "replace"
+    ? clone(incoming?.cards ?? [])
+    : [...clone(current?.cards ?? []), ...clone(incoming?.cards ?? [])];
 
   return createProject({
     books,
+    cards,
     activeBookId: resolvedBookId,
     activeEntryId
   });
+}
+
+function cardStats(cards) {
+  return { cardsAdded: cards.length };
 }
 
 export function mergeProject(current, incoming, strategy = "replace") {
@@ -142,7 +150,8 @@ export function mergeProject(current, incoming, strategy = "replace") {
     booksAdded: 0,
     booksMatched: 0,
     entriesAdded: 0,
-    entriesUpdated: 0
+    entriesUpdated: 0,
+    ...cardStats(Array.isArray(incoming?.cards) ? incoming.cards : [])
   };
 
   if (selected === "replace") {

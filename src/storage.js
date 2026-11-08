@@ -29,7 +29,8 @@ function createProjectPayload(state) {
     version: SCHEMA_VERSION,
     activeBookId: state.activeBookId,
     activeEntryId: state.activeEntryId,
-    books: state.books
+    books: state.books,
+    cards: state.cards ?? []
   };
 }
 
@@ -320,7 +321,7 @@ export async function loadProject(state) {
     const raw = await getBackend().get(STORAGE_KEY);
 
     if (raw) {
-      const result = parseProject(raw);
+      const result = await parseProject(raw);
 
       if (result.ok) {
         return result.project;
@@ -463,7 +464,7 @@ export async function loadRevision(id) {
       return { ok: false, error: "That revision is no longer available." };
     }
 
-    const parsed = parseProject(raw);
+    const parsed = await parseProject(raw);
 
     if (!parsed.ok) {
       return { ok: false, error: parsed.error || "That revision is unreadable." };
@@ -657,7 +658,7 @@ export async function loadProjectBackup() {
   }
 
   const { payload } = result;
-  const parsed = parseProject(JSON.stringify(payload.project));
+  const parsed = await parseProject(JSON.stringify(payload.project));
 
   if (!parsed.ok) {
     return { ok: false, error: parsed.error || "The pre-import backup is unreadable." };

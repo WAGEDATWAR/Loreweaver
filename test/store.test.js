@@ -1,16 +1,21 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createProject } from "../src/schema.js";
+import { createCard, createProject } from "../src/schema.js";
 import {
+  addCard,
   addEntry,
   adjustEntriesOrder,
   canRedo,
   canUndo,
+  deleteCard,
   deleteEntries,
   duplicateActiveBook,
   duplicateEntry,
   getActiveBook,
+  getActiveCard,
   getActiveEntry,
+  getCard,
+  getCards,
   getEntryFilters,
   getHistory,
   getSelectedEntryIds,
@@ -18,6 +23,7 @@ import {
   getState,
   getTagFilters,
   initStore,
+  linkCardBook,
   mergeActiveBookInto,
   moveEntry,
   onHistoryChange,
@@ -38,7 +44,8 @@ import {
   updateActiveBookDescription,
   updateActiveBookTags,
   updateActiveBookTokenBudget,
-  updateActiveEntry
+  updateActiveEntry,
+  updateCard
 } from "../src/store.js";
 import { sortEntries } from "../src/ui/sidebar.js";
 
@@ -345,4 +352,24 @@ test("adds an entry from template fields with the next manual order", () => {
   assert.equal(entry.order, 40);
   assert.equal(getActiveEntry().id, entry.id);
   assert.equal(canUndo(), true);
+});
+
+test("adds, updates, links and deletes cards with undo", () => {
+  initStore(createTestProject());
+  const card = addCard(createCard({ name: "Mara" }));
+  assert.equal(getCards().length, 1);
+  assert.equal(getActiveCard().id, card.id);
+
+  updateCard(card.id, { personality: "Gruff" });
+  assert.equal(getCard(card.id).personality, "Gruff");
+
+  linkCardBook(card.id, getActiveBook().id);
+  assert.equal(getCard(card.id).bookId, getActiveBook().id);
+
+  assert.equal(undo(), true);
+  assert.equal(getCard(card.id).bookId, null);
+
+  assert.equal(deleteCard(card.id), true);
+  assert.equal(getCards().length, 0);
+  assert.equal(getActiveCard(), null);
 });

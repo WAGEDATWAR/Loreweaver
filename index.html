@@ -177,8 +177,7 @@
               </div>
             </section>
 
-            <section class="book-meta" aria-labelledby="book-meta-label">
-              <div class="section-label" id="book-meta-label">Lorebook info</div>
+            <section class="book-meta" aria-labelledby="book-meta-label">              <div class="section-label" id="book-meta-label">Lorebook info</div>
               <details id="book-description-details" class="book-description">
                 <summary>
                   <span class="section-label">Description</span>
@@ -223,6 +222,19 @@
                   <span id="validation-count" class="validation-count">0</span>
                 </button>
               </div>
+            </section>
+
+            <section class="card-section" aria-labelledby="card-label">
+              <div class="card-section-head">
+                <span class="section-label" id="card-label">Character cards</span>
+                <span id="card-count" class="count" aria-live="polite">0</span>
+                <button id="new-card-btn" class="icon-btn" type="button" title="New character card" aria-label="New character card">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                    <path d="M12 5v14"/><path d="M5 12h14"/>
+                  </svg>
+                </button>
+              </div>
+              <div id="card-list" class="card-list" role="list" aria-label="Character cards"></div>
             </section>
 
             <div class="search">
@@ -845,6 +857,79 @@
     </div>
   </dialog>
 
+  <dialog id="card-dialog" class="dialog card-dialog" aria-labelledby="card-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading">
+        <p class="eyebrow">Character card</p>
+        <h2 id="card-title">Edit card</h2>
+        <p class="dialog-copy">Card fields travel with a PNG or CHARX file. A linked lorebook exports inside the card.</p>
+      </div>
+      <div class="card-avatar-row">
+        <div id="card-avatar" class="card-avatar" aria-hidden="true"></div>
+        <div class="card-avatar-side">
+          <label class="btn" for="card-avatar-input">Choose image</label>
+          <input id="card-avatar-input" type="file" accept="image/png,image/webp,image/jpeg" hidden>
+          <span class="hint">PNG recommended. The image is imported, never painted.</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="card-name">Name</label>
+        <input id="card-name" type="text" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="card-personality">Personality</label>
+        <textarea id="card-personality" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label for="card-scenario">Scenario</label>
+        <textarea id="card-scenario" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label for="card-first-message">First message</label>
+        <textarea id="card-first-message" rows="3"></textarea>
+      </div>
+      <div class="field">
+        <label for="card-example-messages">Example messages</label>
+        <textarea id="card-example-messages" rows="3"></textarea>
+      </div>
+      <div class="field">
+        <label for="card-system-prompt">System prompt</label>
+        <textarea id="card-system-prompt" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label for="card-post-history">Post-history instructions</label>
+        <textarea id="card-post-history" rows="2"></textarea>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="card-creator">Creator</label>
+          <input id="card-creator" type="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="card-version">Version</label>
+          <input id="card-version" type="text" autocomplete="off">
+        </div>
+      </div>
+      <div class="field">
+        <label for="card-creator-notes">Creator notes</label>
+        <textarea id="card-creator-notes" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label for="card-link-book">Linked lorebook</label>
+        <select id="card-link-book">
+          <option value="">No linked lorebook</option>
+        </select>
+      </div>
+      <p id="card-status" class="hint" aria-live="polite"></p>
+      <div class="dialog-actions">
+        <button id="card-delete" class="btn btn-danger" type="button">Delete card</button>
+        <button id="card-export" class="btn" type="button">Export PNG</button>
+        <button id="card-cancel" class="btn" type="button">Cancel</button>
+        <button id="card-save" class="btn btn-primary" type="button">Save card</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog id="token-settings-dialog" class="dialog token-settings-dialog" aria-labelledby="token-settings-title">
     <div class="dialog-inner">
       <div class="dialog-heading">
@@ -957,7 +1042,7 @@
 
   <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
 
-  <input id="import-input" type="file" accept=".json,.lwproj,application/json" hidden>
+  <input id="import-input" type="file" accept=".json,.lwproj,.png,.charx,application/json,image/png" hidden>
 
   <script type="module" src="./src/main.js"></script>
 </body>
