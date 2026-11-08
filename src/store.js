@@ -1,4 +1,5 @@
 import { duplicateBook, mergeBookEntries, splitBook, splitPoint } from "./books.js";
+import { applyReplace } from "./replace.js";
 import { createBook, createEntry, normalizeTagList } from "./schema.js";
 import { clamp } from "./utils.js";
 
@@ -15,6 +16,7 @@ let lastHistoryKey = "";
 let lastHistoryAt = 0;
 let selectedEntryIds = new Set();
 let selectionAnchorId = null;
+let historyListener = null;
 
 function clone(value) {
   if (typeof structuredClone === "function") {
@@ -62,6 +64,7 @@ function captureHistory(key = "", coalesce = true) {
     lastHistoryAt = now;
     future = [];
     clearSampleMarker();
+    notifyHistory();
     return;
   }
 
@@ -75,6 +78,7 @@ function captureHistory(key = "", coalesce = true) {
   lastHistoryKey = key;
   lastHistoryAt = now;
   clearSampleMarker();
+  notifyHistory();
 }
 
 export function isSampleProject() {
@@ -86,6 +90,27 @@ function resetHistory() {
   future = [];
   lastHistoryKey = "";
   lastHistoryAt = 0;
+  notifyHistory();
+}
+
+export function getHistory() {
+  return { past: past.slice(), future: future.slice() };
+}
+
+export function hydrateHistory({ past: nextPast, future: nextFuture } = {}) {
+  past = Array.isArray(nextPast) ? nextPast.slice(-HISTORY_LIMIT) : [];
+  future = Array.isArray(nextFuture) ? nextFuture.slice(-HISTORY_LIMIT) : [];
+  lastHistoryKey = "";
+  lastHistoryAt = 0;
+  notifyHistory();
+}
+
+export function onHistoryChange(listener) {
+  historyListener = listener;
+}
+
+function notifyHistory() {
+  historyListener?.(canUndo(), canRedo());
 }
 
 function validEntryIds() {
@@ -118,11 +143,16 @@ function nextCopyTitle(title, entries) {
   return `${base} (copy ${index})`;
 }
 
-export function initStore(project) {
+export function initStore(project, { history = null } = {}) {
   state = project;
   resetHistory();
   clearSelection();
   ensureSelections();
+
+  if (history) {
+    hydrateHistory(history);
+  }
+
   return state;
 }
 
@@ -147,6 +177,7 @@ export function undo() {
   restore(past.pop());
   lastHistoryKey = "";
   lastHistoryAt = 0;
+  notifyHistory();
   return true;
 }
 
@@ -159,6 +190,7 @@ export function redo() {
   restore(future.pop());
   lastHistoryKey = "";
   lastHistoryAt = 0;
+  notifyHistory();
   return true;
 }
 
@@ -241,6 +273,26 @@ export function selectEntryRange(ids, anchorId = null) {
   } else if (!selectionAnchorId || !selectedEntryIds.has(selectionAnchorId)) {
     selectionAnchorId = [...selectedEntryIds][0];
   }
+}
+
+export function addEntriesToSelection(ids) {
+  const validIds = validEntryIds();
+  let added = 0;
+
+  for (const id of ids) {
+    if (!validIds.has(id) || selectedEntryIds.has(id)) {
+      continue;
+    }
+
+    selectedEntryIds.add(id);
+    added += 1;
+  }
+
+  if (added) {
+    selectionAnchorId = [...selectedEntryIds][0] ?? null;
+  }
+
+  return added;
 }
 
 export function ensureSelections() {
@@ -764,6 +816,18 @@ export function adjustEntriesOrder(ids, delta) {
 
   book.updatedAt = now;
   return changed.length;
+}
+
+export function applyReplacePlan(plan) {
+  const book = getActiveBook();
+
+  if (!book || !plan?.changes?.length) {
+    return 0;
+  }
+
+  captureHistory("bulk-replace", false);
+  const touched = applyReplace(book, plan);
+  return touched;
 }
 
 export function moveEntry(sourceId, targetId, place = "before") {

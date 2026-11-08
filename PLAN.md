@@ -65,6 +65,12 @@ are green.
 
 Only when asked. A commit is one step, its docs, and its gates.
 
+## Milestone previews
+
+At every milestone completion, cut a debug APK for on-device evaluation (`docs/MOBILE-PREVIEW.md`) and
+record its filename and commit in `CHANGELOG.md`. The milestone gate runs first; a preview never blocks
+the next milestone.
+
 ## Definition of a phase done
 
 - Its gate holds over the full fixture set, twice.

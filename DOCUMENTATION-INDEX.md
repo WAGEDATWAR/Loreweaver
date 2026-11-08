@@ -49,6 +49,8 @@ convenience note in the editor doc.
 notes, the parity audit against SillyTavern and Chub, and the audit of what the sibling projects want
 from Loreweaver (`docs/reference/EXTERNAL-ASKS.md`) live under `docs/reference/`.
 
+`docs/MOBILE-PREVIEW.md` owns the milestone APK build and is owned by `PLAN.md`.
+
 ## 3. Precedence (highest wins)
 
 1. `DECISIONS.md`

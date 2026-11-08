@@ -1,4 +1,5 @@
 import {
+  buildLossyWarnings,
   copyPreservedFields,
   createUidAllocator,
   getEntryItems,
@@ -127,7 +128,7 @@ export const chubAdapter = {
         description: book.description,
         entries
       },
-      warnings: []
+      warnings: buildLossyWarnings(book, this.exportLabel || this.label)
     };
   }
 };

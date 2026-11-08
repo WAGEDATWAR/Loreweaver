@@ -62,6 +62,7 @@ export function validateBook(book) {
       issues.push({
         code: "emptyContent",
         label: VALIDATION_LABELS.emptyContent,
+        field: "entry-content",
         entryId: entry.id,
         entryTitle: title,
         message: "Add content before exporting this entry."
@@ -73,6 +74,7 @@ export function validateBook(book) {
         issues.push({
           code: "unreachable",
           label: VALIDATION_LABELS.unreachable,
+          field: "entry-keys-input",
           entryId: entry.id,
           entryTitle: title,
           message: "This entry is enabled but has no trigger keys, so it can never activate."
@@ -81,6 +83,7 @@ export function validateBook(book) {
         issues.push({
           code: "missingKeys",
           label: VALIDATION_LABELS.missingKeys,
+          field: "entry-keys-input",
           entryId: entry.id,
           entryTitle: title,
           message: "Add trigger keys or make the entry always on before enabling it."
@@ -109,6 +112,7 @@ export function validateBook(book) {
       issues.push({
         code: "duplicateKeys",
         label: VALIDATION_LABELS.duplicateKeys,
+        field: "entry-keys-input",
         entryId: entry.id,
         entryTitle: title,
         message: `Repeated in this entry: ${[...repeatedKeys].join(", ")}.`
@@ -121,6 +125,7 @@ export function validateBook(book) {
       issues.push({
         code: "invalidRegex",
         label: VALIDATION_LABELS.invalidRegex,
+        field: "entry-keys-input",
         entryId: entry.id,
         entryTitle: title,
         message: `Treated as plain text: ${invalidRegexKeys.join(", ")}.`
@@ -143,6 +148,7 @@ export function validateBook(book) {
       issues.push({
         code: "keyCollision",
         label: VALIDATION_LABELS.keyCollision,
+        field: "entry-keys-input",
         entryId: entry.id,
         entryTitle: title,
         message: `Shared with ${[...others].join(", ")}: ${sharedKeys.join(", ")}.`
@@ -155,6 +161,7 @@ export function validateBook(book) {
       issues.push({
         code: "orderCollision",
         label: VALIDATION_LABELS.orderCollision,
+        field: "entry-order",
         entryId: entry.id,
         entryTitle: title,
         message: `Insertion order ${entry.order} is shared by ${orderGroup.length} entries.`

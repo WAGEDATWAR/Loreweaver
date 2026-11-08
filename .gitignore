@@ -4,3 +4,19 @@ test-results/
 *.log
 .DS_Store
 Thumbs.db
+
+# Generated web payload for the Android preview build.
+www/
+
+# Android build output; the platform project itself is tracked.
+android/.gradle/
+android/build/
+android/app/build/
+android/dist/
+android/local.properties
+android/capacitor-cordova-android-plugins/build/
+android/.idea/
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/app/src/main/res/xml/config.xml

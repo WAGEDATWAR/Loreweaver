@@ -1,4 +1,5 @@
 import {
+  buildLossyWarnings,
   copyPreservedFields,
   createUidAllocator,
   getEntryItems,
@@ -47,8 +48,9 @@ export const sillyTavernAdapter = {
   id: "sillytavern",
   label: "SillyTavern World Info",
   exportLabel: "SillyTavern World Info v2",
-  exportDescription: "A World Info v2 JSON file compatible with SillyTavern.",
+  exportDescription: "The primary v1 target: a World Info v2 JSON file compatible with SillyTavern.",
   exportFilenameSuffix: "sillytavern-world-info",
+  primary: true,
   capabilities: {
     bookExport: true,
     preservesUnknownFields: true
@@ -158,7 +160,7 @@ export const sillyTavernAdapter = {
     return {
       ok: true,
       data: output,
-      warnings: []
+      warnings: buildLossyWarnings(book, this.exportLabel || this.label)
     };
   }
 };

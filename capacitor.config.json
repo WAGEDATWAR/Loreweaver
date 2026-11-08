@@ -1,0 +1,11 @@
+{
+  "appId": "sh.loreweaver.app",
+  "appName": "Loreweaver",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

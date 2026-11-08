@@ -1,5 +1,6 @@
+import { createTokenCache } from "../tokenCache.js";
+
 const FLUSH_DELAY_MS = 60;
-const CACHE_LIMIT = 20000;
 
 export function estimateTokens(text) {
   const length = String(text ?? "").length;
@@ -7,7 +8,7 @@ export function estimateTokens(text) {
 }
 
 export function createTokenizer({ onUpdate } = {}) {
-  const cache = new Map();
+  const cache = createTokenCache();
   const pending = new Map();
   const inflight = new Map();
   let worker = null;
@@ -44,9 +45,7 @@ export function createTokenizer({ onUpdate } = {}) {
       }
 
       job.texts.forEach((text, index) => {
-        if (cache.size < CACHE_LIMIT) {
-          cache.set(text, data.counts[index]);
-        }
+        cache.set(text, data.counts[index]);
       });
 
       ready = true;
@@ -103,7 +102,7 @@ export function createTokenizer({ onUpdate } = {}) {
       onUpdate?.();
     },
     count(text) {
-      return cache.has(text) ? cache.get(text) : null;
+      return cache.get(text);
     },
     request(text) {
       const value = String(text ?? "");
@@ -114,6 +113,9 @@ export function createTokenizer({ onUpdate } = {}) {
 
       pending.set(value, true);
       schedule();
+    },
+    stats() {
+      return cache.stats();
     }
   };
 }

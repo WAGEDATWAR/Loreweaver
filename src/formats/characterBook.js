@@ -1,4 +1,4 @@
-import { copyPreservedFields, isRecord } from "./helpers.js";
+import { buildLossyWarnings, copyPreservedFields, isRecord } from "./helpers.js";
 
 const CHARACTER_BOOK_POSITIONS = new Set(["before_char", "after_char"]);
 
@@ -60,6 +60,8 @@ export const characterBookAdapter = {
     if (fallbackPositions) {
       warnings.push(`${fallbackPositions} ${fallbackPositions === 1 ? "entry used" : "entries used"} a position the character book format doesn't support and ${fallbackPositions === 1 ? "was" : "were"} exported as before the character.`);
     }
+
+    warnings.push(...buildLossyWarnings(book, this.exportLabel || this.label));
 
     return {
       ok: true,

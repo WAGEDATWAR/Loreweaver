@@ -13,8 +13,10 @@ export const EXPORT_FORMATS = adapters
     id: adapter.id,
     label: adapter.exportLabel || adapter.label,
     description: adapter.exportDescription || "",
-    capabilities: { ...adapter.capabilities }
-  }));
+    capabilities: { ...adapter.capabilities },
+    primary: adapter.primary === true
+  }))
+  .sort((left, right) => Number(right.primary) - Number(left.primary));
 
 export function parseLorebookData(input, options = {}) {
   if (!isRecord(input)) {

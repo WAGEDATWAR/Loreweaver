@@ -1,0 +1,30 @@
+{
+  "spec": "lorebook_v3",
+  "spec_version": "3.0",
+  "data": {
+    "id": "wrapped-book",
+    "name": "Wrapped Harbor Book",
+    "description": "A fixture wrapping entries in a Chub lorebook_v3 data block.",
+    "extensions": {
+      "chub": true,
+      "fixture": "wrapped"
+    },
+    "entries": [
+      {
+        "uid": 1,
+        "key": ["harbor"],
+        "comment": "Harbor",
+        "content": "The harbor is quiet before dawn.",
+        "order": 10,
+        "position": 0,
+        "disable": false,
+        "constant": false,
+        "selective": false,
+        "caseSensitive": false,
+        "matchWholeWords": true,
+        "probability": 100,
+        "custom_wrapper_field": "kept"
+      }
+    ]
+  }
+}

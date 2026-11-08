@@ -7,8 +7,10 @@ import {
 } from "./format.js";
 import {
   addBook,
+  addEntriesToSelection,
   addEntry,
   adjustEntriesOrder,
+  applyReplacePlan,
   canRedo,
   canUndo,
   clearSelection,
@@ -20,14 +22,17 @@ import {
   getActiveBook,
   getActiveEntry,
   getEntryFilters,
+  getHistory,
   getSelectedEntryIds,
   getSelectionAnchorId,
   getState,
   getTagFilters,
+  hydrateHistory,
   isSampleProject,
   initStore,
   mergeActiveBookInto,
   moveEntry,
+  onHistoryChange,
   redo,
   renameActiveBook,
   replaceProject,
@@ -56,10 +61,12 @@ import {
   getRevisions,
   getStorageUsage,
   initStorage,
+  loadHistory,
   loadProject,
   loadProjectBackup,
   loadRevision,
   repairRevisions,
+  saveHistory,
   saveProjectBackup,
   saveProjectDetailed,
   saveRevision
@@ -67,6 +74,7 @@ import {
 import { diffProjects } from "./diff.js";
 import { checkProjectIntegrity, repairProject } from "./integrity.js";
 import { MAX_IMPORT_BYTES } from "./limits.js";
+import { parseHistory, serializeHistory } from "./history.js";
 import { IMPORT_STRATEGIES, mergeProject } from "./merge.js";
 import { createSampleProject } from "./sample.js";
 import { createProject, normalizeTagList } from "./schema.js";
@@ -81,6 +89,7 @@ import {
   normalizeTokenSettings
 } from "./settings.js";
 import { SIMULATION_REASONS, simulateContext } from "./simulation.js";
+import { buildActivationGraph } from "./activationGraph.js";
 import { createTokenizer, estimateTokens } from "./tokenizer/client.js";
 import { buildBookOverview } from "./overview.js";
 import { ENTRY_TEMPLATES, buildTemplatePatch, getEntryTemplate } from "./templates.js";
@@ -91,6 +100,8 @@ import { createKeyChips } from "./ui/keyChips.js";
 import { confirmAction, toast } from "./ui/overlays.js";
 import { getVisibleEntryIds, renderSidebar } from "./ui/sidebar.js";
 import { clamp } from "./utils.js";
+import { selectEntriesByTokenSize } from "./bulk.js";
+import { applyReplace, parseReplaceQuery, planReplace } from "./replace.js";
 import { VALIDATION_LABELS, validateBook } from "./validation.js";
 
 const refs = {
@@ -136,6 +147,10 @@ const refs = {
   backupReminder: document.querySelector("#backup-reminder"),
   backupReminderExportBtn: document.querySelector("#backup-reminder-export-btn"),
   backupReminderDismissBtn: document.querySelector("#backup-reminder-dismiss-btn"),
+  sessionSummary: document.querySelector("#session-summary"),
+  sessionSummaryMessage: document.querySelector("#session-summary-message"),
+  sessionSummaryExportBtn: document.querySelector("#session-summary-export-btn"),
+  sessionSummaryDismissBtn: document.querySelector("#session-summary-dismiss-btn"),
   storageUsageTotal: document.querySelector("#storage-usage-total"),
   storageUsageBackend: document.querySelector("#storage-usage-backend"),
   storageUsageProject: document.querySelector("#storage-usage-project"),
@@ -237,6 +252,27 @@ const refs = {
   bulkDisableBtn: document.querySelector("#bulk-disable-btn"),
   bulkDeleteBtn: document.querySelector("#bulk-delete-btn"),
   bulkClearBtn: document.querySelector("#bulk-clear-btn"),
+  bulkSizeBtn: document.querySelector("#bulk-size-btn"),
+  bulkSizeDialog: document.querySelector("#bulk-size-dialog"),
+  bulkSizeMin: document.querySelector("#bulk-size-min"),
+  bulkSizeMax: document.querySelector("#bulk-size-max"),
+  bulkSizeDisabled: document.querySelector("#bulk-size-disabled"),
+  bulkSizeSummary: document.querySelector("#bulk-size-summary"),
+  bulkSizeCancel: document.querySelector("#bulk-size-cancel"),
+  bulkSizeApply: document.querySelector("#bulk-size-apply"),
+  replaceDialog: document.querySelector("#replace-dialog"),
+  replaceFind: document.querySelector("#replace-find"),
+  replaceWith: document.querySelector("#replace-with"),
+  replaceRegex: document.querySelector("#replace-regex"),
+  replaceCase: document.querySelector("#replace-case"),
+  replaceFieldContent: document.querySelector("#replace-field-content"),
+  replaceFieldTitle: document.querySelector("#replace-field-title"),
+  replaceFieldKeys: document.querySelector("#replace-field-keys"),
+  replaceFieldNotes: document.querySelector("#replace-field-notes"),
+  replaceSummary: document.querySelector("#replace-summary"),
+  replaceCancel: document.querySelector("#replace-cancel"),
+  replacePreview: document.querySelector("#replace-preview"),
+  replaceApply: document.querySelector("#replace-apply"),
   bulkOrderDownBtn: document.querySelector("#bulk-order-down"),
   bulkOrderUpBtn: document.querySelector("#bulk-order-up"),
   bulkOrderApplyBtn: document.querySelector("#bulk-order-apply"),
@@ -326,6 +362,7 @@ refs.tokenCount = (text) => tokenizer.count(text);
 refs.requestTokens = (text) => tokenizer.request(text);
 
 let saveTimer = 0;
+let historySaveTimer = 0;
 let saveFailed = false;
 let unsavedChanges = false;
 let projectFileHandle = null;
@@ -344,6 +381,7 @@ const ONBOARDED_KEY = storageKey("onboarded:v1");
 const TOKEN_SETTINGS_KEY = storageKey("token-settings:v1");
 const LAST_BACKUP_KEY = storageKey("last-backup:v1");
 const BACKUP_SNOOZE_KEY = storageKey("backup-reminder-snooze:v1");
+const LAST_SESSION_KEY = storageKey("last-session:v1");
 const BACKUP_REMINDER_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 const BACKUP_SNOOZE_MS = 3 * 24 * 60 * 60 * 1000;
 const SORT_MODES = new Set(["manual", "title", "order", "updated", "enabled"]);
@@ -359,6 +397,7 @@ let sidebarWidth = 0;
 let sidebarWidthMode = "auto";
 let sidebarDrag = null;
 let virtualScrollFrame = 0;
+let sessionStart = null;
 
 function readSortMode() {
   try {
@@ -668,6 +707,89 @@ function hideBackupReminder() {
 function snoozeBackupReminder() {
   writeTimestamp(BACKUP_SNOOZE_KEY);
   hideBackupReminder();
+}
+
+function hideSessionSummary() {
+  if (refs.sessionSummary) {
+    refs.sessionSummary.hidden = true;
+  }
+}
+
+function sessionSummaryText(diff) {
+  const { summary } = diff;
+  const parts = [];
+
+  if (summary.entriesAdded) {
+    parts.push(`${summary.entriesAdded} ${summary.entriesAdded === 1 ? "entry added" : "entries added"}`);
+  }
+
+  if (summary.entriesRemoved) {
+    parts.push(`${summary.entriesRemoved} removed`);
+  }
+
+  if (summary.entriesChanged) {
+    parts.push(`${summary.entriesChanged} edited`);
+  }
+
+  if (summary.booksAdded) {
+    parts.push(`${summary.booksAdded} new ${summary.booksAdded === 1 ? "lorebook" : "lorebooks"}`);
+  }
+
+  if (summary.booksRemoved) {
+    parts.push(`${summary.booksRemoved} ${summary.booksRemoved === 1 ? "lorebook removed" : "lorebooks removed"}`);
+  }
+
+  return parts.join(", ");
+}
+
+function maybeShowSessionSummary() {
+  const record = readSessionRecord();
+
+  if (!record?.text || !refs.sessionSummary) {
+    return;
+  }
+
+  refs.sessionSummaryMessage.textContent = `Your last session ended with changes: ${record.text}.`;
+  refs.sessionSummary.hidden = false;
+}
+
+function readSessionRecord() {
+  try {
+    const raw = localStorage.getItem(LAST_SESSION_KEY);
+
+    if (!raw) {
+      return null;
+    }
+
+    const record = JSON.parse(raw);
+    return record && typeof record.text === "string" ? record : null;
+  } catch {
+    return null;
+  }
+}
+
+function recordSessionChanges() {
+  try {
+    if (!sessionStart || !getState()) {
+      return;
+    }
+
+    const diff = diffProjects(sessionStart, getState());
+
+    if (!diff.hasChanges) {
+      return;
+    }
+
+    const text = sessionSummaryText(diff);
+
+    if (!text) {
+      return;
+    }
+
+    localStorage.setItem(LAST_SESSION_KEY, JSON.stringify({ text, at: Date.now() }));
+  } catch {
+    return;
+  }
 }
 
 function maybeRemindBackup() {
@@ -1049,6 +1171,8 @@ function buildCommands() {
       scheduleSave();
     } },
     { title: "Lorebook actions", keywords: ["duplicate", "merge", "split", "book"], run: openBookActionsDialog },
+    { title: "Select entries by token size", keywords: ["bulk", "select", "tokens", "size"], run: openBulkSizeDialog },
+    { title: "Bulk find and replace", hint: "Ctrl+H", keywords: ["replace", "bulk", "find"], run: openReplaceDialog },
     { title: "Save project", hint: "Ctrl+S", keywords: ["persist"], run: async () => {
       if (await flushSave()) {
         toast("Project saved", "success");
@@ -1119,7 +1243,7 @@ function supportsFileSystemAccess() {
 
 function suggestedProjectFilename() {
   const stamp = new Date().toISOString().slice(0, 10);
-  return `loreweaver-project-${stamp}.json`;
+  return `loreweaver-project-${stamp}.lwproj`;
 }
 
 async function ensureWritePermission(handle) {
@@ -1152,7 +1276,7 @@ function updateFileLabel() {
 
 async function openProjectFile() {
   if (!supportsFileSystemAccess()) {
-    toast("Opening project files isn't supported in this browser.", "error");
+    refs.importInput.click();
     return;
   }
 
@@ -1160,7 +1284,9 @@ async function openProjectFile() {
 
   try {
     [handle] = await window.showOpenFilePicker({
-      types: [{ description: "Loreweaver project", accept: { "application/json": [".json"] } }],
+      types: [
+        { description: "Loreweaver project", accept: { "application/json": [".lwproj", ".json"] } }
+      ],
       multiple: false
     });
   } catch {
@@ -1181,7 +1307,7 @@ async function openProjectFile() {
 
 async function saveProjectFile({ saveAs = false } = {}) {
   if (!supportsFileSystemAccess()) {
-    toast("Saving to a file isn't supported in this browser.", "error");
+    saveProjectDownload();
     return;
   }
 
@@ -1191,7 +1317,9 @@ async function saveProjectFile({ saveAs = false } = {}) {
     if (!handle || saveAs) {
       handle = await window.showSaveFilePicker({
         suggestedName: suggestedProjectFilename(),
-        types: [{ description: "Loreweaver project", accept: { "application/json": [".json"] } }]
+        types: [
+          { description: "Loreweaver project", accept: { "application/json": [".lwproj"] } }
+        ]
       });
     }
 
@@ -1581,6 +1709,7 @@ function renderSimulationResults() {
   }
 
   refs.simulationResults.append(activatedSection);
+  refs.simulationResults.append(createActivationGraph(result));
 
   if (result.injectedText) {
     const section = document.createElement("section");
@@ -1621,6 +1750,72 @@ function renderSimulationResults() {
   }
 }
 
+function createActivationGraph(result) {
+  const graph = buildActivationGraph(result);
+  const section = document.createElement("section");
+  const heading = document.createElement("h3");
+  const legend = document.createElement("div");
+  const wrap = document.createElement("div");
+
+  section.className = "simulation-section";
+  heading.textContent = "Activation graph";
+
+  const legendItems = [
+    { tone: "is-activated", label: `Activated (${graph.activatedTotal})` },
+    { tone: "is-skipped", label: `Inactive (${graph.skippedTotal})` }
+  ];
+
+  legend.className = "simulation-graph-legend";
+
+  for (const item of legendItems) {
+    const entry = document.createElement("span");
+    const swatch = document.createElement("span");
+    swatch.className = `simulation-graph-swatch ${item.tone}`;
+    swatch.setAttribute("aria-hidden", "true");
+    entry.append(swatch, document.createTextNode(item.label));
+    legend.append(entry);
+  }
+
+  wrap.className = "simulation-graph";
+  wrap.setAttribute("role", "img");
+  wrap.setAttribute("aria-label", `${graph.activatedTotal} activated and ${graph.skippedTotal} inactive entries; key bars are sized by title length.`);
+
+  for (const item of graph.activated) {
+    wrap.append(graphRow(item, `#${item.rank}`, false));
+  }
+
+  for (const item of graph.skipped) {
+    wrap.append(graphRow(item, "\u2013", true));
+  }
+
+  if (!graph.activated.length && !graph.skipped.length) {
+    const empty = document.createElement("p");
+    empty.className = "simulation-empty";
+    empty.textContent = "Nothing to graph yet.";
+    wrap.append(empty);
+  }
+
+  section.append(heading, legend, wrap);
+  return section;
+}
+
+function graphRow(item, marker, skipped) {
+  const row = document.createElement("div");
+  const rank = document.createElement("span");
+  const bar = document.createElement("span");
+  const reason = SIMULATION_REASONS[item.reason] ?? item.reason;
+
+  row.className = `simulation-graph-row${skipped ? " is-skipped" : ""}`;
+  rank.className = "simulation-graph-rank";
+  rank.textContent = marker;
+  bar.className = "simulation-graph-bar";
+  bar.style.width = `${item.width}%`;
+  bar.title = `${item.title} \u00b7 ${reason}`;
+  bar.textContent = item.title;
+  row.append(rank, bar);
+  return row;
+}
+
 function openSimulationDialog() {
   renderSimulationResults();
 
@@ -1641,7 +1836,7 @@ function handleSimulationJump(entryId) {
   scheduleSave();
 }
 
-function jumpToValidationEntry(entryId) {
+function jumpToValidationEntry(entryId, field = "") {
   refs.validationDialog.close();
   clearSearch();
   setActiveEntry(entryId);
@@ -1649,6 +1844,12 @@ function jumpToValidationEntry(entryId) {
   scrollEntryCardIntoView(entryId);
   focusEntryCard(entryId);
   scheduleSave();
+
+  if (field) {
+    const target = refs.editorPane.querySelector(`#${field}`);
+    target?.focus({ preventScroll: false });
+    target?.scrollIntoView({ block: "center" });
+  }
 }
 
 function focusEntryCard(id) {
@@ -1753,7 +1954,7 @@ function renderExportOptions() {
       id: format.id,
       title: format.label,
       description: format.description,
-      meta: "Book"
+      meta: format.primary ? "Book \u00b7 primary" : "Book"
     }))
   ];
 
@@ -2071,13 +2272,20 @@ async function openExportDialog() {
 
 function exportProjectBackup() {
   const stamp = new Date().toISOString().slice(0, 10);
-  downloadJson(buildExport(getState()), `loreweaver-project-${stamp}.json`);
+  downloadJson(buildExport(getState()), `loreweaver-project-${stamp}.lwproj`);
   markBackupExported();
   hideBackupReminder();
   toast("Project backup exported", "success");
 }
 
-function handleExport(formatId) {
+function saveProjectDownload() {
+  downloadJson(buildExport(getState()), suggestedProjectFilename());
+  markBackupExported();
+  hideBackupReminder();
+  toast("Project downloaded", "success");
+}
+
+async function handleExport(formatId) {
   if (formatId === "project") {
     exportProjectBackup();
     refs.exportDialog.close();
@@ -2098,13 +2306,26 @@ function handleExport(formatId) {
     return;
   }
 
-  downloadJson(exported.data, exported.filename);
-  refs.exportDialog.close();
-  toast(`Exported ${book.name.trim() || "Untitled Lorebook"} as ${exported.label}`, "success");
-
   if (exported.warnings.length) {
-    toast(exported.warnings[0]);
+    refs.exportDialog.close();
+    const accepted = await confirmAction({
+      title: `Export as ${exported.label}?`,
+      message: "Some fields cannot survive this format. They stay in Loreweaver, but the exported file drops them.",
+      warnings: exported.warnings,
+      confirmLabel: "Export anyway",
+      tone: "primary"
+    });
+
+    if (!accepted) {
+      openExportDialog();
+      return;
+    }
+  } else {
+    refs.exportDialog.close();
   }
+
+  downloadJson(exported.data, exported.filename);
+  toast(`Exported ${book.name.trim() || "Untitled Lorebook"} as ${exported.label}`, "success");
 }
 
 async function handleRestoreBackup() {
@@ -2479,8 +2700,192 @@ function handleBulkEnabled(enabled) {
   toast(`${changed} ${changed === 1 ? "entry" : "entries"} ${enabled ? "enabled" : "disabled"}`, "success");
 }
 
-function handleBulkOrderSet() {
-  const ids = getSelectedEntryIds();
+function renderBulkSizeSummary() {
+  const book = getActiveBook();
+  const min = Number(refs.bulkSizeMin.value) || 0;
+  const max = refs.bulkSizeMax.value === "" ? null : Number(refs.bulkSizeMax.value);
+  const matches = selectEntriesByTokenSize(book, {
+    min,
+    max,
+    includeDisabled: refs.bulkSizeDisabled.checked,
+    tokenCount: (text) => tokenizer.count(text)
+  });
+
+  refs.bulkSizeSummary.textContent = matches.length
+    ? `${matches.length} ${matches.length === 1 ? "entry matches" : "entries match"} this range.`
+    : "No entries match this range.";
+  refs.bulkSizeApply.disabled = matches.length === 0;
+  return matches;
+}
+
+function openBulkSizeDialog() {
+  refs.bulkSizeMin.value = "0";
+  refs.bulkSizeMax.value = "";
+  refs.bulkSizeDisabled.checked = true;
+  renderBulkSizeSummary();
+  refs.bulkSizeDialog.showModal();
+  refs.bulkSizeMin.focus();
+  refs.bulkSizeMin.select();
+}
+
+function handleBulkSizeApply() {
+  const matches = renderBulkSizeSummary();
+
+  if (!matches.length) {
+    return;
+  }
+
+  const added = addEntriesToSelection(matches.map((entry) => entry.id));
+  refs.bulkSizeDialog.close();
+  clearSearch();
+  renderAll();
+  toast(`Added ${added} ${added === 1 ? "entry" : "entries"} to the selection`, "success");
+}
+
+function replaceFields() {
+  const fields = [];
+
+  if (refs.replaceFieldContent.checked) {
+    fields.push("content");
+  }
+
+  if (refs.replaceFieldTitle.checked) {
+    fields.push("title");
+  }
+
+  if (refs.replaceFieldNotes.checked) {
+    fields.push("notes");
+  }
+
+  if (refs.replaceFieldKeys.checked) {
+    fields.push("keys");
+  }
+
+  return fields;
+}
+
+function replaceQuery() {
+  return parseReplaceQuery({
+    find: refs.replaceFind.value,
+    replacement: refs.replaceWith.value,
+    regex: refs.replaceRegex.checked,
+    caseSensitive: refs.replaceCase.checked
+  });
+}
+
+function replaceTargets() {
+  const selected = getSelectedEntryIds();
+  return selected.length ? selected : null;
+}
+
+function currentReplacePlan() {
+  const parsed = replaceQuery();
+
+  if (!parsed.ok) {
+    return { ok: false, error: parsed.error };
+  }
+
+  const fields = replaceFields();
+
+  if (!fields.length) {
+    return { ok: false, error: "Pick at least one field to search." };
+  }
+
+  const plan = planReplace(getActiveBook(), parsed.query, {
+    fields,
+    onlySelected: replaceTargets()
+  });
+
+  return { ok: true, plan, query: parsed.query };
+}
+
+function updateReplaceControls() {
+  const parsed = replaceQuery();
+  const ready = parsed.ok && replaceFields().length > 0;
+
+  refs.replacePreview.disabled = !ready;
+  refs.replaceApply.disabled = !ready;
+  refs.replaceSummary.textContent = parsed.ok
+    ? replaceFields().length
+      ? "Preview the matches before replacing."
+      : "Pick at least one field to search."
+    : parsed.error;
+}
+
+function openReplaceDialog() {
+  refs.replaceFind.value = "";
+  refs.replaceWith.value = "";
+  refs.replaceRegex.checked = false;
+  refs.replaceCase.checked = false;
+  refs.replaceFieldContent.checked = true;
+  refs.replaceFieldTitle.checked = false;
+  refs.replaceFieldKeys.checked = false;
+  refs.replaceFieldNotes.checked = false;
+  updateReplaceControls();
+  refs.replaceDialog.showModal();
+  refs.replaceFind.focus();
+}
+
+function replaceScopeLabel() {
+  const selected = getSelectedEntryIds();
+  return selected.length ? `the ${selected.length} selected ${selected.length === 1 ? "entry" : "entries"}` : "the whole lorebook";
+}
+
+async function previewReplace() {
+  const result = currentReplacePlan();
+
+  if (!result.ok) {
+    refs.replaceSummary.textContent = result.error;
+    return;
+  }
+
+  if (!result.plan.entryCount) {
+    refs.replaceSummary.textContent = `No matches in ${replaceScopeLabel()}.`;
+    return;
+  }
+
+  const before = getActiveBook();
+  const after = structuredClone(before);
+  applyReplace(after, result.plan);
+
+  const accepted = await showDiffDialog({
+    eyebrow: "Bulk replace",
+    title: "Review replacements",
+    message: `${result.plan.totalMatches} ${result.plan.totalMatches === 1 ? "match" : "matches"} across ${result.plan.entryCount} ${result.plan.entryCount === 1 ? "entry" : "entries"} in ${replaceScopeLabel()}.`,
+    diff: diffProjects(
+      { books: [before], activeBookId: before.id, activeEntryId: null },
+      { books: [after], activeBookId: after.id, activeEntryId: null }
+    ),
+    confirmLabel: "Replace",
+    cancelLabel: "Back",
+    tone: "primary"
+  });
+
+  if (accepted) {
+    refs.replaceDialog.close();
+    handleReplaceApply(result);
+  }
+}
+
+function handleReplaceApply(result = currentReplacePlan()) {
+  if (!result.ok) {
+    refs.replaceSummary.textContent = result.error;
+    return;
+  }
+
+  const touched = applyReplacePlan(result.plan);
+
+  if (!touched) {
+    toast("No matches to replace.");
+    return;
+  }
+
+  renderAll();
+  scheduleSave();
+  toast(`Replaced ${result.plan.totalMatches} ${result.plan.totalMatches === 1 ? "match" : "matches"} in ${touched} ${touched === 1 ? "entry" : "entries"}`, "success");
+}
+
+function handleBulkOrderSet() {  const ids = getSelectedEntryIds();
 
   if (!ids.length) {
     return;
@@ -3086,6 +3491,66 @@ refs.duplicateEntryBtn.addEventListener("click", () => {
   handleDuplicateEntry();
 });
 
+refs.bulkSizeBtn.addEventListener("click", () => {
+  openBulkSizeDialog();
+});
+
+for (const input of [refs.bulkSizeMin, refs.bulkSizeMax, refs.bulkSizeDisabled]) {
+  input.addEventListener("input", renderBulkSizeSummary);
+  input.addEventListener("change", renderBulkSizeSummary);
+}
+
+refs.bulkSizeCancel.addEventListener("click", () => {
+  refs.bulkSizeDialog.close();
+});
+
+refs.bulkSizeApply.addEventListener("click", handleBulkSizeApply);
+
+refs.bulkSizeDialog.addEventListener("click", (event) => {
+  if (event.target === refs.bulkSizeDialog) {
+    refs.bulkSizeDialog.close();
+  }
+});
+
+refs.replaceDialog.addEventListener("click", (event) => {
+  if (event.target === refs.replaceDialog) {
+    refs.replaceDialog.close();
+  }
+});
+
+for (const input of [
+  refs.replaceFind,
+  refs.replaceWith,
+  refs.replaceRegex,
+  refs.replaceCase,
+  refs.replaceFieldContent,
+  refs.replaceFieldTitle,
+  refs.replaceFieldKeys,
+  refs.replaceFieldNotes
+]) {
+  input.addEventListener("input", updateReplaceControls);
+  input.addEventListener("change", updateReplaceControls);
+}
+
+refs.replaceFind.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !refs.replacePreview.disabled) {
+    event.preventDefault();
+    previewReplace();
+  }
+});
+
+refs.replaceCancel.addEventListener("click", () => {
+  refs.replaceDialog.close();
+});
+
+refs.replacePreview.addEventListener("click", () => {
+  previewReplace();
+});
+
+refs.replaceApply.addEventListener("click", () => {
+  handleReplaceApply();
+});
+
 refs.entryTitle.addEventListener("input", (event) => {
   updateActiveEntry({ title: event.target.value });
   renderSidebar(refs);
@@ -3465,6 +3930,14 @@ refs.backupReminderDismissBtn.addEventListener("click", () => {
   snoozeBackupReminder();
 });
 
+refs.sessionSummaryExportBtn.addEventListener("click", () => {
+  exportProjectBackup();
+});
+
+refs.sessionSummaryDismissBtn.addEventListener("click", () => {
+  hideSessionSummary();
+});
+
 refs.storageExportBtn.addEventListener("click", () => {
   exportProjectBackup();
 });
@@ -3570,7 +4043,7 @@ refs.validationIssues.addEventListener("click", (event) => {
   const issue = event.target.closest("[data-entry-id]");
 
   if (issue) {
-    jumpToValidationEntry(issue.dataset.entryId);
+    jumpToValidationEntry(issue.dataset.entryId, issue.dataset.field);
   }
 });
 
@@ -3602,6 +4075,12 @@ document.addEventListener("keydown", async (event) => {
   if (modifier && event.shiftKey && !event.altKey && key === "f") {
     event.preventDefault();
     openGlobalSearchDialog();
+    return;
+  }
+
+  if (modifier && !event.shiftKey && !event.altKey && key === "h") {
+    event.preventDefault();
+    openReplaceDialog();
     return;
   }
 
@@ -3666,6 +4145,8 @@ document.addEventListener("keydown", async (event) => {
 });
 
 window.addEventListener("beforeunload", (event) => {
+  recordSessionChanges();
+
   if (unsavedChanges || saveFailed) {
     event.preventDefault();
     event.returnValue = "";
@@ -3674,6 +4155,7 @@ window.addEventListener("beforeunload", (event) => {
 
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") {
+    recordSessionChanges();
     flushSave();
   }
 });
@@ -3686,7 +4168,17 @@ setDetailsCollapsed(storedDetailsState ?? window.matchMedia("(max-width: 720px)"
 const storedSidebarState = readSidebarState();
 setSidebarCollapsed(storedSidebarState ?? false, false);
 
-initStore(await loadProject());
+const persistedHistory = parseHistory(await loadHistory());
+const loadedProject = await loadProject();
+initStore(loadedProject, { history: persistedHistory });
+sessionStart = structuredClone(loadedProject);
+onHistoryChange(() => {
+  updateHistoryButtons();
+  window.clearTimeout(historySaveTimer);
+  historySaveTimer = window.setTimeout(() => {
+    saveHistory(serializeHistory(getHistory()));
+  }, 500);
+});
 
 const initialSortMode = readSortMode();
 
@@ -3733,10 +4225,15 @@ if (initialSave.ok) {
   showStorageBanner(initialSave);
 }
 
+refs.saveFileBtn.hidden = false;
+
 if (supportsFileSystemAccess()) {
   refs.openFileBtn.hidden = false;
-  refs.saveFileBtn.hidden = false;
+} else {
+  refs.saveFileBtn.title = "Download the project as a file";
+  refs.saveFileBtn.setAttribute("aria-label", "Download project file");
 }
 
 maybeRemindBackup();
+maybeShowSessionSummary();
 maybeShowOnboarding();

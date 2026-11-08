@@ -41,6 +41,7 @@ C = context, U = surface.
 | A-4 | **Single-book export is the primary flow**; a full project export is a backup. | locked |
 | A-5 | **Internal ids are stable and opaque**; `entry_`/`book_` prefixes, never reused. | locked |
 | A-6 | **Frontend quirks belong in adapters**, never in the canonical model. | locked |
+| A-7 | **SillyTavern World Info v2 is the primary v1 export target.** It sorts first, is marked primary, and carries the most complete round-trip. | locked |
 
 ## Editor (E-series)
 
@@ -102,3 +103,4 @@ migration of the `lorebook-studio` namespace on load. | locked |
 | U-4 | **The library auto-fits 200-460 px and collapses to a 50 px rail**; width persists. | locked |
 | U-5 | **`prefers-reduced-motion` disables animation.** | locked |
 | U-6 | **Icon-only buttons carry `aria-label` and `title`.** | locked |
+

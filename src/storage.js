@@ -15,6 +15,7 @@ export const STORAGE_KEY = storageKey("project:v1");
 export const BACKUP_KEY = storageKey("pre-import-backup:v1");
 export const REVISIONS_KEY = storageKey("revisions:v1");
 export const REVISION_KEY_PREFIX = storageKey("revision:v1:");
+export const HISTORY_KEY = storageKey("history:v1");
 
 const REVISION_LIMIT = 12;
 const REVISION_CHAR_BUDGET = 1_500_000;
@@ -110,6 +111,7 @@ function isManagedKey(key) {
   return currentKey === STORAGE_KEY
     || currentKey === BACKUP_KEY
     || currentKey === REVISIONS_KEY
+    || currentKey === HISTORY_KEY
     || currentKey.startsWith(REVISION_KEY_PREFIX);
 }
 
@@ -313,7 +315,7 @@ async function readBackupPayload() {
   }
 }
 
-export async function loadProject() {
+export async function loadProject(state) {
   try {
     const raw = await getBackend().get(STORAGE_KEY);
 
@@ -329,6 +331,36 @@ export async function loadProject() {
   }
 
   return createSampleProject();
+}
+
+export async function loadHistory() {
+  try {
+    return await getBackend().get(HISTORY_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export async function saveHistory(serialized) {
+  return enqueue(async () => {
+    try {
+      await getBackend().set(HISTORY_KEY, serialized);
+      return { ok: true };
+    } catch {
+      return { ok: false };
+    }
+  });
+}
+
+export async function clearHistory() {
+  return enqueue(async () => {
+    try {
+      await getBackend().remove(HISTORY_KEY);
+      return { ok: true };
+    } catch {
+      return { ok: false };
+    }
+  });
 }
 
 export async function saveProjectDetailed(state) {

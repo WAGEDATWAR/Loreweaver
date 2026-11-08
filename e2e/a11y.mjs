@@ -86,6 +86,29 @@ const states = [
     await page.click("#about-guide-btn");
     await page.waitFor('document.querySelector("#guide-dialog")?.open');
   } },
+  { name: "replace dialog", setup: async (page) => {
+    await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "h", ctrlKey: true, bubbles: true, cancelable: true })); true');
+    await page.waitFor('document.querySelector("#replace-dialog")?.open');
+  } },
+  { name: "session summary banner", setup: async (page) => {
+    await page.evaluate(`(() => {
+      localStorage.setItem("loreweaver:last-session:v1", JSON.stringify({ text: "1 entry added", at: Date.now() }));
+      return true;
+    })()`);
+    await page.reload();
+    await page.waitFor('document.querySelector("#book-name")?.value');
+    await page.waitFor('document.querySelector("#session-summary")?.hidden === false');
+  } },
+  { name: "bulk size dialog", setup: async (page) => {
+    await page.evaluate(`(() => {
+      const card = document.querySelector(".entry-card");
+      card.dispatchEvent(new MouseEvent("click", { bubbles: true, ctrlKey: true }));
+      return true;
+    })()`);
+    await page.waitFor('document.querySelector("#bulk-bar")?.hidden === false');
+    await page.click("#bulk-size-btn");
+    await page.waitFor('document.querySelector("#bulk-size-dialog")?.open');
+  } },
   { name: "confirm dialog", setup: async (page) => {
     await page.click("#delete-entry-btn");
     await page.waitFor('document.querySelector("#confirm-dialog")?.open');

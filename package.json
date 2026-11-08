@@ -1,6 +1,6 @@
 {
   "name": "loreweaver",
-  "version": "0.7.4",
+  "version": "0.8.0",
   "private": true,
   "type": "module",
   "description": "A local-first web editor for LLM roleplay lorebooks.",
@@ -12,6 +12,11 @@
     "test:all": "npm test && npm run test:e2e",
     "a11y": "node --no-warnings e2e/a11y.mjs",
     "benchmark": "node scripts/benchmark.mjs",
+    "bundle": "node scripts/bundle.mjs",
+    "apk": "node scripts/build.mjs",
+    "apk:debug": "node scripts/build.mjs --variant debug",
+    "apk:install": "node scripts/build.mjs --variant debug --install",
+    "apk:dry": "node scripts/build.mjs --dry-run",
     "deferrals": "node scripts/deferrals.mjs",
     "deferral-scan": "node scripts/deferral-scan.mjs",
     "check": "node scripts/check.mjs",
@@ -21,7 +26,12 @@
     "release:check": "node scripts/release-check.mjs"
   },
   "devDependencies": {
+    "@capacitor/android": "^6.2.3",
+    "@capacitor/cli": "^6.2.3",
+    "@capacitor/core": "^6.2.3",
     "axe-core": "^4.14.0",
     "gpt-tokenizer": "^4.1.0"
   }
 }
+
+

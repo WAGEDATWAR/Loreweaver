@@ -300,6 +300,23 @@ test("round-trips a Chub lorebook fixture with dual fields", () => {
   );
 });
 
+test("imports a wrapped lorebook_v3 data block and preserves its wrapper fields", () => {
+  const imported = parseProject(readFixture("chub-wrapped-lorebook-v3.json"), {
+    filename: "chub-wrapped-lorebook-v3.json"
+  });
+
+  assert.equal(imported.ok, true);
+  assert.equal(imported.formatId, "chub");
+
+  const book = imported.project.books[0];
+  assert.equal(book.name, "Wrapped Harbor Book");
+  assert.equal(book.entries.length, 1);
+  assert.equal(book.entries[0].content, "The harbor is quiet before dawn.");
+  assert.deepEqual(book.entries[0].keys, ["harbor"]);
+  assert.equal(book.entries[0].extensions.sourceFields.custom_wrapper_field, "kept");
+  assert.equal(book.extensions.sourceFields.id, "wrapped-book");
+});
+
 test("exports one active book as a native project and reimports it", () => {
   const imported = parseProject(readFixture("sillytavern-world-info.json"));
   const book = imported.project.books[0];
@@ -381,15 +398,55 @@ test("falls back unsupported character book positions to before the character", 
 
   assert.equal(exported.ok, true);
   assert.equal(exported.data.entries[0].position, "before_char");
-  assert.equal(exported.warnings.length, 1);
-  assert.match(exported.warnings[0], /doesn't support/);
+  assert.ok(exported.warnings.length >= 1);
+  assert.ok(exported.warnings.some((warning) => /doesn't support/.test(warning)));
+});
+
+test("warns that tags and notes do not survive interchange formats", () => {
+  const project = createProject({
+    books: [{
+      name: "Tagged",
+      tags: ["campaign"],
+      entries: [{
+        title: "Tagged entry",
+        keys: ["tagged"],
+        content: "Body",
+        notes: "Author only",
+        tags: ["actor"]
+      }]
+    }]
+  });
+  const book = project.books[0];
+
+  for (const formatId of ["sillytavern", "chub", "characterbook"]) {
+    const exported = serializeLorebook(formatId, book);
+    assert.equal(exported.ok, true);
+    assert.ok(exported.warnings.some((warning) => /Lorebook tags/.test(warning)), formatId);
+    assert.ok(exported.warnings.some((warning) => /author note/i.test(warning)), formatId);
+  }
+});
+
+test("native export stays lossless and warning-free", () => {
+  const project = createProject({
+    books: [{
+      name: "Tagged",
+      tags: ["campaign"],
+      entries: [{ title: "Tagged entry", keys: ["tagged"], content: "Body", notes: "Author only", tags: ["actor"] }]
+    }]
+  });
+  const exported = serializeLorebook("native", project.books[0]);
+
+  assert.equal(exported.ok, true);
+  assert.deepEqual(exported.warnings, []);
 });
 
 test("publishes export capabilities for every book format", () => {
   assert.deepEqual(
     EXPORT_FORMATS.map((format) => format.id),
-    ["native", "chub", "sillytavern", "characterbook"]
+    ["sillytavern", "native", "chub", "characterbook"]
   );
+  assert.equal(EXPORT_FORMATS[0].primary, true);
+  assert.equal(EXPORT_FORMATS.filter((format) => format.primary).length, 1);
 
   for (const format of EXPORT_FORMATS) {
     assert.equal(format.capabilities.bookExport, true);

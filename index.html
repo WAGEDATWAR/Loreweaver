@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b0d12">
-  <meta name="app-version" content="0.7.4">
+  <meta name="app-version" content="0.8.0">
   <meta name="description" content="A local-first editor for lorebooks used in LLM roleplay frontends.">
   <title>Loreweaver</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
@@ -120,6 +120,21 @@
       <div class="storage-banner-actions">
         <button id="backup-reminder-export-btn" class="btn btn-primary" type="button">Export backup</button>
         <button id="backup-reminder-dismiss-btn" class="icon-btn" type="button" aria-label="Dismiss backup reminder" title="Dismiss">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path d="m6 6 12 12"/><path d="m18 6-12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="session-summary" class="storage-banner is-info" role="status" hidden>
+      <div class="storage-banner-text">
+        <strong>Since your last session</strong>
+        <span id="session-summary-message"></span>
+      </div>
+      <div class="storage-banner-actions">
+        <button id="session-summary-export-btn" class="btn" type="button">Export backup</button>
+        <button id="session-summary-dismiss-btn" class="icon-btn" type="button" aria-label="Dismiss session summary" title="Dismiss">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
             <path d="m6 6 12 12"/><path d="m18 6-12 12"/>
           </svg>
@@ -277,6 +292,11 @@
               <button id="bulk-clear-btn" class="icon-btn" type="button" title="Clear selection" aria-label="Clear selection">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
                   <path d="m6 6 12 12"/><path d="M18 6 6 18"/>
+                </svg>
+              </button>
+              <button id="bulk-size-btn" class="icon-btn" type="button" title="Select entries by token size" aria-label="Select entries by token size">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19V3"/>
                 </svg>
               </button>
             </div>
@@ -743,6 +763,88 @@
     </div>
   </dialog>
 
+  <dialog id="replace-dialog" class="dialog replace-dialog" aria-labelledby="replace-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading">
+        <p class="eyebrow">Bulk replace</p>
+        <h2 id="replace-title">Find and replace</h2>
+        <p class="dialog-copy">Replace across the active lorebook, or the current selection when there is one. A preview follows before anything changes.</p>
+      </div>
+      <div class="field">
+        <label for="replace-find">Find</label>
+        <input id="replace-find" type="text" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="replace-with">Replace with</label>
+        <input id="replace-with" type="text" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="field-grid">
+        <label class="chip" for="replace-regex">
+          <input id="replace-regex" type="checkbox">
+          <span>Regular expression</span>
+        </label>
+        <label class="chip" for="replace-case">
+          <input id="replace-case" type="checkbox">
+          <span>Match case</span>
+        </label>
+      </div>
+      <fieldset class="replace-fields">
+        <legend>Search in</legend>
+        <label class="chip" for="replace-field-content">
+          <input id="replace-field-content" type="checkbox" checked>
+          <span>Content</span>
+        </label>
+        <label class="chip" for="replace-field-title">
+          <input id="replace-field-title" type="checkbox">
+          <span>Titles</span>
+        </label>
+        <label class="chip" for="replace-field-keys">
+          <input id="replace-field-keys" type="checkbox">
+          <span>Trigger keys</span>
+        </label>
+        <label class="chip" for="replace-field-notes">
+          <input id="replace-field-notes" type="checkbox">
+          <span>Notes</span>
+        </label>
+      </fieldset>
+      <p id="replace-summary" class="hint" aria-live="polite">Enter a search term to preview matches.</p>
+      <div class="dialog-actions">
+        <button id="replace-cancel" class="btn" type="button">Cancel</button>
+        <button id="replace-preview" class="btn" type="button" disabled>Preview</button>
+        <button id="replace-apply" class="btn btn-primary" type="button" disabled>Replace all</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="bulk-size-dialog" class="dialog bulk-size-dialog" aria-labelledby="bulk-size-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading">
+        <p class="eyebrow">Bulk selection</p>
+        <h2 id="bulk-size-title">Select entries by token size</h2>
+        <p class="dialog-copy">Pick a token range. Matches join the current selection, longest first.</p>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="bulk-size-min">At least (tokens)</label>
+          <input id="bulk-size-min" type="number" min="0" step="10" value="0">
+        </div>
+        <div class="field">
+          <label for="bulk-size-max">At most (tokens)</label>
+          <input id="bulk-size-max" type="number" min="0" step="10" placeholder="No limit">
+        </div>
+      </div>
+      <label class="chip bulk-size-disabled" for="bulk-size-disabled">
+        <input id="bulk-size-disabled" type="checkbox" checked>
+        <span>Include disabled entries</span>
+      </label>
+      <p id="bulk-size-summary" class="hint" aria-live="polite"></p>
+      <div class="dialog-actions">
+        <button id="bulk-size-cancel" class="btn" type="button">Cancel</button>
+        <button id="bulk-size-apply" class="btn btn-primary" type="button">Add to selection</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog id="token-settings-dialog" class="dialog token-settings-dialog" aria-labelledby="token-settings-title">
     <div class="dialog-inner">
       <div class="dialog-heading">
@@ -855,7 +957,7 @@
 
   <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
 
-  <input id="import-input" type="file" accept=".json,application/json" hidden>
+  <input id="import-input" type="file" accept=".json,.lwproj,application/json" hidden>
 
   <script type="module" src="./src/main.js"></script>
 </body>

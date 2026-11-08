@@ -95,6 +95,19 @@ test("reports insertion-order collisions for every affected entry", () => {
 
   assert.deepEqual(issues.map((issue) => issue.entryId), ["entry_one", "entry_two"]);
   assert.match(issues[0].message, /order 50 is shared by 2 entries/);
+  assert.equal(issues[0].field, "entry-order");
+});
+
+test("every issue names the field to focus", () => {
+  const book = createBook([
+    { id: "entry_empty", title: "Empty", content: "", keys: [], order: 10 },
+    { id: "entry_regex", title: "Regex", content: "Body", keys: ["/[bad/"], order: 10 }
+  ]);
+
+  for (const issue of validateBook(book)) {
+    assert.ok(issue.field, `${issue.code} has a field target`);
+    assert.match(issue.field, /^entry-(content|keys-input|order)$/);
+  }
 });
 
 test("returns no issues for a complete book", () => {

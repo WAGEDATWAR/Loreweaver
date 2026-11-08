@@ -47,3 +47,10 @@ jobs:
 
       - name: Deferral ledger
         run: npm run deferrals
+
+      - name: Web bundle assembles
+        run: npm run bundle
+
+      - name: APK tooling wiring
+        run: npm run apk:dry
+

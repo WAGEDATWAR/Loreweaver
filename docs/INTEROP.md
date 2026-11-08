@@ -11,7 +11,8 @@ native projects all round-trip their fixtures.
 
 ## 1. Implemented targets
 
-1. SillyTavern World Info JSON (standalone lorebook import and export).
+1. SillyTavern World Info JSON (standalone lorebook import and export). **The primary v1 export target**,
+   sorted first in the export dialog and marked primary.
 2. Chub lorebook import and export.
 3. `lorebook_v3` character-book import.
 4. Native Loreweaver project backup plus single-book native export.
@@ -76,6 +77,10 @@ back to the same source format.
 A new adapter is not done until: the fixture round-trips unknown fields intact, detection beats the
 other adapters for its file, a lossy field emits a warning, and `npm test` covers all three.
 
+Tags and author notes never survive an interchange format, so every serializer emits those two warnings
+(`buildLossyWarnings` in `formats/helpers.js`) and the export dialog confirms before the file downloads.
+Native export stays silent because it drops nothing.
+
 ## 5. Import safety
 
 - Size and schema limits (25 MB, 1000 lorebooks, 50,000 entries) reject oversized files before parsing.
@@ -84,6 +89,7 @@ other adapters for its file, a lossy field emits a warning, and `npm test` cover
 - Merge strategies: replace the project, append to lorebooks matched by name, or merge entries matched
   by title. The diff and confirm label update live when the strategy changes.
 - Duplicate source UIDs are remapped on import.
+- Project files use the `.lwproj` extension and still accept `.json` (DEF-025).
 
 ## 6. Known gaps
 
@@ -91,5 +97,6 @@ other adapters for its file, a lossy field emits a warning, and `npm test` cover
 - Chub wrapper variants beyond `lorebook_v3` are not covered (DEF-013).
 - RisuAI-native export is not supported (DEF-014).
 - Advanced Chub and SillyTavern fields are preserved but not editable (DEF-015).
-- Current serializers fulfil the warning contract but emit few lossy-field warnings (DEF-016).
 - Import does not yet offer a JSON/YAML plain export for scripting (DEF-017).
+
+

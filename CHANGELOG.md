@@ -4,19 +4,39 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-08
+
+Mobile preview builds, bulk authoring tools and the completed scale phase.
+
+**Milestone preview APK:** `android/dist/loreweaver-preview_debug_20261108-032416_375066a.apk`
+(build 26, version 0.8.0).
+
 ### Added
 
 - A virtualized entry list above 120 rows: only the visible window plus an overscan renders, with a
   pure `src/windowing.js` module and `test/windowing.test.js`. Focus, keyboard navigation and reordering
   still work across the full list.
-- `npm run benchmark` (2,000-entry filter, sort, overview and window pass against a 250 ms budget),
-  wired into CI, plus a 2,000-entry browser scenario.
+- `npm run benchmark` now runs 2,000-entry, 500,000-character and 5,000-entry profiles against budgets,
+  wired into CI, plus browser scenarios for the 2,000-entry window.
+- Bulk find and replace (`Ctrl+H`) with field targets, a match preview through the diff dialog, and undo.
+- Select-by-token-size dialog feeding the bulk bar, with the bulk size summary.
+- A ranked activation graph, legend and inactive rows in the context simulation.
+- Undo and redo history that survives a reload, bounded to 20 steps in `src/history.js`.
+- A session summary banner listing what changed since the last session.
+- `.lwproj` project files; `.json` projects still import.
+- Lossy-export warnings for tags and author notes, confirmed before an interchange export downloads.
+- A milestone preview APK pipeline (`npm run apk`, `docs/MOBILE-PREVIEW.md`), a share-targeted bundle
+  script and a mobile safe-area pass.
 - A lorebook actions dialog to duplicate, split, and merge lorebooks, with id and source-UID remapping on merge.
 - `AGENTS.md`, `DOCUMENTATION-INDEX.md`, `DECISIONS.md`, and `DEFERRALS.md`, plus owned topic docs under `docs/` (`LOREWEAVER`, `ARCHITECTURE`, `EDITOR`, `INTEROP`, `PERSISTENCE`, `CONTEXT`, `UI`) and reference notes under `docs/reference/`.
 - `npm run deferrals` (ledger check) and `npm run deferral-scan` (prose check), with the ledger gate wired into CI.
 
 ### Changed
 
+- Token counts are cached by content in a bounded LRU (`src/tokenCache.js`) and survive re-renders.
+- SillyTavern World Info v2 is the primary export target and sorts first in the export dialog.
+- Validation issues focus the offending field, not only the entry.
+- Saving and opening fall back to a download and the file picker without File System Access.
 - Renamed the product from Lorebook Studio to Loreweaver across the UI, docs, package metadata, and export filenames. Stored projects, backups, revisions, UI preferences, and IndexedDB data migrate from the old `lorebook-studio` namespace on load, and legacy native files still import.
 - Reshaped `PLAN.md` to workflow and gate discipline; the charter, architecture, and topic detail moved into their owning docs.
 - Reorganized `TODO.md` around phases with gates and a deferral cross-reference.
@@ -181,3 +201,5 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 - Canonical project, book, and entry schema.
 - Native project import/export, single-book export, and pre-import backups.
 - Search, autosave, sample project, and the dark application shell.
+
+

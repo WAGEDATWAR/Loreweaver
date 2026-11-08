@@ -12,12 +12,15 @@ import {
   getActiveBook,
   getActiveEntry,
   getEntryFilters,
+  getHistory,
   getSelectedEntryIds,
+  getSelectionAnchorId,
   getState,
   getTagFilters,
   initStore,
   mergeActiveBookInto,
   moveEntry,
+  onHistoryChange,
   redo,
   replaceProject,
   selectEntryRange,
@@ -76,6 +79,35 @@ function createTestProject() {
     ]
   });
 }
+
+test("hydrates and reports persisted history", () => {
+  const project = createTestProject();
+  const pastSnapshot = {
+    activeBookId: project.activeBookId,
+    activeEntryId: project.activeEntryId,
+    books: project.books.map((book) => ({ ...book, entries: book.entries.map((entry) => ({ ...entry, title: "Old title" })) }))
+  };
+
+  initStore(project, { history: { past: [pastSnapshot], future: [] } });
+  assert.equal(canUndo(), true);
+  assert.equal(undo(), true);
+  assert.equal(getActiveEntry().title, "Old title");
+
+  const history = getHistory();
+  assert.equal(history.past.length, 0);
+  assert.equal(history.future.length, 1);
+});
+
+test("notifies on history changes", () => {
+  initStore(createTestProject());
+  const seen = [];
+  onHistoryChange((canUndoNow, canRedoNow) => seen.push([canUndoNow, canRedoNow]));
+  updateActiveEntry({ title: "Change" });
+  undo();
+
+  assert.deepEqual(seen[0], [true, false]);
+  assert.deepEqual(seen[1], [false, true]);
+});
 
 test("undoes and redoes entry edits", () => {
   initStore(createTestProject());

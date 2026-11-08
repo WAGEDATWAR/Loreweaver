@@ -259,6 +259,27 @@ export function collectSourceFields(entry) {
   return fields;
 }
 
+export function buildLossyWarnings(book, formatLabel) {
+  const warnings = [];
+  const entries = book?.entries ?? [];
+  const taggedEntries = entries.filter((entry) => entry.tags?.length).length;
+  const notedEntries = entries.filter((entry) => String(entry.notes ?? "").trim()).length;
+
+  if (book?.tags?.length) {
+    warnings.push(`Lorebook tags (${book.tags.length}) are not part of ${formatLabel} and will be dropped.`);
+  }
+
+  if (taggedEntries) {
+    warnings.push(`${taggedEntries} ${taggedEntries === 1 ? "entry keeps its tags" : "entries keep their tags"} only in Loreweaver; ${formatLabel} drops them.`);
+  }
+
+  if (notedEntries) {
+    warnings.push(`${notedEntries} ${notedEntries === 1 ? "author note is" : "author notes are"} excluded from ${formatLabel} exports.`);
+  }
+
+  return warnings;
+}
+
 function unwrapFilename(filename) {
   if (!filename) {
     return "";

@@ -368,6 +368,58 @@ export const scenarios = [
     }
   },
   {
+    name: "bulk replaces with a preview and undo",
+    async run(page) {
+      await resetApp(page);
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "h", ctrlKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('document.querySelector("#replace-dialog")?.open');
+
+      await setValue(page, "#replace-find", "harbor");
+      await setValue(page, "#replace-with", "port");
+      await page.waitFor('document.querySelector("#replace-preview")?.disabled === false');
+      await page.click("#replace-preview");
+      await page.waitFor('document.querySelector("#diff-dialog")?.open');
+
+      const message = await page.evaluate('document.querySelector("#diff-message").textContent');
+      assert.match(message, /matches? across/);
+      await page.click("#diff-accept");
+      await page.waitFor('!document.querySelector("#replace-dialog")?.open');
+
+      await page.waitFor('document.querySelector("#entry-content")?.value.includes("port bells")');
+      assert.ok(!(await page.evaluate('[...document.querySelectorAll("#entry-content")].some((node) => node.value.includes("harbor bells"))')));
+
+      await page.click("#undo-btn");
+      await page.waitFor('document.querySelector("#entry-content")?.value.includes("harbor bells")');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "selects entries by token size into the bulk selection",
+    async run(page) {
+      await resetApp(page);
+
+      await page.evaluate(`(() => {
+        const card = document.querySelector(".entry-card");
+        card.dispatchEvent(new MouseEvent("click", { bubbles: true, ctrlKey: true }));
+        return true;
+      })()`);
+      await page.waitFor('document.querySelector("#bulk-bar")?.hidden === false');
+      await page.click("#bulk-size-btn");
+      await page.waitFor('document.querySelector("#bulk-size-dialog")?.open');
+
+      await setValue(page, "#bulk-size-min", "5");
+      await page.waitFor('document.querySelector("#bulk-size-apply")?.disabled === false');
+      const summary = await page.evaluate('document.querySelector("#bulk-size-summary").textContent');
+      assert.match(summary, /entries? match/);
+
+      await page.click("#bulk-size-apply");
+      await page.waitFor('!document.querySelector("#bulk-size-dialog")?.open');
+      await page.waitFor('Number(document.querySelector("#bulk-count").textContent.split(" ")[0]) > 1');
+      await page.waitFor('document.querySelector("#bulk-bar")?.hidden === false');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "sets insertion order for selected entries",
     async run(page) {
       await resetApp(page);
@@ -393,6 +445,44 @@ export const scenarios = [
         return true;
       })()`);
       await page.waitFor('document.querySelector("#entry-order")?.value === "510"');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "summarizes what changed since the last session",
+    async run(page) {
+      await resetApp(page);
+      await setValue(page, "#entry-title", "Session change");
+      await page.waitFor('document.querySelector("#entry-title")?.value === "Session change"');
+      await sleep(200);
+      await page.reload();
+      await page.waitFor('document.querySelector("#book-name")?.value');
+
+      await page.waitFor('document.querySelector("#session-summary")?.hidden === false');
+      const text = await page.evaluate('document.querySelector("#session-summary-message").textContent');
+      assert.match(text, /1 edited/);
+
+      await page.click("#session-summary-dismiss-btn");
+      await page.waitFor('document.querySelector("#session-summary")?.hidden === true');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "keeps undo history across a reload",
+    async run(page) {
+      await resetApp(page);
+      const original = await page.evaluate('document.querySelector("#entry-title").value');
+      await setValue(page, "#entry-title", "Renamed before reload");
+      await page.waitFor('document.querySelector("#entry-title")?.value === "Renamed before reload"');
+      await page.waitFor('document.querySelector("#save-state")?.dataset.state === "saved"');
+      await sleep(800);
+
+      await page.reload();
+      await page.waitFor('document.querySelector("#entry-title")?.value === "Renamed before reload"');
+      assert.equal(await page.evaluate('document.querySelector("#undo-btn").disabled'), false);
+
+      await page.click("#undo-btn");
+      await page.waitFor(`document.querySelector("#entry-title")?.value === ${JSON.stringify(original)}`);
       assert.deepEqual(page.errors, []);
     }
   },
@@ -427,6 +517,87 @@ export const scenarios = [
       assert.ok(total.length > 0);
       await page.click("#export-cancel");
       await page.waitFor('!document.querySelector("#export-dialog")?.open');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "lists SillyTavern first as the primary export and warns before lossy export",
+    async run(page) {
+      await resetApp(page);
+      await page.click("#export-btn");
+      await page.waitFor('document.querySelector("#export-dialog")?.open');
+      await page.waitFor('document.querySelector("#export-options [data-export-format]")');
+
+      const order = await page.evaluate('[...document.querySelectorAll("#export-options [data-export-format]")].map((node) => node.dataset.exportFormat)');
+      assert.equal(order[0], "project");
+      assert.equal(order[1], "sillytavern");
+      const meta = await page.evaluate('document.querySelector("#export-options [data-export-format=\\"sillytavern\\"] .export-option-meta").textContent');
+      assert.match(meta, /primary/);
+
+      await page.evaluate(`(() => {
+        const bookName = document.querySelector("#book-name");
+        bookName.value = "Harbor Secrets";
+        bookName.dispatchEvent(new Event("input", { bubbles: true }));
+        return true;
+      })()`);
+      await page.click('#export-options [data-export-format="sillytavern"]');
+      await page.waitFor('document.querySelector("#confirm-dialog")?.open || !document.querySelector("#export-dialog")?.open');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "downloads an export with the expected filename and content",
+    async run(page) {
+      await resetApp(page);
+      await page.evaluate(`(() => {
+        window.__downloads = [];
+        const original = URL.createObjectURL;
+        URL.createObjectURL = (blob) => {
+          window.__downloads.push({ type: blob.type, size: blob.size });
+          return original.call(URL, blob);
+        };
+        const originalClick = HTMLAnchorElement.prototype.click;
+        HTMLAnchorElement.prototype.click = function patched() {
+          window.__downloads.at(-1).name = this.download;
+          return originalClick.call(this);
+        };
+        return true;
+      })()`);
+
+      await page.click("#export-btn");
+      await page.waitFor('document.querySelector("#export-dialog")?.open');
+      await page.waitFor('document.querySelector("#export-options [data-export-format=\\"native\\"]")');
+      await page.click('#export-options [data-export-format="native"]');
+      await page.waitFor('window.__downloads?.length === 1');
+
+      const download = await page.evaluate('window.__downloads[0]');
+      assert.equal(download.type, "application/json");
+      assert.match(download.name, /\.json$/);
+      assert.ok(download.size > 0);
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "routes keyboard shortcuts for undo, search and replace",
+    async run(page) {
+      await resetApp(page);
+      const original = await page.evaluate('document.querySelector("#entry-title").value');
+      await setValue(page, "#entry-title", "Shortcut edit");
+      await page.waitFor('document.querySelector("#entry-title")?.value === "Shortcut edit"');
+
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "z", ctrlKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor(`document.querySelector("#entry-title")?.value === ${JSON.stringify(original)}`);
+
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "f", ctrlKey: true, shiftKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('document.querySelector("#global-search-dialog")?.open');
+      await page.evaluate('document.querySelector("#global-search-dialog").close(); true');
+
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "h", ctrlKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('document.querySelector("#replace-dialog")?.open');
+      await page.evaluate('document.querySelector("#replace-dialog").close(); true');
+
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('document.querySelector("#command-dialog")?.open');
       assert.deepEqual(page.errors, []);
     }
   },
@@ -832,6 +1003,13 @@ export const scenarios = [
       const skipped = await page.evaluate('document.querySelector(".simulation-skipped summary")?.textContent ?? ""');
       assert.match(skipped, /Not activated/);
 
+      const bars = await page.evaluate('document.querySelectorAll(".simulation-graph-row").length');
+      assert.ok(bars >= 2);
+      const activatedBars = await page.evaluate('document.querySelectorAll(".simulation-graph-row:not(.is-skipped)").length');
+      assert.equal(activatedBars, 2);
+      const legend = await page.evaluate('document.querySelector(".simulation-graph-legend")?.textContent ?? ""');
+      assert.match(legend, /Activated/);
+
       await page.evaluate('document.querySelector(".simulation-item-title").click(); true');
       await page.waitFor('!document.querySelector("#simulation-dialog")?.open');
       assert.deepEqual(page.errors, []);
@@ -972,6 +1150,40 @@ export const scenarios = [
 
       await page.click("#integrity-close");
       await page.waitFor('!document.querySelector("#integrity-dialog")?.open');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "keeps the new dialogs usable at phone width",
+    async run(page) {
+      await resetApp(page);
+      await page.setViewport(390, 844);
+      await sleep(150);
+
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "h", ctrlKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('document.querySelector("#replace-dialog")?.open');
+      const replace = await page.evaluate(`(() => {
+        const element = document.querySelector("#replace-dialog");
+        return { width: Math.round(element.getBoundingClientRect().width), viewport: window.innerWidth };
+      })()`);
+      assert.ok(replace.width <= replace.viewport);
+      await page.click("#replace-cancel");
+
+      await page.evaluate(`(() => {
+        const card = document.querySelector(".entry-card");
+        card.dispatchEvent(new MouseEvent("click", { bubbles: true, ctrlKey: true }));
+        return true;
+      })()`);
+      await page.waitFor('document.querySelector("#bulk-bar")?.hidden === false');
+      await page.click("#bulk-size-btn");
+      await page.waitFor('document.querySelector("#bulk-size-dialog")?.open');
+      const size = await page.evaluate(`(() => {
+        const element = document.querySelector("#bulk-size-dialog");
+        return { width: Math.round(element.getBoundingClientRect().width), viewport: window.innerWidth };
+      })()`);
+      assert.ok(size.width <= size.viewport);
+      await page.click("#bulk-size-cancel");
+      await page.setViewport(1440, 900);
       assert.deepEqual(page.errors, []);
     }
   },
