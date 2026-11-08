@@ -21,6 +21,11 @@ async function dismissOnboarding(page) {
 const states = [
   { name: "onboarding dialog", keepOnboarding: true, setup: async () => {} },
   { name: "workspace", setup: async () => {} },
+  { name: "light workspace", setup: async (page) => {
+    await page.evaluate('document.documentElement.dataset.theme = "light"; true');
+    // The theme flip animates colors over 140ms; let it settle before auditing.
+    await sleep(250);
+  } },
   { name: "command palette", setup: async (page) => {
     await page.click("#command-btn");
     await page.waitFor('document.querySelector("#command-dialog")?.open');

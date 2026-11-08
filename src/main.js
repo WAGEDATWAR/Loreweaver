@@ -208,6 +208,7 @@ const refs = {
   aboutExportFormats: document.querySelector("#about-export-formats"),
   aboutStorage: document.querySelector("#about-storage"),
   aboutGuideBtn: document.querySelector("#about-guide-btn"),
+  aboutThemeBtn: document.querySelector("#about-theme-btn"),
   aboutTokenBtn: document.querySelector("#about-token-btn"),
   aboutIntegrityBtn: document.querySelector("#about-integrity-btn"),
   tokenSettingsDialog: document.querySelector("#token-settings-dialog"),
@@ -428,6 +429,7 @@ const SORT_STATE_KEY = storageKey("sort:v1");
 const FILTER_STATE_KEY = storageKey("filters:v1");
 const TAG_FILTER_STATE_KEY = storageKey("tag-filters:v1");
 const ONBOARDED_KEY = storageKey("onboarded:v1");
+const THEME_KEY = storageKey("theme:v1");
 const TOKEN_SETTINGS_KEY = storageKey("token-settings:v1");
 const LAST_BACKUP_KEY = storageKey("last-backup:v1");
 const BACKUP_SNOOZE_KEY = storageKey("backup-reminder-snooze:v1");
@@ -919,7 +921,52 @@ async function openAboutDialog() {
     refs.aboutDialog.showModal();
   }
 
+  syncThemeButton();
   await renderAboutDialog();
+}
+
+function readTheme() {
+  try {
+    return localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
+  } catch {
+    return "dark";
+  }
+}
+
+function applyTheme(theme) {
+  const value = theme === "light" ? "light" : "dark";
+
+  if (value === "light") {
+    document.documentElement.dataset.theme = "light";
+  } else {
+    delete document.documentElement.dataset.theme;
+  }
+
+  try {
+    localStorage.setItem(THEME_KEY, value);
+  } catch {
+    return;
+  }
+}
+
+function syncThemeButton() {
+  if (!refs.aboutThemeBtn) {
+    return;
+  }
+
+  const light = document.documentElement.dataset.theme === "light";
+  refs.aboutThemeBtn.setAttribute("aria-pressed", String(light));
+  refs.aboutThemeBtn.textContent = light ? "Dark theme" : "Light theme";
+}
+
+function toggleTheme() {
+  applyTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light");
+  syncThemeButton();
+  const meta = document.querySelector('meta[name="theme-color"]');
+
+  if (meta) {
+    meta.content = document.documentElement.dataset.theme === "light" ? "#f6f7fa" : "#0b0d12";
+  }
 }
 
 async function renderIntegrityDialog() {
@@ -1225,6 +1272,7 @@ function buildCommands() {
     { title: "Select entries by token size", keywords: ["bulk", "select", "tokens", "size"], run: openBulkSizeDialog },
     { title: "Bulk find and replace", hint: "Ctrl+H", keywords: ["replace", "bulk", "find"], run: openReplaceDialog },
     { title: "New character card", keywords: ["card", "character", "avatar"], run: () => openCardDialog() },
+    { title: "Toggle light theme", keywords: ["theme", "colour", "dark"], run: toggleTheme },
     { title: "Save project", hint: "Ctrl+S", keywords: ["persist"], run: async () => {
       if (await flushSave()) {
         toast("Project saved", "success");
@@ -4314,6 +4362,10 @@ refs.aboutGuideBtn.addEventListener("click", () => {
   openGuideDialog();
 });
 
+refs.aboutThemeBtn.addEventListener("click", () => {
+  toggleTheme();
+});
+
 refs.aboutTokenBtn.addEventListener("click", () => {
   refs.aboutDialog.close();
   openTokenSettingsDialog();
@@ -4666,6 +4718,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 await initStorage();
+applyTheme(readTheme());
 
 const storedDetailsState = readDetailsState();
 setDetailsCollapsed(storedDetailsState ?? window.matchMedia("(max-width: 720px)").matches, false);

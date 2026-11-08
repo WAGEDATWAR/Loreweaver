@@ -30,6 +30,32 @@
   --topbar-height: 60px;
 }
 
+:root[data-theme="light"] {
+  color-scheme: only light;
+  --bg: #f6f7fa;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #eef1f6;
+  --surface-hover: #e8ecf3;
+  --border: #d5dbe6;
+  --border-strong: #b9c2d1;
+  --text: #141821;
+  --text-soft: #2b3242;
+  --muted: #4f5a6e;
+  --faint: #525c6e;
+  --accent: #3d5bd9;
+  --accent-strong: #2f49b8;
+  --accent-soft: rgba(61, 91, 217, 0.1);
+  --accent-border: rgba(61, 91, 217, 0.34);
+  --danger: #c0324a;
+  --danger-soft: rgba(192, 50, 74, 0.1);
+  --danger-border: rgba(192, 50, 74, 0.32);
+  --warning: #7a5514;
+  --warning-soft: rgba(138, 100, 28, 0.12);
+  --warning-border: rgba(138, 100, 28, 0.32);
+  --success: #1f7a56;
+}
+
 *,
 *::before,
 *::after {
@@ -68,6 +94,20 @@ body::before {
     radial-gradient(720px 440px at 102% -4%, rgba(76, 196, 184, 0.055), transparent 58%);
 }
 
+:root[data-theme="light"] body::before {
+  background:
+    radial-gradient(900px 520px at 10% -12%, rgba(61, 91, 217, 0.09), transparent 62%),
+    radial-gradient(720px 440px at 102% -4%, rgba(31, 122, 86, 0.05), transparent 58%);
+}
+
+:root[data-theme="light"] .topbar {
+  background: rgba(246, 247, 250, 0.85);
+}
+
+:root[data-theme="light"] .sidebar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(238, 241, 246, 0.85));
+}
+
 ::selection {
   background: rgba(143, 168, 255, 0.32);
   color: #ffffff;
@@ -75,7 +115,7 @@ body::before {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #2b3342 transparent;
+  scrollbar-color: var(--border-strong) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -88,14 +128,14 @@ body::before {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2b3342;
+  background: var(--border-strong);
   background-clip: content-box;
   border: 2px solid transparent;
   border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a4559;
+  background: var(--faint);
   background-clip: content-box;
 }
 
@@ -4374,4 +4414,14 @@ button.book-action:disabled {
 
 .peek-dialog .simulation-output {
   margin-top: 14px;
+}
+
+:root[data-theme="light"] .doc-name,
+:root[data-theme="light"] .entry-title,
+:root[data-theme="light"] .entry-content,
+:root[data-theme="light"] .field input,
+:root[data-theme="light"] .field select,
+:root[data-theme="light"] .field textarea {
+  color: var(--text);
+  background: var(--surface);
 }

@@ -43,6 +43,10 @@ The sidebar is the library. The main pane is the document. There are no nested s
 Selected surfaces use accent tints rather than saturated fills. Borders carry structure. Shadows are
 reserved for dialogs and toasts.
 
+A full light token set (`:root[data-theme="light"]`) mirrors every dark token; the theme is toggled in
+the About panel and the command palette and persists locally. Both themes are held to WCAG AA by
+`npm run contrast`, which parses the token blocks and checks the text pairs in CI.
+
 ## 3. Typography
 
 - System UI stack, no web-font dependency.
@@ -103,7 +107,7 @@ reserved for dialogs and toasts.
 ## 8. Known gaps
 
 - A mobile library drawer is deferred (DEF-030).
-- A light theme waits on token stability (DEF-031).
+- A light theme ships opt-in (DEF-031); both themes pass `npm run contrast` (DEF-112).
 - There is no density option or remembered text-area height (DEF-032, DEF-033).
 - Virtualized rows hide tag chips and the matched-field note; the full card returns when the list is
   narrow or below the windowing threshold.
@@ -112,3 +116,4 @@ reserved for dialogs and toasts.
 
 A surface change ships with an axe pass at 1440, 390 and 320 px, a focus-target check, keyboard access,
 and a browser scenario. A new dialog is added to `e2e/a11y.mjs` in the same change.
+

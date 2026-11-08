@@ -447,6 +447,21 @@ export const scenarios = [
     }
   },
   {
+    name: "toggles a persistent light theme",
+    async run(page) {
+      await resetApp(page);
+      await page.click("#about-btn");
+      await page.waitFor('document.querySelector("#about-dialog")?.open');
+      await page.click("#about-theme-btn");
+      await page.waitFor('document.documentElement.dataset.theme === "light"');
+      const pressed = await page.evaluate('document.querySelector("#about-theme-btn").getAttribute("aria-pressed")');
+      assert.equal(pressed, "true");
+      await page.reload();
+      await page.waitFor('document.documentElement.dataset.theme === "light"');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "peeks at an entry as injected text",
     async run(page) {
       await resetApp(page);
@@ -1473,4 +1488,3 @@ export const scenarios = [
     }
   }
 ];
-

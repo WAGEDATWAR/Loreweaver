@@ -21,7 +21,7 @@ C = context, U = surface.
 | G-4 | **No runtime dependencies.** Dev dependencies are `axe-core` and `gpt-tokenizer` only. | locked |
 | G-5 | **An adapter round-trips its fixture unknown-fields-intact or it does not ship.** | locked |
 | G-6 | **Every destructive path is confirmation-gated**, and every import is backup-gated. | locked |
-| G-7 | **Dark-only v1.** A light theme waits until tokens and components are stable (DEF-031). | locked |
+| G-7 | **Dark default, light opt-in.** A full light token set ships behind a persisted toggle (DEF-031); both themes pass the contrast gate (DEF-112). | locked |
 | G-8 | **Vanilla modules, no framework, no build step.** A framework migration is not a goal. | locked |
 | G-9 | **The product is Loreweaver.** The former name Lorebook Studio stays as the legacy namespace. | locked |
 | G-10 | **Pre-1.0 semver, changelog per release, `vX.Y.Z` tags.** | locked |
@@ -105,4 +105,5 @@ migration of the `lorebook-studio` namespace on load. | locked |
 | U-4 | **The library auto-fits 200-460 px and collapses to a 50 px rail**; width persists. | locked |
 | U-5 | **`prefers-reduced-motion` disables animation.** | locked |
 | U-6 | **Icon-only buttons carry `aria-label` and `title`.** | locked |
+
 

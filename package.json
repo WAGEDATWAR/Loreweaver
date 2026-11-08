@@ -12,6 +12,7 @@
     "test:all": "npm test && npm run test:e2e",
     "a11y": "node --no-warnings e2e/a11y.mjs",
     "benchmark": "node scripts/benchmark.mjs",
+    "contrast": "node scripts/contrast.mjs",
     "bundle": "node scripts/bundle.mjs",
     "apk": "node scripts/build.mjs",
     "apk:debug": "node scripts/build.mjs --variant debug",
@@ -33,5 +34,7 @@
     "gpt-tokenizer": "^4.1.0"
   }
 }
+
+
 
 

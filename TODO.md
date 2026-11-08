@@ -110,8 +110,8 @@ adapters, validation, extraction, linking, the library and the parity section al
 ## UI, UX and accessibility
 
 - [ ] `M` `P5` A mobile library drawer (DEF-030).
-- [ ] `H` `P5` A light theme over stable tokens (DEF-031, G-7).
-- [ ] `L` `P5` A pre-commit contrast check over the token set (DEF-112).
+
+
 - [ ] `L` `P5` Density options for compact lists (DEF-032).
 - [ ] `L` `P5` Resizable text areas with remembered heights (DEF-033).
 - [ ] `L` `P5` A keyboard shortcuts reference dialog (DEF-034).
@@ -173,4 +173,5 @@ adapters, validation, extraction, linking, the library and the parity section al
 - The product rename to Loreweaver, with a namespace migration and legacy-file import (v0.7.4+).
 - Book duplicate, split and merge with id and source-UID remapping.
 - The documentation set reshaped to the topic-owner standard.
+
 
