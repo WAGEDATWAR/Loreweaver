@@ -12,6 +12,11 @@ All notable changes to Loreweaver are documented here. The format is based on [K
   container is an adapter), plus ledger series K (DEF-084 to DEF-091).
 - Ledger series O (pinned/recent entries, regex search) and N (fine polish), and DEF-106 to DEF-116.
 - `TODO.md` restructured into phase-tagged area sections with an ordered Next Up slice.
+- P5 authoring polish: per-entry token and character limits with validation, entry links `[[Title]]` with
+  broken-link detection, a Suggest keys button, bulk tag add/remove, an inject-peek dialog, `Ctrl+D`
+  duplicate, `Ctrl+Enter` simulation, a Copy entry command, `aria-keyshortcuts`, and reset-filters and
+  clear-search actions in the empty list state (DEF-005, DEF-007 to DEF-009, DEF-037, DEF-096 to DEF-103,
+  DEF-109, DEF-114 to DEF-116).
 
 ## [0.8.0] - 2026-11-08
 
@@ -210,6 +215,7 @@ Mobile preview builds, bulk authoring tools and the completed scale phase.
 - Canonical project, book, and entry schema.
 - Native project import/export, single-book export, and pre-import backups.
 - Search, autosave, sample project, and the dark application shell.
+
 
 
 

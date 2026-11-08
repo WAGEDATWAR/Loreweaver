@@ -1,4 +1,6 @@
 import { isRegexKey, parseRegexKey } from "./keys.js";
+import { checkEntryLimits } from "./entryLimits.js";
+import { findBrokenLinks } from "./entryLinks.js";
 
 export const VALIDATION_LABELS = {
   emptyContent: "Empty content",
@@ -7,7 +9,10 @@ export const VALIDATION_LABELS = {
   invalidRegex: "Invalid regex keys",
   missingKeys: "Missing keys",
   unreachable: "Unreachable entries",
-  orderCollision: "Order collision"
+  orderCollision: "Order collision",
+  brokenLink: "Broken entry link",
+  tokenLimit: "Token limit",
+  charLimit: "Character limit"
 };
 
 function entryLabel(entry) {
@@ -18,7 +23,7 @@ function normalizeKey(key) {
   return key.trim().toLocaleLowerCase();
 }
 
-export function validateBook(book) {
+export function validateBook(book, tokenCount = null) {
   if (!book?.entries?.length) {
     return [];
   }
@@ -57,6 +62,8 @@ export function validateBook(book) {
 
   for (const entry of book.entries) {
     const title = entryLabel(entry);
+
+    issues.push(...checkEntryLimits(entry, tokenCount));
 
     if (!entry.content.trim()) {
       issues.push({
@@ -168,6 +175,8 @@ export function validateBook(book) {
       });
     }
   }
+
+  issues.push(...findBrokenLinks(book));
 
   return issues;
 }

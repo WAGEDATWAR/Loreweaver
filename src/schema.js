@@ -65,6 +65,8 @@ export function createEntry(patch = {}) {
     order: Number.isFinite(patch.order) ? clamp(Math.round(patch.order), 0, 9999) : 100,
     position: POSITION_VALUES.has(patch.position) ? patch.position : "before_char",
     probability: Number.isFinite(patch.probability) ? clamp(Math.round(patch.probability), 0, 100) : 100,
+    tokenLimit: Number.isFinite(patch.tokenLimit) ? clamp(Math.round(patch.tokenLimit), 0, 1_000_000) : 0,
+    charLimit: Number.isFinite(patch.charLimit) ? clamp(Math.round(patch.charLimit), 0, 1_000_000) : 0,
     createdAt: Number.isFinite(patch.createdAt) ? patch.createdAt : now,
     updatedAt: Number.isFinite(patch.updatedAt) ? patch.updatedAt : now,
     extensions: normalizeExtensions(patch.extensions)

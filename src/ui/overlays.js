@@ -99,14 +99,43 @@ export function confirmAction({
   });
 }
 
+const TOAST_DURATION_MS = 3000;
+const recentToasts = new Map();
+
 export function toast(message, tone = "default") {
   if (!toastStack) {
     return;
   }
 
+  const text = String(message ?? "");
+  const key = `${tone}:${text}`;
+  const now = Date.now();
+  const last = recentToasts.get(key);
+
+  if (last && now - last < 1200) {
+    const existing = toastStack.querySelector(`[data-toast-key="${CSS.escape(key)}"]`);
+
+    if (existing) {
+      existing.classList.remove("is-visible");
+      requestAnimationFrame(() => existing.classList.add("is-visible"));
+      return;
+    }
+  }
+
+  recentToasts.set(key, now);
+
+  if (recentToasts.size > 40) {
+    for (const [staleKey, at] of recentToasts) {
+      if (now - at > 10000) {
+        recentToasts.delete(staleKey);
+      }
+    }
+  }
+
   const element = document.createElement("div");
   element.className = `toast toast-${tone}`;
-  element.textContent = message;
+  element.dataset.toastKey = key;
+  element.textContent = text;
   toastStack.append(element);
 
   requestAnimationFrame(() => element.classList.add("is-visible"));
@@ -114,5 +143,5 @@ export function toast(message, tone = "default") {
   window.setTimeout(() => {
     element.classList.remove("is-visible");
     window.setTimeout(() => element.remove(), 250);
-  }, 3000);
+  }, TOAST_DURATION_MS);
 }

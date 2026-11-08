@@ -42,6 +42,8 @@ export function renderEditor(refs) {
   refs.entryPosition.value = entry.position;
   refs.entryProbability.value = String(entry.probability);
   refs.entryProbabilityOutput.textContent = `${entry.probability}%`;
+  refs.entryTokenLimit.value = String(entry.tokenLimit ?? 0);
+  refs.entryCharLimit.value = String(entry.charLimit ?? 0);
   refs.entryConstant.checked = entry.constant;
   refs.entrySelective.checked = entry.selective;
   refs.entryCaseSensitive.checked = entry.caseSensitive;

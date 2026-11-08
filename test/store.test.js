@@ -4,6 +4,7 @@ import { createCard, createProject } from "../src/schema.js";
 import {
   addCard,
   addEntry,
+  addTagToEntries,
   adjustEntriesOrder,
   canRedo,
   canUndo,
@@ -28,6 +29,7 @@ import {
   moveEntry,
   onHistoryChange,
   redo,
+  removeTagFromEntries,
   replaceProject,
   selectEntryRange,
   setActiveEntry,
@@ -372,4 +374,17 @@ test("adds, updates, links and deletes cards with undo", () => {
   assert.equal(deleteCard(card.id), true);
   assert.equal(getCards().length, 0);
   assert.equal(getActiveCard(), null);
+});
+
+test("bulk adds and removes a tag with undo", () => {
+  initStore(createTestProject());
+  const ids = getState().books[0].entries.map((entry) => entry.id);
+  selectEntryRange(ids, ids[0]);
+
+  assert.equal(addTagToEntries(ids, "campaign"), ids.length);
+  assert.ok(getState().books[0].entries.every((entry) => entry.tags.includes("campaign")));
+  assert.equal(addTagToEntries(ids, "campaign"), 0);
+
+  assert.equal(removeTagFromEntries(ids, "campaign"), ids.length);
+  assert.ok(getState().books[0].entries.every((entry) => !entry.tags.includes("campaign")));
 });

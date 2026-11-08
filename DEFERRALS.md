@@ -21,13 +21,13 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 | DEF-002 | Richer empty and search states | - | P5 | scheduled |
 | DEF-003 | A lorebook properties dropdown holding description, tags and budget | - | P5 | scheduled |
 | DEF-004 | Author custom templates and "duplicate as template" | - | P5 | scheduled |
-| DEF-005 | Per-entry word/character/token limits | - | P5 | scheduled |
+| DEF-005 | Per-entry word/character/token limits | token and character limits with validation | P5 | done |
 | DEF-006 | Undo history that survives reload | E-5; 20-step bounded history in `history.js` | P4 | done |
-| DEF-007 | Entry links (`[[Title]]`) with broken-link validation | - | P5 | scheduled |
-| DEF-008 | Suggested trigger keys from title and content | - | P5 | scheduled |
-| DEF-009 | Bulk tag assignment for selected entries | - | P5 | scheduled |
+| DEF-007 | Entry links (`[[Title]]`) with broken-link validation | `entryLinks.js`, folded into validation | P5 | done |
+| DEF-008 | Suggested trigger keys from title and content | `suggestKeys.js` with a Suggest keys button | P5 | done |
+| DEF-009 | Bulk tag assignment for selected entries | bulk tag dialog, add and remove | P5 | done |
 | DEF-108 | A configurable default for new-entry flags (always on, selective, case sensitive, whole words) | per-project defaults, not a hidden global | P5 | scheduled |
-| DEF-109 | An inject-peek preview of an entry's rendered text | simulation shows the set; this shows one entry | P5 | scheduled |
+| DEF-109 | An inject-peek preview of an entry's rendered text | peek dialog with token cost | P5 | done |
 | DEF-110 | Markdown preview for content | only if the target frontends read it consistently | P5 | scheduled |
 | DEF-113 | Per-entry colour labels for visual grouping | distinct from tags | P5 | scheduled |
 
@@ -105,7 +105,7 @@ never learns a card quirk.
 | DEF-034 | A keyboard shortcuts reference dialog | - | P5 | scheduled |
 | DEF-035 | A focus mode that hides the sidebar | - | P5 | scheduled |
 | DEF-036 | Hover hint popups for long field explanations | - | P5 | scheduled |
-| DEF-037 | `aria-keyshortcuts` on shortcut buttons | - | P5 | scheduled |
+| DEF-037 | `aria-keyshortcuts` on shortcut buttons | undo, redo, export, add entry | P5 | done |
 | DEF-038 | A changelog link in the About panel | - | P5 | scheduled |
 
 
@@ -116,18 +116,18 @@ Small, low-risk surface fixes carried from the old backlog.
 | # | Item | Notes | Owner | Status |
 |---|---|---|---|---|
 | DEF-095 | Hide field hints while the field has content | show again on focus or when empty | P5 | scheduled |
-| DEF-096 | Multi-select validation issue-type filters | today one type at a time | P5 | scheduled |
-| DEF-097 | Hide the Repair button when the integrity check is clean | - | P5 | scheduled |
-| DEF-098 | Toast timing and duplicate-failure suppression | - | P5 | scheduled |
-| DEF-099 | Truncate long lorebook names with a full-name tooltip | - | P5 | scheduled |
-| DEF-100 | Show the app version in the tab title | - | P5 | scheduled |
-| DEF-101 | A "Copy entry" action | title, keys and content to the clipboard | P5 | scheduled |
-| DEF-102 | Ctrl/Cmd+Enter runs the simulation from its input | - | P5 | scheduled |
-| DEF-103 | Ctrl/Cmd+D duplicates the active entry | - | P5 | scheduled |
+| DEF-096 | Multi-select validation issue-type filters | filters are a toggleable set | P5 | done |
+| DEF-097 | Hide the Repair button when the integrity check is clean | hidden, not just disabled | P5 | done |
+| DEF-098 | Toast timing and duplicate-failure suppression | 1.2s dedupe window | P5 | done |
+| DEF-099 | Truncate long lorebook names with a full-name tooltip | select and options carry the full title | P5 | done |
+| DEF-100 | Show the app version in the tab title | - | P5 | done |
+| DEF-101 | A "Copy entry" action | clipboard command and palette entry | P5 | done |
+| DEF-102 | Ctrl/Cmd+Enter runs the simulation from its input | - | P5 | done |
+| DEF-103 | Ctrl/Cmd+D duplicates the active entry | - | P5 | done |
 | DEF-104 | Loading and error states for every async action | extends DEF-002 | P5 | scheduled |
-| DEF-114 | Remember the last active entry per lorebook across a book switch | - | P5 | scheduled |
-| DEF-115 | A "Reset filters" action when a search or filter hides everything | - | P5 | scheduled |
-| DEF-116 | A "Clear search" affordance in the sidebar empty state | - | P5 | scheduled |
+| DEF-114 | Remember the last active entry per lorebook across a book switch | `ui.lastEntryByBook` | P5 | done |
+| DEF-115 | A "Reset filters" action when a search or filter hides everything | empty-state button | P5 | done |
+| DEF-116 | A "Clear search" affordance in the sidebar empty state | empty-state button | P5 | done |
 | DEF-105 | An optional UI-state block in project files | session layout, opt-in | P5 | scheduled |
 | DEF-106 | A schema reference page generated from the canonical model | held to the model by a test | P5 | scheduled |
 | DEF-107 | Print/PDF export for offline review passes | - | P5 | scheduled |
@@ -187,6 +187,10 @@ may delay a v1 phase.
 | DEF-062 | An embedding and vendoring guide with the licence note | asks A-1/C-3 | post-v1 | scheduled |
 | DEF-063 | Extract the pure core into a new component repository | asks A-1 to A-6; the v1 tag is the precondition | post-v1 | scheduled |
 | DEF-065 | Run-level budget arbitration across attached books | ask B-9; the run budget is the outer bound | post-v1 | scheduled |
+
+
+
+
 
 
 

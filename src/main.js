@@ -10,6 +10,8 @@ import {
 import {
   addBook,
   addEntriesToSelection,
+  addTagToEntries,
+  removeTagFromEntries,
   addEntry,
   adjustEntriesOrder,
   applyReplacePlan,
@@ -44,6 +46,7 @@ import {
   setEntriesEnabled,
   setEntriesOrder,
   setEntryFilters,
+  resetFilters,
   setSearchQuery,
   setSortMode,
   setTagFilters,
@@ -88,6 +91,7 @@ import { IMPORT_STRATEGIES, mergeProject } from "./merge.js";
 import { createSampleProject } from "./sample.js";
 import { createCard, createProject, normalizeTagList } from "./schema.js";
 import { searchProject } from "./search.js";
+import { suggestKeys } from "./suggestKeys.js";
 import { storageKey } from "./storage/namespace.js";
 import {
   CONTEXT_WINDOW_PRESETS,
@@ -292,6 +296,12 @@ const refs = {
   bulkSizeSummary: document.querySelector("#bulk-size-summary"),
   bulkSizeCancel: document.querySelector("#bulk-size-cancel"),
   bulkSizeApply: document.querySelector("#bulk-size-apply"),
+  bulkTagBtn: document.querySelector("#bulk-tag-btn"),
+  bulkTagDialog: document.querySelector("#bulk-tag-dialog"),
+  bulkTagInput: document.querySelector("#bulk-tag-input"),
+  bulkTagCancel: document.querySelector("#bulk-tag-cancel"),
+  bulkTagAdd: document.querySelector("#bulk-tag-add"),
+  bulkTagRemove: document.querySelector("#bulk-tag-remove"),
   replaceDialog: document.querySelector("#replace-dialog"),
   replaceFind: document.querySelector("#replace-find"),
   replaceWith: document.querySelector("#replace-with"),
@@ -323,6 +333,12 @@ const refs = {
   deleteEntryBtn: document.querySelector("#delete-entry-btn"),
   entryKeysContainer: document.querySelector("#entry-keys"),
   entryKeysInput: document.querySelector("#entry-keys-input"),
+  suggestKeysBtn: document.querySelector("#suggest-keys-btn"),
+  peekBtn: document.querySelector("#peek-btn"),
+  peekDialog: document.querySelector("#peek-dialog"),
+  peekMeta: document.querySelector("#peek-meta"),
+  peekBody: document.querySelector("#peek-body"),
+  peekClose: document.querySelector("#peek-close"),
   entrySecondaryKeysContainer: document.querySelector("#entry-secondary-keys"),
   entrySecondaryKeysInput: document.querySelector("#entry-secondary-keys-input"),
   entryTagsContainer: document.querySelector("#entry-tags"),
@@ -335,6 +351,8 @@ const refs = {
   entryOrder: document.querySelector("#entry-order"),
   entryPosition: document.querySelector("#entry-position"),
   entryProbability: document.querySelector("#entry-probability"),
+  entryTokenLimit: document.querySelector("#entry-token-limit"),
+  entryCharLimit: document.querySelector("#entry-char-limit"),
   entryProbabilityOutput: document.querySelector("#entry-probability-output"),
   entryConstant: document.querySelector("#entry-constant"),
   entrySelective: document.querySelector("#entry-selective"),
@@ -399,7 +417,7 @@ let saveFailed = false;
 let unsavedChanges = false;
 let projectFileHandle = null;
 let simulationTimer = 0;
-let validationFilter = null;
+let validationFilters = new Set();
 let tokenSettings = { ...DEFAULT_TOKEN_SETTINGS };
 const numberFormatter = new Intl.NumberFormat("en-US");
 
@@ -944,6 +962,7 @@ async function renderIntegrityDialog() {
   }
 
   refs.integrityRepairBtn.disabled = problems.length === 0;
+  refs.integrityRepairBtn.hidden = problems.length === 0;
 }
 
 async function openIntegrityDialog() {
@@ -1240,7 +1259,8 @@ function buildCommands() {
 
   if (entry) {
     commands.splice(2, 0,
-      { title: "Duplicate entry", keywords: ["copy"], run: handleDuplicateEntry },
+      { title: "Duplicate entry", hint: "Ctrl+D", keywords: ["copy"], run: handleDuplicateEntry },
+      { title: "Copy entry", keywords: ["clipboard", "copy"], run: handleCopyEntry },
       { title: "Delete entry", keywords: ["remove"], run: handleDeleteEntry }
     );
   }
@@ -1380,7 +1400,7 @@ async function saveProjectFile({ saveAs = false } = {}) {
 
 function updateDocumentTitle() {
   const book = getActiveBook();
-  document.title = `${book?.name.trim() || "Untitled Lorebook"} — Loreweaver`;
+  document.title = `${book?.name.trim() || "Untitled Lorebook"} — Loreweaver ${appVersion()}`;
 }
 
 function updateHistoryButtons() {
@@ -1482,7 +1502,7 @@ function scheduleSave() {
 }
 
 function updateValidationIndicator() {
-  const count = validateBook(getActiveBook()).length;
+  const count = validateBook(getActiveBook(), (text) => tokenizer.count(text)).length;
   const label = count
     ? `${count} ${count === 1 ? "validation issue" : "validation issues"}`
     : "No validation issues";
@@ -1495,7 +1515,7 @@ function updateValidationIndicator() {
 function createValidationChip(label, count, code) {
   const chip = document.createElement("button");
   const value = document.createElement("strong");
-  const active = validationFilter === code;
+  const active = code ? validationFilters.has(code) : validationFilters.size === 0;
 
   chip.type = "button";
   chip.className = "validation-chip";
@@ -1514,10 +1534,10 @@ function createValidationChip(label, count, code) {
 }
 
 function renderValidationDialog() {
-  const issues = validateBook(getActiveBook());
+  const issues = validateBook(getActiveBook(), (text) => tokenizer.count(text));
   const entryCount = new Set(issues.map((issue) => issue.entryId)).size;
-  const filtered = validationFilter
-    ? issues.filter((issue) => issue.code === validationFilter)
+  const filtered = validationFilters.size
+    ? issues.filter((issue) => validationFilters.has(issue.code))
     : issues;
 
   refs.validationSummary.textContent = issues.length
@@ -1577,7 +1597,7 @@ function renderValidationDialog() {
 }
 
 function openValidationDialog() {
-  validationFilter = null;
+  validationFilters = new Set();
   renderValidationDialog();
   refs.validationDialog.showModal();
 }
@@ -2642,6 +2662,28 @@ function handleRedo() {
   scheduleSave();
 }
 
+async function handleCopyEntry() {
+  const entry = getActiveEntry();
+
+  if (!entry) {
+    return;
+  }
+
+  const text = [
+    entry.title,
+    entry.keys.length ? `Keys: ${entry.keys.join(", ")}` : "",
+    "",
+    entry.content
+  ].filter((part, index) => part !== "" || index === 2).join("\n");
+
+  try {
+    await navigator.clipboard.writeText(text);
+    toast("Entry copied", "success");
+  } catch {
+    toast("Couldn't copy the entry to the clipboard.", "error");
+  }
+}
+
 function handleDuplicateEntry() {
   const copy = duplicateEntry();
 
@@ -2831,6 +2873,49 @@ function openBulkSizeDialog() {
   refs.bulkSizeDialog.showModal();
   refs.bulkSizeMin.focus();
   refs.bulkSizeMin.select();
+}
+
+function openBulkTagDialog() {
+  const ids = getSelectedEntryIds();
+
+  if (!ids.length) {
+    return;
+  }
+
+  refs.bulkTagInput.value = "";
+  refs.bulkTagDialog.showModal();
+  refs.bulkTagInput.focus();
+}
+
+function applyBulkTag(mode) {
+  const ids = getSelectedEntryIds();
+  const tag = refs.bulkTagInput.value.trim();
+
+  if (!ids.length) {
+    return;
+  }
+
+  if (!tag) {
+    refs.bulkTagInput.focus();
+    return;
+  }
+
+  const changed = mode === "add"
+    ? addTagToEntries(ids, tag)
+    : removeTagFromEntries(ids, tag);
+
+  refs.bulkTagDialog.close();
+
+  if (!changed) {
+    toast(mode === "add"
+      ? `Selected entries already have "${tag}".`
+      : `Selected entries don't have "${tag}".`);
+    return;
+  }
+
+  renderAll();
+  scheduleSave();
+  toast(`${mode === "add" ? "Added" : "Removed"} "${tag}" ${mode === "add" ? "to" : "from"} ${changed} ${changed === 1 ? "entry" : "entries"}`, "success");
 }
 
 function handleBulkSizeApply() {
@@ -3540,6 +3625,23 @@ refs.templateDialog.addEventListener("click", (event) => {
 });
 
 refs.entryList.addEventListener("click", (event) => {
+  const action = event.target.closest("[data-empty-action]");
+
+  if (action) {
+    if (action.dataset.emptyAction === "clear-search") {
+      clearSearch();
+      renderSidebar(refs);
+      refs.entrySearch.focus();
+    } else {
+      resetFilters();
+      persistEntryFilters(getEntryFilters());
+      persistTagFilters(getTagFilters());
+      renderSidebar(refs);
+    }
+
+    return;
+  }
+
   const card = event.target.closest("[data-entry-id]");
 
   if (!card) {
@@ -3805,6 +3907,22 @@ refs.bulkSizeCancel.addEventListener("click", () => {
 
 refs.bulkSizeApply.addEventListener("click", handleBulkSizeApply);
 
+refs.bulkTagBtn.addEventListener("click", openBulkTagDialog);
+refs.bulkTagCancel.addEventListener("click", () => refs.bulkTagDialog.close());
+refs.bulkTagAdd.addEventListener("click", () => applyBulkTag("add"));
+refs.bulkTagRemove.addEventListener("click", () => applyBulkTag("remove"));
+refs.bulkTagInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    applyBulkTag("add");
+  }
+});
+refs.bulkTagDialog.addEventListener("click", (event) => {
+  if (event.target === refs.bulkTagDialog) {
+    refs.bulkTagDialog.close();
+  }
+});
+
 refs.bulkSizeDialog.addEventListener("click", (event) => {
   if (event.target === refs.bulkSizeDialog) {
     refs.bulkSizeDialog.close();
@@ -3873,6 +3991,56 @@ refs.entryNotes.addEventListener("input", (event) => {
   scheduleSave();
 });
 
+function openPeekDialog() {
+  const entry = getActiveEntry();
+
+  if (!entry) {
+    return;
+  }
+
+  const measured = tokenizer.count(entry.content);
+  const tokens = Number.isFinite(measured) ? measured : estimateTokens(entry.content);
+  const prefix = Number.isFinite(measured) ? "" : "~";
+  refs.peekMeta.textContent = `${entry.title.trim() || "Untitled entry"} \u00b7 ${prefix}${numberFormatter.format(tokens)} tokens \u00b7 ${entry.constant ? "always on" : entry.keys.length ? `keys: ${entry.keys.join(", ")}` : "no keys"}`;
+  refs.peekBody.textContent = entry.content || "(no content)";
+  refs.peekDialog.showModal();
+  refs.peekClose.focus();
+}
+
+refs.suggestKeysBtn.addEventListener("click", () => {
+  const entry = getActiveEntry();
+
+  if (!entry) {
+    return;
+  }
+
+  const suggested = suggestKeys({
+    title: entry.title,
+    content: entry.content,
+    existing: entry.keys,
+    limit: 5
+  });
+
+  if (!suggested.length) {
+    toast("No new key suggestions for this entry.");
+    return;
+  }
+
+  updateActiveEntry({ keys: [...entry.keys, ...suggested] });
+  renderEditor(refs);
+  renderSidebar(refs);
+  scheduleSave();
+  toast(`Added ${suggested.length} suggested ${suggested.length === 1 ? "key" : "keys"}`, "success");
+});
+
+refs.peekBtn.addEventListener("click", openPeekDialog);
+refs.peekClose.addEventListener("click", () => refs.peekDialog.close());
+refs.peekDialog.addEventListener("click", (event) => {
+  if (event.target === refs.peekDialog) {
+    refs.peekDialog.close();
+  }
+});
+
 refs.entryOrder.addEventListener("input", (event) => {
   if (event.target.value === "") {
     return;
@@ -3920,6 +4088,20 @@ refs.entryProbability.addEventListener("input", (event) => {
   refs.entryProbabilityOutput.textContent = `${value}%`;
   scheduleSave();
 });
+
+for (const [input, field] of [
+  [refs.entryTokenLimit, "tokenLimit"],
+  [refs.entryCharLimit, "charLimit"]
+]) {
+  input.addEventListener("input", (event) => {
+    if (event.target.value === "") {
+      return;
+    }
+
+    updateActiveEntry({ [field]: clamp(Math.round(Number(event.target.value) || 0), 0, 1_000_000) });
+    scheduleSave();
+  });
+}
 
 const checkboxBindings = [
   [refs.entryConstant, "constant"],
@@ -4322,7 +4504,7 @@ refs.validationCloseBtn.addEventListener("click", () => {
 
 refs.validationCategories.addEventListener("click", (event) => {
   if (event.target.closest("[data-validation-all]")) {
-    validationFilter = null;
+    validationFilters = new Set();
     renderValidationDialog();
     return;
   }
@@ -4334,7 +4516,13 @@ refs.validationCategories.addEventListener("click", (event) => {
   }
 
   const code = chip.dataset.validationFilter;
-  validationFilter = validationFilter === code ? null : code;
+
+  if (validationFilters.has(code)) {
+    validationFilters.delete(code);
+  } else {
+    validationFilters.add(code);
+  }
+
   renderValidationDialog();
 });
 
@@ -4383,6 +4571,12 @@ document.addEventListener("keydown", async (event) => {
     return;
   }
 
+  if (modifier && event.shiftKey && !event.altKey && key === "e") {
+    event.preventDefault();
+    openExportDialog();
+    return;
+  }
+
   if (modifier && !event.altKey && key === "z") {
     event.preventDefault();
 
@@ -4416,6 +4610,18 @@ document.addEventListener("keydown", async (event) => {
   if (modifier && event.shiftKey && key === "s" && supportsFileSystemAccess()) {
     event.preventDefault();
     await saveProjectFile({ saveAs: true });
+    return;
+  }
+
+  if (modifier && !event.altKey && key === "d" && getActiveEntry()) {
+    event.preventDefault();
+    handleDuplicateEntry();
+    return;
+  }
+
+  if (modifier && key === "Enter" && refs.simulationDialog.open) {
+    event.preventDefault();
+    renderSimulationResults();
     return;
   }
 

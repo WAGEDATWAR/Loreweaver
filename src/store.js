@@ -356,8 +356,20 @@ export function setActiveBook(id) {
     return;
   }
 
+  if (!state.ui.lastEntryByBook) {
+    state.ui.lastEntryByBook = {};
+  }
+
+  if (state.activeBookId && state.activeEntryId) {
+    state.ui.lastEntryByBook[state.activeBookId] = state.activeEntryId;
+  }
+
+  const remembered = state.ui.lastEntryByBook[book.id];
+
   state.activeBookId = book.id;
-  state.activeEntryId = book.entries[0]?.id ?? null;
+  state.activeEntryId = book.entries.some((entry) => entry.id === remembered)
+    ? remembered
+    : book.entries[0]?.id ?? null;
   clearSelection();
 }
 
@@ -444,6 +456,19 @@ export function setTagFilters(tags) {
   state.ui.tagFilters = next;
   clearSelection();
   return [...next];
+}
+
+export function resetFilters() {
+  if (!state?.ui) {
+    return;
+  }
+
+  for (const name of ENTRY_FILTERS) {
+    state.ui.filters[name] = false;
+  }
+
+  state.ui.tagFilters = [];
+  clearSelection();
 }
 
 export function toggleTagFilter(tag) {
@@ -803,8 +828,61 @@ export function setEntriesOrder(ids, order) {
   return changed.length;
 }
 
-export function adjustEntriesOrder(ids, delta) {
+export function addTagToEntries(ids, tag) {
   const book = getActiveBook();
+  const value = String(tag ?? "").trim();
+
+  if (!book || !value) {
+    return 0;
+  }
+
+  const targets = new Set(ids);
+  const changed = book.entries.filter((entry) => targets.has(entry.id) && !entry.tags.includes(value));
+
+  if (!changed.length) {
+    return 0;
+  }
+
+  captureHistory(`bulk-tag-add:${value}`, false);
+  const now = Date.now();
+
+  for (const entry of changed) {
+    entry.tags = normalizeTagList([...entry.tags, value]);
+    entry.updatedAt = now;
+  }
+
+  book.updatedAt = now;
+  return changed.length;
+}
+
+export function removeTagFromEntries(ids, tag) {
+  const book = getActiveBook();
+  const value = String(tag ?? "").trim();
+
+  if (!book || !value) {
+    return 0;
+  }
+
+  const targets = new Set(ids);
+  const changed = book.entries.filter((entry) => targets.has(entry.id) && entry.tags.includes(value));
+
+  if (!changed.length) {
+    return 0;
+  }
+
+  captureHistory(`bulk-tag-remove:${value}`, false);
+  const now = Date.now();
+
+  for (const entry of changed) {
+    entry.tags = entry.tags.filter((item) => item !== value);
+    entry.updatedAt = now;
+  }
+
+  book.updatedAt = now;
+  return changed.length;
+}
+
+export function adjustEntriesOrder(ids, delta) {  const book = getActiveBook();
 
   if (!book) {
     return 0;

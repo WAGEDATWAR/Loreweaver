@@ -4323,3 +4323,55 @@ button.book-action:disabled {
   gap: 6px;
   align-items: center;
 }
+
+.entry-list-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 8px 4px;
+}
+
+.entry-list-empty p {
+  margin: 0;
+}
+
+.entry-list-empty-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.entry-list-empty-actions .btn {
+  justify-content: center;
+  font-size: 11.5px;
+}
+
+.link-btn {
+  align-self: flex-start;
+  padding: 0;
+  color: var(--accent);
+  font-size: 10.5px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
+.bulk-tag-dialog {
+  width: min(480px, calc(100vw - 32px));
+}
+
+.bulk-tag-dialog .field {
+  margin-top: 14px;
+}
+
+.peek-dialog {
+  width: min(620px, calc(100vw - 32px));
+}
+
+.peek-dialog .simulation-output {
+  margin-top: 14px;
+}

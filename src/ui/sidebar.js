@@ -268,6 +268,46 @@ function renderBulkBar(refs) {
   refs.bulkCount.textContent = `${count} selected`;
 }
 
+function createEmptyState({ query, narrowing, hasFilters, hasTagFilters, entries }) {
+  const empty = document.createElement("div");
+  const text = document.createElement("p");
+  const searchValue = getState().ui.searchQuery.trim();
+  empty.className = "entry-list-empty";
+  text.textContent = query
+    ? `No entries match "${searchValue}".`
+    : narrowing
+      ? "No entries match the current filters."
+      : "No entries yet. Create one to start writing.";
+  empty.append(text);
+
+  if (narrowing && entries.length) {
+    const actions = document.createElement("div");
+    actions.className = "entry-list-empty-actions";
+
+    if (query) {
+      const clear = document.createElement("button");
+      clear.type = "button";
+      clear.className = "btn btn-block";
+      clear.dataset.emptyAction = "clear-search";
+      clear.textContent = "Clear search";
+      actions.append(clear);
+    }
+
+    if (hasFilters || hasTagFilters) {
+      const reset = document.createElement("button");
+      reset.type = "button";
+      reset.className = "btn btn-block";
+      reset.dataset.emptyAction = "reset-filters";
+      reset.textContent = "Reset filters";
+      actions.append(reset);
+    }
+
+    empty.append(actions);
+  }
+
+  return empty;
+}
+
 export function renderSidebar(refs) {
   const state = getState();
   const book = getActiveBook();
@@ -303,11 +343,13 @@ export function renderSidebar(refs) {
     const option = document.createElement("option");
     option.value = item.id;
     option.textContent = item.name.trim() || "Untitled Lorebook";
+    option.title = option.textContent;
     return option;
   });
 
   refs.bookSelect.replaceChildren(...options);
   refs.bookSelect.value = state.activeBookId ?? "";
+  refs.bookSelect.title = refs.bookSelect.selectedOptions[0]?.textContent ?? "";
   refs.entrySort.value = state.ui.sortMode;
   renderFilterChips(refs.entryFilters, filters);
   renderTagFilters(refs.tagFilters, availableTags, tagFilters);
@@ -319,14 +361,7 @@ export function renderSidebar(refs) {
   renderBulkBar(refs);
 
   if (!filtered.length && !pinnedEntry) {
-    const empty = document.createElement("div");
-    empty.className = "entry-list-empty";
-    empty.textContent = query
-      ? `No entries match "${state.ui.searchQuery.trim()}".`
-      : narrowing
-        ? "No entries match the current filters."
-        : "No entries yet. Create one to start writing.";
-    refs.entryList.append(empty);
+    refs.entryList.append(createEmptyState({ query, narrowing, hasFilters, hasTagFilters, entries }));
     refs.entryList.classList.remove("is-virtual");
     refs.entryList.style.removeProperty("--entry-row-height");
     visibleIds = [];
@@ -392,6 +427,11 @@ export function renderSidebar(refs) {
   }
 
   refs.entryList.append(fragment);
+
+  if (pinnedEntry && !filtered.length) {
+    refs.entryList.append(createEmptyState({ query, narrowing, hasFilters, hasTagFilters, entries }));
+  }
+
   refs.entryList.scrollTop = scrollTop;
 
   if (focusedEntryId) {

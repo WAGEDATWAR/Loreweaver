@@ -86,6 +86,20 @@ const states = [
     await page.click("#about-guide-btn");
     await page.waitFor('document.querySelector("#guide-dialog")?.open');
   } },
+  { name: "peek dialog", setup: async (page) => {
+    await page.click("#peek-btn");
+    await page.waitFor('document.querySelector("#peek-dialog")?.open');
+  } },
+  { name: "bulk tag dialog", setup: async (page) => {
+    await page.evaluate(`(() => {
+      const card = document.querySelector(".entry-card");
+      card.dispatchEvent(new MouseEvent("click", { bubbles: true, ctrlKey: true }));
+      return true;
+    })()`);
+    await page.waitFor('document.querySelector("#bulk-bar")?.hidden === false');
+    await page.click("#bulk-tag-btn");
+    await page.waitFor('document.querySelector("#bulk-tag-dialog")?.open');
+  } },
   { name: "card dialog", setup: async (page) => {
     await page.click("#new-card-btn");
     await page.waitFor('document.querySelector("#card-dialog")?.open');

@@ -119,3 +119,16 @@ test("returns no issues for a complete book", () => {
   assert.deepEqual(validateBook(book), []);
   assert.deepEqual(validateBook(null), []);
 });
+
+test("reports broken entry links", () => {
+  const book = createBook([{ id: "entry_a", title: "Mara", content: "See [[Harbor]]" }]);
+  const issues = validateBook(book).filter((issue) => issue.code === "brokenLink");
+  assert.equal(issues.length, 1);
+  assert.equal(issues[0].field, "entry-content");
+});
+
+test("reports content over a token limit", () => {
+  const book = createBook([{ id: "entry_a", title: "Long", content: "a".repeat(80), tokenLimit: 5 }]);
+  const issues = validateBook(book).filter((issue) => issue.code === "tokenLimit");
+  assert.equal(issues.length, 1);
+});

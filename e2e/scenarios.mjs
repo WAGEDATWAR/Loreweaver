@@ -368,6 +368,148 @@ export const scenarios = [
     }
   },
   {
+    name: "offers reset filters and clear search in the empty state",
+    async run(page) {
+      await resetApp(page);
+      await page.evaluate(`(() => {
+        const chip = document.querySelector('[data-filter="missingKeys"]');
+        chip.click();
+        return true;
+      })()`);
+      await page.evaluate(`(() => {
+        const input = document.querySelector("#entry-search");
+        input.value = "zzzznomatch";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        return true;
+      })()`);
+      await page.waitFor('document.querySelector("[data-empty-action=\\"clear-search\\"]")');
+      await page.click('[data-empty-action="clear-search"]');
+      await page.waitFor('document.querySelector("#entry-search")?.value === ""');
+      await page.waitFor('document.querySelector("[data-empty-action=\\"reset-filters\\"]")');
+      await page.click('[data-empty-action="reset-filters"]');
+      await page.waitFor('document.querySelectorAll(".entry-card").length > 0');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "duplicates with Ctrl+D and copies an entry",
+    async run(page) {
+      await resetApp(page);
+      const before = await page.evaluate('document.querySelectorAll(".entry-card").length');
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "d", ctrlKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor(`document.querySelectorAll(".entry-card").length === ${before + 1}`);
+
+      await page.evaluate(`(() => {
+        window.__copied = "";
+        navigator.clipboard.writeText = async (value) => { window.__copied = value; };
+        return true;
+      })()`);
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('document.querySelector("#command-dialog")?.open');
+      await setValue(page, "#command-input", "copy entry");
+      await page.waitFor('document.querySelectorAll(".command-option").length >= 1');
+      await page.evaluate(`(() => {
+        const input = document.querySelector("#command-input");
+        input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+        return true;
+      })()`);
+      await page.waitFor('window.__copied.length > 0');
+      assert.match(await page.evaluate("window.__copied"), /copy/i);
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "remembers the last active entry per lorebook",
+    async run(page) {
+      await resetApp(page);
+      await page.click("#new-book-btn");
+      await page.waitFor('document.querySelectorAll("#book-select option").length === 2');
+      await page.click("#add-entry-btn");
+      await page.waitFor('document.querySelector("#entry-title")?.value === ""');
+      await setValue(page, "#entry-title", "Second book entry");
+      await page.waitFor('document.querySelector("#entry-title")?.value === "Second book entry"');
+
+      await page.evaluate(`(() => {
+        const select = document.querySelector("#book-select");
+        select.value = select.options[0].value;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        return true;
+      })()`);
+      await page.waitFor('document.querySelector("#book-name")?.value === "Aurora Vale"');
+      await page.evaluate(`(() => {
+        const select = document.querySelector("#book-select");
+        select.value = select.options[1].value;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        return true;
+      })()`);
+      await page.waitFor('document.querySelector("#entry-title")?.value === "Second book entry"');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "peeks at an entry as injected text",
+    async run(page) {
+      await resetApp(page);
+      await page.click("#peek-btn");
+      await page.waitFor('document.querySelector("#peek-dialog")?.open');
+      const body = await page.evaluate('document.querySelector("#peek-body").textContent');
+      assert.ok(body.length > 0);
+      const meta = await page.evaluate('document.querySelector("#peek-meta").textContent');
+      assert.match(meta, /tokens/);
+      await page.click("#peek-close");
+      await page.waitFor('!document.querySelector("#peek-dialog")?.open');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "suggests keys and flags limits and broken links",
+    async run(page) {
+      await resetApp(page);
+      await page.click("#add-entry-btn");
+      await page.waitFor('document.querySelectorAll(".entry-card").length === 4');
+      await setValue(page, "#entry-title", "Mara Voss");
+      await setValue(page, "#entry-content", "Mara walks the harbor and sees [[Nowhere]].");
+
+      await page.click("#suggest-keys-btn");
+      await page.waitFor('document.querySelectorAll("#entry-keys .key-chip").length > 0');
+      const chips = await page.evaluate('[...document.querySelectorAll("#entry-keys .key-chip")].map((chip) => chip.textContent)');
+      assert.ok(chips.some((chip) => /mara/i.test(chip)));
+
+      await setValue(page, "#entry-token-limit", "1");
+      await page.waitFor('document.querySelector("#validation-count")?.textContent !== "0"');
+      await page.click("#validation-btn");
+      await page.waitFor('document.querySelector("#validation-dialog")?.open');
+      const types = await page.evaluate('[...document.querySelectorAll(".validation-issue-type")].map((node) => node.textContent)');
+      assert.ok(types.includes("Broken entry link"));
+      assert.ok(types.includes("Token limit"));
+      await page.click("#validation-close");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "adds and removes a bulk tag",
+    async run(page) {
+      await resetApp(page);
+      const ids = await page.evaluate('[...document.querySelectorAll(".entry-card")].map((card) => card.dataset.entryId)');
+      await page.evaluate(`(() => {
+        const cards = [...document.querySelectorAll(".entry-card")];
+        cards[0].dispatchEvent(new MouseEvent("click", { bubbles: true, ctrlKey: true }));
+        return true;
+      })()`);
+      await page.waitFor('document.querySelector("#bulk-bar")?.hidden === false');
+      await page.click("#bulk-tag-btn");
+      await page.waitFor('document.querySelector("#bulk-tag-dialog")?.open');
+      await setValue(page, "#bulk-tag-input", "campaign");
+      await page.click("#bulk-tag-add");
+      await page.waitFor('!document.querySelector("#bulk-tag-dialog")?.open');
+      await page.waitFor('document.querySelectorAll(".entry-tag").length > 0');
+      const tagged = await page.evaluate('[...document.querySelectorAll(".entry-tag")].map((node) => node.textContent)');
+      assert.ok(tagged.includes("campaign"));
+      assert.ok(ids.length >= 1);
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "imports a PNG card and extracts its book",
     async run(page, context) {
       await resetApp(page);
@@ -1064,7 +1206,7 @@ export const scenarios = [
 
       const summary = await page.evaluate('document.querySelector("#simulation-summary").textContent');
       assert.match(summary, /activate/);
-      const output = await page.evaluate('document.querySelector(".simulation-output")?.textContent ?? ""');
+      const output = await page.evaluate('document.querySelector("#simulation-results .simulation-output")?.textContent ?? ""');
       assert.match(output, /Aurora Vale clings/);
       const skipped = await page.evaluate('document.querySelector(".simulation-skipped summary")?.textContent ?? ""');
       assert.match(skipped, /Not activated/);
@@ -1331,3 +1473,4 @@ export const scenarios = [
     }
   }
 ];
+

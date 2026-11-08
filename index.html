@@ -47,12 +47,12 @@
           </svg>
         </button>
         <div class="history-controls" role="group" aria-label="History">
-          <button id="undo-btn" class="icon-btn" type="button" aria-label="Undo" title="Undo (Ctrl+Z)" disabled>
+          <button id="undo-btn" class="icon-btn" type="button" aria-label="Undo" aria-keyshortcuts="Control+Z" title="Undo (Ctrl+Z)" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v2"/>
             </svg>
           </button>
-          <button id="redo-btn" class="icon-btn" type="button" aria-label="Redo" title="Redo (Ctrl+Shift+Z)" disabled>
+          <button id="redo-btn" class="icon-btn" type="button" aria-label="Redo" aria-keyshortcuts="Control+Shift+Z" title="Redo (Ctrl+Shift+Z)" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0-6 6v2"/>
             </svg>
@@ -82,7 +82,7 @@
           </svg>
           <span class="btn-label">Import</span>
         </button>
-        <button id="export-btn" class="btn" type="button" aria-label="Export lorebook or project" title="Export lorebook or project">
+        <button id="export-btn" class="btn" type="button" aria-label="Export lorebook or project" aria-keyshortcuts="Control+Shift+E" title="Export lorebook or project">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/>
           </svg>
@@ -311,12 +311,17 @@
                   <path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19V3"/>
                 </svg>
               </button>
+              <button id="bulk-tag-btn" class="icon-btn" type="button" title="Tag selected entries" aria-label="Tag selected entries">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 12V4h8l9 9-8 8-9-9Z"/><circle cx="7.5" cy="8.5" r="1.2"/>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
 
         <div class="sidebar-footer">
-          <button id="add-entry-btn" class="btn btn-primary btn-block" type="button" title="New entry (Alt+N)">
+          <button id="add-entry-btn" class="btn btn-primary btn-block" type="button" aria-keyshortcuts="Alt+N" title="New entry (Alt+N)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
               <path d="M12 5v14"/><path d="M5 12h14"/>
             </svg>
@@ -385,6 +390,7 @@
                     <div id="entry-keys" class="key-chips">
                       <input id="entry-keys-input" class="key-chips-input" type="text" placeholder="sword, blade, weapon" autocomplete="off" spellcheck="false">
                     </div>
+                    <button id="suggest-keys-btn" class="link-btn" type="button">Suggest keys from title and content</button>
                   </div>
                   <div class="field">
                     <label for="entry-secondary-keys-input">Secondary keys <span class="hint">optional</span></label>
@@ -445,6 +451,7 @@
                     <span class="stat-name">Tokens</span>
                   </div>
                 </div>
+                <button id="peek-btn" class="link-btn" type="button">Peek as injected text</button>
               </section>
 
               <section class="details-section">
@@ -477,6 +484,16 @@
                       <input id="entry-probability" type="range" min="0" max="100" step="1">
                       <output id="entry-probability-output" for="entry-probability">100%</output>
                     </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="entry-token-limit">Token limit <span class="hint">0 = off</span></label>
+                    <input id="entry-token-limit" type="number" inputmode="numeric" min="0" step="10">
+                  </div>
+
+                  <div class="field">
+                    <label for="entry-char-limit">Character limit <span class="hint">0 = off</span></label>
+                    <input id="entry-char-limit" type="number" inputmode="numeric" min="0" step="100">
                   </div>
                 </div>
 
@@ -634,6 +651,20 @@
       <p id="overview-longest" class="overview-longest"></p>
       <div class="dialog-actions">
         <button id="overview-close" class="btn" type="button">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="peek-dialog" class="dialog peek-dialog" aria-labelledby="peek-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading">
+        <p class="eyebrow">Injection peek</p>
+        <h2 id="peek-title">Entry as injected</h2>
+        <p id="peek-meta" class="dialog-copy"></p>
+      </div>
+      <pre id="peek-body" class="simulation-output"></pre>
+      <div class="dialog-actions">
+        <button id="peek-close" class="btn" type="button">Close</button>
       </div>
     </div>
   </dialog>
@@ -824,6 +855,25 @@
         <button id="replace-cancel" class="btn" type="button">Cancel</button>
         <button id="replace-preview" class="btn" type="button" disabled>Preview</button>
         <button id="replace-apply" class="btn btn-primary" type="button" disabled>Replace all</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="bulk-tag-dialog" class="dialog bulk-tag-dialog" aria-labelledby="bulk-tag-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading">
+        <p class="eyebrow">Bulk tags</p>
+        <h2 id="bulk-tag-title">Tag selected entries</h2>
+        <p id="bulk-tag-copy" class="dialog-copy">Add or remove a tag on every selected entry.</p>
+      </div>
+      <div class="field">
+        <label for="bulk-tag-input">Tag</label>
+        <input id="bulk-tag-input" type="text" autocomplete="off" placeholder="campaign">
+      </div>
+      <div class="dialog-actions">
+        <button id="bulk-tag-cancel" class="btn" type="button">Cancel</button>
+        <button id="bulk-tag-remove" class="btn" type="button">Remove tag</button>
+        <button id="bulk-tag-add" class="btn btn-primary" type="button">Add tag</button>
       </div>
     </div>
   </dialog>
