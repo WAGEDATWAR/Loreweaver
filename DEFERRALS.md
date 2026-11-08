@@ -26,18 +26,61 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 | DEF-007 | Entry links (`[[Title]]`) with broken-link validation | - | P5 | scheduled |
 | DEF-008 | Suggested trigger keys from title and content | - | P5 | scheduled |
 | DEF-009 | Bulk tag assignment for selected entries | - | P5 | scheduled |
+| DEF-108 | A configurable default for new-entry flags (always on, selective, case sensitive, whole words) | per-project defaults, not a hidden global | P5 | scheduled |
+| DEF-109 | An inject-peek preview of an entry's rendered text | simulation shows the set; this shows one entry | P5 | scheduled |
+| DEF-110 | Markdown preview for content | only if the target frontends read it consistently | P5 | scheduled |
+| DEF-113 | Per-entry colour labels for visual grouping | distinct from tags | P5 | scheduled |
+
 
 ## I. Interop
 
 | # | Item | Notes | Owner | Status |
 |---|---|---|---|---|
-| DEF-012 | Character card containers (PNG/CHARX) and embedded books | - | P5 | scheduled |
+| DEF-012 | Character card containers (PNG/CHARX) and embedded books | tracked in detail as the K series (DEF-084 to DEF-091); this row closes with them | P5 | scheduled |
 | DEF-013 | Chub wrapper variants beyond `lorebook_v3` | wrapped `data` block fixture imports with wrapper fields preserved | P4 | done |
 | DEF-014 | RisuAI-native export | - | P5 | scheduled |
 | DEF-015 | Editable advanced SillyTavern and Chub fields | - | P5 | scheduled |
 | DEF-016 | Lossy-field warning coverage across serializers | tags and notes warn on every interchange export (`buildLossyWarnings`); native stays silent | P4 | done |
 | DEF-017 | JSON/YAML plain export for scripting | - | P5 | scheduled |
 | DEF-019 | Drag-and-drop file import onto the window | - | P5 | scheduled |
+| DEF-111 | An import audit log of detected format, warnings and skipped fields | complements the preview; keeps a review trail | P5 | scheduled |
+
+
+## K. Character cards
+
+Cards are a first-class record (G-16). The container is an adapter (A-8), so the canonical book model
+never learns a card quirk.
+
+| # | Item | Notes | Owner | Status |
+|---|---|---|---|---|
+| DEF-084 | A card metadata record (name, personality, scenario, greetings, examples, creator notes, tags, avatar) | the hub the container adapters project onto | P5 | scheduled |
+| DEF-085 | Read PNG tEXt/zTXt card chunks | V2/V3 card JSON rides in PNG text chunks | P5 | scheduled |
+| DEF-086 | CHARX (zip) card import and export | zip container around the card and its assets | P5 | scheduled |
+| DEF-087 | Card spec V2/V3 detection and validation | warn on a malformed card instead of guessing | P5 | scheduled |
+| DEF-088 | Extract an embedded character book into a lorebook on card import | the book stays linked; extraction is previewed | P5 | scheduled |
+| DEF-089 | Bind a lorebook to a card and export them together | one flow writes the card and its book | P5 | scheduled |
+| DEF-090 | A card library with preview and avatar | cards are picked beside books, not a separate app | P5 | scheduled |
+| DEF-091 | Card field parity checklist | extends `docs/reference/PARITY.md` to card fields | P5 | scheduled |
+
+
+## O. Organization
+
+| # | Item | Notes | Owner | Status |
+|---|---|---|---|---|
+| DEF-092 | User-pinned entries per book | distinct from the auto "Current" pin | P5 | scheduled |
+| DEF-093 | A recent-entries list | last edited, cross-book | P5 | scheduled |
+| DEF-094 | A regex search mode in the entry list | complements regex keys | P5 | scheduled |
+
+
+## C. Context
+
+| # | Item | Notes | Owner | Status |
+|---|---|---|---|---|
+| DEF-020 | Cache tokenization per entry revision | content-keyed LRU in `tokenCache.js`; survives re-render, clears on encoding change | P4 | done |
+| DEF-021 | Bulk operations by token size | select-by-size dialog feeds the bulk bar (`bulk.js`) | P4 | done |
+| DEF-022 | A visual activation graph for the simulation | ranked bars, legend and inactive rows in the simulator (`activationGraph.js`) | P4 | done |
+| DEF-023 | A large-book performance benchmark and virtualization | windowing plus 2,000/5,000-entry and 500,000-character benchmark profiles | P4 | done |
+
 
 ## P. Persistence
 
@@ -49,14 +92,6 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 | DEF-024 | A "what changed since your last session" summary | session-start diff banner on next load | P4 | done |
 | DEF-025 | A custom `.lwproj` extension for project files | project save and backup write `.lwproj`; `.json` still imports | P4 | done |
 
-## C. Context
-
-| # | Item | Notes | Owner | Status |
-|---|---|---|---|---|
-| DEF-020 | Cache tokenization per entry revision | content-keyed LRU in `tokenCache.js`; survives re-render, clears on encoding change | P4 | done |
-| DEF-021 | Bulk operations by token size | select-by-size dialog feeds the bulk bar (`bulk.js`) | P4 | done |
-| DEF-022 | A visual activation graph for the simulation | ranked bars, legend and inactive rows in the simulator (`activationGraph.js`) | P4 | done |
-| DEF-023 | A large-book performance benchmark and virtualization | windowing plus 2,000/5,000-entry and 500,000-character benchmark profiles | P4 | done |
 
 ## U. Surface
 
@@ -64,6 +99,7 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 |---|---|---|---|---|
 | DEF-030 | A mobile library drawer | - | P5 | scheduled |
 | DEF-031 | A light theme or theme tokens | G-7 | P5 | scheduled |
+| DEF-112 | A pre-commit contrast check over the token set | light theme needs it; also catches dark regressions | P5 | scheduled |
 | DEF-032 | Density options for compact lists | - | P5 | scheduled |
 | DEF-033 | Resizable text areas with remembered heights | - | P5 | scheduled |
 | DEF-034 | A keyboard shortcuts reference dialog | - | P5 | scheduled |
@@ -71,6 +107,37 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 | DEF-036 | Hover hint popups for long field explanations | - | P5 | scheduled |
 | DEF-037 | `aria-keyshortcuts` on shortcut buttons | - | P5 | scheduled |
 | DEF-038 | A changelog link in the About panel | - | P5 | scheduled |
+
+
+## N. Fine polish
+
+Small, low-risk surface fixes carried from the old backlog.
+
+| # | Item | Notes | Owner | Status |
+|---|---|---|---|---|
+| DEF-095 | Hide field hints while the field has content | show again on focus or when empty | P5 | scheduled |
+| DEF-096 | Multi-select validation issue-type filters | today one type at a time | P5 | scheduled |
+| DEF-097 | Hide the Repair button when the integrity check is clean | - | P5 | scheduled |
+| DEF-098 | Toast timing and duplicate-failure suppression | - | P5 | scheduled |
+| DEF-099 | Truncate long lorebook names with a full-name tooltip | - | P5 | scheduled |
+| DEF-100 | Show the app version in the tab title | - | P5 | scheduled |
+| DEF-101 | A "Copy entry" action | title, keys and content to the clipboard | P5 | scheduled |
+| DEF-102 | Ctrl/Cmd+Enter runs the simulation from its input | - | P5 | scheduled |
+| DEF-103 | Ctrl/Cmd+D duplicates the active entry | - | P5 | scheduled |
+| DEF-104 | Loading and error states for every async action | extends DEF-002 | P5 | scheduled |
+| DEF-114 | Remember the last active entry per lorebook across a book switch | - | P5 | scheduled |
+| DEF-115 | A "Reset filters" action when a search or filter hides everything | - | P5 | scheduled |
+| DEF-116 | A "Clear search" affordance in the sidebar empty state | - | P5 | scheduled |
+| DEF-105 | An optional UI-state block in project files | session layout, opt-in | P5 | scheduled |
+| DEF-106 | A schema reference page generated from the canonical model | held to the model by a test | P5 | scheduled |
+| DEF-107 | Print/PDF export for offline review passes | - | P5 | scheduled |
+
+
+
+
+
+
+
 
 ## Q. Engineering
 
@@ -85,6 +152,7 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 | DEF-055 | Jump to the offending field from a validation issue | issues carry a `field` target and focus it on jump | P4 | done |
 | DEF-056 | A 5,000-entry profile for `npm run benchmark` | consumer ask B-14; wide-scale profile lands 34.8ms | P4 | done |
 
+
 ## R. Product and release
 
 | # | Item | Notes | Owner | Status |
@@ -96,6 +164,15 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 | DEF-057 | Three-way merge over a common ancestor | consumer ask B-16; `diff.js` is the base | P5 | scheduled |
 | DEF-060 | Decide the Windows build story | consumer ask C-1; Chrysalis S70 needs an answer | P5 | scheduled |
 | DEF-064 | Multi-book attach with per-book weights and a set-level priority order | consumer ask B-8; today one active book | P5 | scheduled |
+
+
+## M. Mobile
+
+| # | Item | Notes | Owner | Status |
+|---|---|---|---|---|
+| DEF-066 | Share-sheet import and export on Android | preview builds use the file picker and downloads | post-v1 | scheduled |
+| DEF-067 | A signed release APK and keystore | previews are debug-signed only (docs/MOBILE-PREVIEW.md) | P5 | scheduled |
+
 
 ## X. Component (post-v1, separate repository)
 
@@ -110,17 +187,5 @@ may delay a v1 phase.
 | DEF-062 | An embedding and vendoring guide with the licence note | asks A-1/C-3 | post-v1 | scheduled |
 | DEF-063 | Extract the pure core into a new component repository | asks A-1 to A-6; the v1 tag is the precondition | post-v1 | scheduled |
 | DEF-065 | Run-level budget arbitration across attached books | ask B-9; the run budget is the outer bound | post-v1 | scheduled |
-
-## M. Mobile
-
-| # | Item | Notes | Owner | Status |
-|---|---|---|---|---|
-| DEF-066 | Share-sheet import and export on Android | preview builds use the file picker and downloads | post-v1 | scheduled |
-| DEF-067 | A signed release APK and keystore | previews are debug-signed only (docs/MOBILE-PREVIEW.md) | P5 | scheduled |
-
-
-
-
-
 
 

@@ -18,6 +18,21 @@ native projects all round-trip their fixtures.
 4. Native Loreweaver project backup plus single-book native export.
 5. Standalone character-book export.
 
+### 1.1 Character cards (P5)
+
+Not built yet; owned by `DEFERRALS.md` K, decided by G-16 and A-8. A card is a canonical record and the
+container is an adapter, so the split is:
+
+| Layer | Owns |
+|---|---|
+| Card record | name, personality, scenario, greetings, examples, creator notes, tags, avatar bytes |
+| PNG adapter | reads and writes the `tEXt`/`zTXt` `ccv3`/`chara` chunks around the image |
+| CHARX adapter | the zip container and its assets |
+| Book link | an embedded book extracts to a lorebook, or a bound book writes back in |
+
+A card that carries a book exports the card and its book together (DEF-089); extraction previews before
+it touches the project (DEF-088). Neither adapter may put a card quirk into the book model.
+
 ## 2. Adapter contract
 
 Each adapter provides:
@@ -93,8 +108,8 @@ Native export stays silent because it drops nothing.
 
 ## 6. Known gaps
 
-- Character card containers (PNG/CHARX) and embedded character books are not supported (DEF-012).
-- Chub wrapper variants beyond `lorebook_v3` are not covered (DEF-013).
+- Character card containers (PNG/CHARX) and embedded character books are not built yet (DEF-012,
+  DEF-084 to DEF-091).
 - RisuAI-native export is not supported (DEF-014).
 - Advanced Chub and SillyTavern fields are preserved but not editable (DEF-015).
 - Import does not yet offer a JSON/YAML plain export for scripting (DEF-017).

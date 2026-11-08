@@ -39,6 +39,7 @@ convenience note in the editor doc.
 | `docs/ARCHITECTURE.md` | Application shape, data flow, canonical model, module boundaries | built |
 | `docs/EDITOR.md` | Entry authoring, keys, templates, selection, bulk actions, book actions, history | built |
 | `docs/INTEROP.md` | Format adapters, detection, field mapping, round-trip requirements, limits | built |
+| `docs/CARDS.md` | Character card record, PNG/CHARX containers, card fields, book links | designed |
 | `docs/PERSISTENCE.md` | Storage backends, migration, integrity, backups, revisions, recovery | built |
 | `docs/CONTEXT.md` | Tokenizer, budgets, overview metrics, context simulation | built |
 | `docs/UI.md` | Layout, design tokens, interaction patterns, accessibility, responsive rules | built |
@@ -48,6 +49,7 @@ convenience note in the editor doc.
 `docs/getting-started.md` is the in-app guide, so it targets the same voice as `docs/UI.md`. Prior-art
 notes, the parity audit against SillyTavern and Chub, and the audit of what the sibling projects want
 from Loreweaver (`docs/reference/EXTERNAL-ASKS.md`) live under `docs/reference/`.
+`docs/reference/LEGACY-BACKLOG.md` proves every retired `Lorebook Tool` item has a home.
 
 `docs/MOBILE-PREVIEW.md` owns the milestone APK build and is owned by `PLAN.md`.
 
@@ -65,9 +67,11 @@ A decision beats a design. If they disagree, the design has a bug, not the decis
 
 | Topic | Owner |
 |---|---|
-| Product intent, pillars, constraints, phase order | `docs/LOREWEAVER.md` || Shape, data flow, canonical model, module boundaries | `docs/ARCHITECTURE.md` |
+| Product intent, pillars, constraints, phase order | `docs/LOREWEAVER.md` |
+| Shape, data flow, canonical model, module boundaries | `docs/ARCHITECTURE.md` |
 | Entry fields, keys, templates, selection, bulk and book actions, history | `docs/EDITOR.md` |
 | Formats, detection, field mapping, round-trip, import limits | `docs/INTEROP.md` |
+| Character cards, containers, card fields, book links | `docs/CARDS.md` |
 | Storage, migration, integrity, backup, revision, recovery | `docs/PERSISTENCE.md` |
 | Tokenizer, budgets, overview, simulation | `docs/CONTEXT.md` |
 | Layout, tokens, interaction, accessibility, responsive | `docs/UI.md` |
@@ -81,6 +85,7 @@ A decision beats a design. If they disagree, the design has a bug, not the decis
 
 **Touching authoring:** `docs/EDITOR.md`, then `docs/ARCHITECTURE.md` 2.
 **Touching a format:** `docs/INTEROP.md`, then `docs/reference/PARITY.md`.
+**Touching cards:** `docs/CARDS.md`, then `DECISIONS.md` G-16/A-8.
 **Touching storage:** `docs/PERSISTENCE.md`, then `DEFERRALS.md` P.
 **Touching tokens or simulation:** `docs/CONTEXT.md`, then `DECISIONS.md` C.
 **Touching the surface:** `docs/UI.md`, then `DECISIONS.md` U.

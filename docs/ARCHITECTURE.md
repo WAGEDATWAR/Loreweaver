@@ -6,6 +6,10 @@
 
 **Status:** built. Every module below exists and is gated.
 
+**Planned (P5):** a `cards` collection beside `books` (G-16). A card is a sibling record, not a book
+variant, and its PNG/CHARX containers are adapters (A-8, `docs/INTEROP.md` 1.1). The shape below gains
+`cards: Card[]` and `activeCardId`; no book field changes for it.
+
 ---
 
 ## 1. Shape

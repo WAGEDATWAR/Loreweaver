@@ -30,6 +30,7 @@ C = context, U = surface.
 | G-13 | **Content-agnostic.** No explicitness policy; an entry carries what it carries. | locked |
 | G-14 | **The standalone tool is the first and only v1 target.** A reusable component is a separate repository, extracted **after** v1 ships. No ask from a consumer delays a standalone phase. | locked |
 | G-15 | **The pure core is the extraction seam.** `schema`, `books`, `validation`, `overview`, `keys`, `simulation`, `search`, `diff`, `merge`, `integrity` and `windowing` stay DOM-, storage- and `main.js`-free (A-1) so the component can lift them without a rewrite. Extraction never required a second source of truth. | locked |
+| G-16 | **A character card is a first-class record, not a lorebook variant.** A card is a sibling record to a book and may own or link one. Card support lands before v1; card art editing stays a non-goal. | locked |
 
 ## Architecture (A-series)
 
@@ -42,6 +43,7 @@ C = context, U = surface.
 | A-5 | **Internal ids are stable and opaque**; `entry_`/`book_` prefixes, never reused. | locked |
 | A-6 | **Frontend quirks belong in adapters**, never in the canonical model. | locked |
 | A-7 | **SillyTavern World Info v2 is the primary v1 export target.** It sorts first, is marked primary, and carries the most complete round-trip. | locked |
+| A-8 | **A card container is an adapter, not a model change.** PNG text chunks and CHARX live at the rim; the card record and its book stay canonical. | locked |
 
 ## Editor (E-series)
 

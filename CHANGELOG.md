@@ -4,6 +4,15 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ## [Unreleased]
 
+### Added
+
+- `docs/CARDS.md` and `docs/reference/LEGACY-BACKLOG.md`. The retired `Lorebook Tool` backlog is audited
+  item by item and every open entry either ships, gains a ledger row, or is folded.
+- Character cards as a first-class P5 workstream: decisions G-16 (a card is a record) and A-8 (a
+  container is an adapter), plus ledger series K (DEF-084 to DEF-091).
+- Ledger series O (pinned/recent entries, regex search) and N (fine polish), and DEF-106 to DEF-116.
+- `TODO.md` restructured into phase-tagged area sections with an ordered Next Up slice.
+
 ## [0.8.0] - 2026-11-08
 
 Mobile preview builds, bulk authoring tools and the completed scale phase.

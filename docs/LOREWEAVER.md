@@ -55,7 +55,7 @@ because the alternative - editing blobs - makes both properties accidental.
 - Replacing a roleplay frontend or running model inference.
 - Embedding a chat client.
 - Account systems, cloud sync, or collaboration.
-- Image generation or character card artwork editing.
+- Image generation or character card artwork editing (the card image is imported, never painted).
 - Emulating every activation rule at runtime. The editor captures settings; consumers apply them.
 - A reusable embedded component. v1 is the standalone tool; the component is extracted after v1 in its
   own repository (G-14).
@@ -84,7 +84,7 @@ Each phase in `TODO.md` has a gate in `PLAN.md`. A regression blocks the next ph
 - **P3 - Context intelligence.** Real tokenizer, budget, collision and coverage detection, simulation,
   regex keys.
 - **P4 - Scale and durability.** IndexedDB, project files, longer retention, virtualization, export diff.
-- **P5 - Release.** Onboarding, palette, themes, guide, a11y audit, browser suite, deployment.
+- **P5 - Release.** Character cards, onboarding, themes, guide, a11y audit, browser suite, deployment.
 - **P6 - Component (post-v1, separate repo).** Extract the pure core and a headless surface so a consumer
   can embed the editor (G-14, G-15). It tracks v1; it does not gate it.
 
@@ -94,6 +94,7 @@ Each phase in `TODO.md` has a gate in `PLAN.md`. A regression blocks the next ph
 - Real SillyTavern and Chub books round-trip with unknown fields intact and warnings for the rest.
 - A 2,000-entry book stays responsive and an accidental import is recoverable.
 - A new user creates and exports a first lorebook without external documentation.
+- A card imports, round-trips through PNG and CHARX, and exports with its book.
 - Every gate is green on `main`; `npm run a11y` reports zero serious violations.
 - The pure modules still import no DOM, storage or `main.js` at v1, so extraction stays a lift.
 
@@ -105,12 +106,11 @@ these docs without a gate is a claim to remove or instrument.
 
 ## 10. Backlog (untriaged)
 
-Ideas that are not yet a phase step or a deferral row. Triage moves each into `TODO.md`, a phase, or
-`DEFERRALS.md`.
+Ideas with no phase step and no `DEFERRALS.md` row yet. Triage moves each into `TODO.md`, a phase, or
+the ledger; the ledger is the source of truth once a row exists, so this list stays short.
 
-- Entry links (`[[Title]]`) with broken-link validation.
-- Markdown preview if target frontends interpret it consistently.
-- Suggested trigger keys from title and content.
-- Per-entry colour and tag grouping.
-- An encryption story for sensitive content.
-- A "what changed since your last session" summary.
+- A shared key dictionary across a project, to audit collisions before they ship.
+- Importable lorebook "style guides" that prefill entry defaults.
+- A side-by-side compare of two books in the same project.
+- A reading mode that hides all chrome.
+
