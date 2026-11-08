@@ -1,8 +1,20 @@
 # Changelog
 
-All notable changes to Lorebook Studio are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to the version in `package.json`.
+All notable changes to Loreweaver are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to the version in `package.json`.
 
 ## [Unreleased]
+
+### Added
+
+- A lorebook actions dialog to duplicate, split, and merge lorebooks, with id and source-UID remapping on merge.
+- `AGENTS.md`, `DOCUMENTATION-INDEX.md`, `DECISIONS.md`, and `DEFERRALS.md`, plus owned topic docs under `docs/` (`LOREWEAVER`, `ARCHITECTURE`, `EDITOR`, `INTEROP`, `PERSISTENCE`, `CONTEXT`, `UI`) and reference notes under `docs/reference/`.
+- `npm run deferrals` (ledger check) and `npm run deferral-scan` (prose check), with the ledger gate wired into CI.
+
+### Changed
+
+- Renamed the product from Lorebook Studio to Loreweaver across the UI, docs, package metadata, and export filenames. Stored projects, backups, revisions, UI preferences, and IndexedDB data migrate from the old `lorebook-studio` namespace on load, and legacy native files still import.
+- Reshaped `PLAN.md` to workflow and gate discipline; the charter, architecture, and topic detail moved into their owning docs.
+- Reorganized `TODO.md` around phases with gates and a deferral cross-reference.
 
 ## [0.7.4] - 2026-10-22
 

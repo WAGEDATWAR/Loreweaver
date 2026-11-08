@@ -1,4 +1,5 @@
-export const DATABASE_NAME = "lorebook-studio";
+export const DATABASE_NAME = "loreweaver";
+export const LEGACY_DATABASE_NAME = "lorebook-studio";
 export const DATABASE_VERSION = 1;
 export const STORE_NAME = "keyval";
 

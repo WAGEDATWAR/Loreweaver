@@ -227,7 +227,7 @@ test("round-trips native projects with source metadata", () => {
   const restored = parseProject(JSON.stringify(buildExport(imported.project)));
 
   assert.equal(restored.ok, true);
-  assert.equal(restored.format, "Lorebook Studio project");
+  assert.equal(restored.format, "Loreweaver project");
   assert.deepEqual(restored.project.books[0].extensions, imported.project.books[0].extensions);
   assert.deepEqual(restored.project.books[0].entries[0].extensions, imported.project.books[0].entries[0].extensions);
 });
@@ -306,7 +306,7 @@ test("exports one active book as a native project and reimports it", () => {
   const exported = serializeLorebook("native", book);
 
   assert.equal(exported.ok, true);
-  assert.equal(exported.filename, "harbor-secrets-lorebook-studio.json");
+  assert.equal(exported.filename, "harbor-secrets-loreweaver.json");
   assert.equal(exported.data.books.length, 1);
   assert.equal(exported.data.books[0].name, "Harbor Secrets");
 

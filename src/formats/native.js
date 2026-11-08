@@ -1,4 +1,4 @@
-import { APP_ID, SCHEMA_VERSION, createProject } from "../schema.js";
+import { APP_ID, LEGACY_APP_ID, SCHEMA_VERSION, createProject } from "../schema.js";
 import { isRecord } from "./helpers.js";
 
 function createBookSnapshot(book) {
@@ -14,10 +14,10 @@ function createBookSnapshot(book) {
 
 export const nativeAdapter = {
   id: "native",
-  label: "Lorebook Studio project",
-  exportLabel: "Lorebook Studio book",
-  exportDescription: "A single-book Lorebook Studio file that keeps every canonical field.",
-  exportFilenameSuffix: "lorebook-studio",
+  label: "Loreweaver project",
+  exportLabel: "Loreweaver book",
+  exportDescription: "A single-book Loreweaver file that keeps every canonical field.",
+  exportFilenameSuffix: "loreweaver",
   capabilities: {
     bookExport: true,
     preservesUnknownFields: true
@@ -27,7 +27,7 @@ export const nativeAdapter = {
       return 0;
     }
 
-    if (input.app === APP_ID) {
+    if (input.app === APP_ID || input.app === LEGACY_APP_ID) {
       return 20;
     }
 
@@ -35,7 +35,7 @@ export const nativeAdapter = {
   },
   parse(input) {
     if (!Array.isArray(input.books)) {
-      return { ok: false, error: "That file doesn't look like a Lorebook Studio project." };
+      return { ok: false, error: "That file doesn't look like a Loreweaver project." };
     }
 
     if (!input.books.length) {

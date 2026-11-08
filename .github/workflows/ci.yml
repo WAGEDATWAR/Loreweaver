@@ -41,3 +41,6 @@ jobs:
 
       - name: Accessibility audit
         run: npm run a11y
+
+      - name: Deferral ledger
+        run: npm run deferrals

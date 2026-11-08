@@ -88,7 +88,7 @@ if (entry === fileURLToPath(import.meta.url)) {
 
   startStaticServer({ port })
     .then(({ server }) => {
-      console.log(`Lorebook Studio running at http://localhost:${server.address().port}`);
+      console.log(`Loreweaver running at http://localhost:${server.address().port}`);
     })
     .catch((error) => {
       console.error(error);

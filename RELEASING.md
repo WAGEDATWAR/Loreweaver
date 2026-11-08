@@ -1,6 +1,6 @@
 # Releasing
 
-Lorebook Studio uses a simple pre-1.0 semantic versioning convention.
+Loreweaver uses a simple pre-1.0 semantic versioning convention.
 
 ## Versioning
 
@@ -24,6 +24,8 @@ Lorebook Studio uses a simple pre-1.0 semantic versioning convention.
    - `npm test`
    - `npm run test:e2e`
    - `npm run a11y`
+   - `npm run deferrals`
+   - `npm run deferral-scan`
    - `npm run release:check`
 5. Commit the release changes.
 6. Push `main`.
@@ -36,4 +38,6 @@ Lorebook Studio uses a simple pre-1.0 semantic versioning convention.
 - `npm run lint` enforces whitespace, indentation, and small code-quality rules.
 - `npm run format` reports files that need whitespace normalization; `npm run format:write` applies fixes.
 - `npm run a11y` runs the axe-core accessibility audit over the workspace and every dialog.
+- `npm run deferrals` validates the `DEFERRALS.md` ledger.
+- `npm run deferral-scan` reports prose deferrals with no ledger id.
 - `npm run release:check` verifies that `package.json`, the `index.html` app-version meta, `CHANGELOG.md`, and the tag on `HEAD` agree.

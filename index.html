@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0b0d12">
   <meta name="app-version" content="0.7.4">
   <meta name="description" content="A local-first editor for lorebooks used in LLM roleplay frontends.">
-  <title>Lorebook Studio</title>
+  <title>Loreweaver</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="icon" href="./favicon.ico" sizes="32x32">
   <link rel="stylesheet" href="./src/styles.css">
@@ -14,7 +14,7 @@
 <body>
   <div class="app">
     <header class="topbar">
-      <h1 class="sr-only">Lorebook Studio</h1>
+      <h1 class="sr-only">Loreweaver</h1>
       <div class="brand">
         <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -22,7 +22,7 @@
             <path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5V5.5Z"/>
           </svg>
         </span>
-        <span class="brand-name">Lorebook Studio</span>
+        <span class="brand-name">Loreweaver</span>
       </div>
 
       <span class="topbar-divider" aria-hidden="true"></span>
@@ -76,7 +76,7 @@
           </svg>
           <span class="btn-label">Save</span>
         </button>
-        <button id="import-btn" class="btn" type="button" aria-label="Import lorebook" title="Import a lorebook or Lorebook Studio project">
+        <button id="import-btn" class="btn" type="button" aria-label="Import lorebook" title="Import a lorebook or Loreweaver project">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>
           </svg>
@@ -88,7 +88,7 @@
           </svg>
           <span class="btn-label">Export</span>
         </button>
-        <button id="about-btn" class="icon-btn about-btn" type="button" aria-label="About Lorebook Studio" title="About and getting started">
+        <button id="about-btn" class="icon-btn about-btn" type="button" aria-label="About Loreweaver" title="About and getting started">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6h.01"/>
           </svg>
@@ -144,6 +144,11 @@
               <div class="section-label" id="book-label">Lorebook</div>
               <div class="book-controls">
                 <select id="book-select" class="book-select" aria-labelledby="book-label"></select>
+                <button id="book-actions-btn" class="icon-btn" type="button" title="Lorebook actions" aria-label="Lorebook actions">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/>
+                  </svg>
+                </button>
                 <button id="new-book-btn" class="icon-btn" type="button" title="New lorebook" aria-label="New lorebook">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
                     <path d="M12 5v14"/><path d="M5 12h14"/>
@@ -675,7 +680,7 @@
     <div class="dialog-inner">
       <div class="dialog-heading">
         <p class="eyebrow">Welcome</p>
-        <h2 id="onboarding-title">Welcome to Lorebook Studio</h2>
+        <h2 id="onboarding-title">Welcome to Loreweaver</h2>
         <p class="dialog-copy">A local-first editor for lorebooks used in LLM roleplay frontends.</p>
       </div>
       <ul class="onboarding-points">
@@ -702,6 +707,38 @@
         <button id="sample-reset" class="btn btn-primary" type="button">Reset to the sample</button>
         <button id="sample-empty" class="btn" type="button">Start with an empty lorebook</button>
         <button id="sample-cancel" class="btn" type="button">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="book-actions-dialog" class="dialog book-actions-dialog" aria-labelledby="book-actions-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading">
+        <p class="eyebrow">Lorebook actions</p>
+        <h2 id="book-actions-title">Manage this lorebook</h2>
+        <p id="book-actions-summary" class="dialog-copy"></p>
+      </div>
+      <div class="book-actions">
+        <button id="book-duplicate" class="book-action" type="button">
+          <span class="book-action-title">Duplicate lorebook</span>
+          <span class="book-action-desc">Create a copy with the same entries and a new name.</span>
+        </button>
+        <button id="book-split" class="book-action" type="button">
+          <span class="book-action-title">Split lorebook</span>
+          <span class="book-action-desc">Move the selected entries into a new lorebook, or split in half when none are selected.</span>
+        </button>
+        <div class="book-action book-action-merge">
+          <span class="book-action-title">Merge into another lorebook</span>
+          <span class="book-action-desc">Append this lorebook's entries into the target, then remove this one.</span>
+          <div class="book-action-row">
+            <label class="sr-only" for="book-merge-target">Merge target</label>
+            <select id="book-merge-target" class="book-merge-target"></select>
+            <button id="book-merge" class="btn" type="button">Merge</button>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button id="book-actions-close" class="btn" type="button">Close</button>
       </div>
     </div>
   </dialog>
@@ -774,10 +811,10 @@
     <div class="dialog-inner">
       <div class="dialog-heading">
         <p class="eyebrow">About</p>
-        <h2 id="about-title">Lorebook Studio</h2>
+        <h2 id="about-title">Loreweaver</h2>
         <p id="about-version" class="dialog-copy">Version 0.0.0</p>
       </div>
-      <p class="about-privacy">Lorebook Studio is local-first. Your projects never leave this device: there are no accounts, no analytics, and no uploads. Everything is stored in your browser and is only shared when you export or import a file yourself.</p>
+      <p class="about-privacy">Loreweaver is local-first. Your projects never leave this device: there are no accounts, no analytics, and no uploads. Everything is stored in your browser and is only shared when you export or import a file yourself.</p>
       <dl class="about-details">
         <dt>Import formats</dt>
         <dd id="about-import-formats">&mdash;</dd>

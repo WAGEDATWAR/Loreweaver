@@ -1,3 +1,4 @@
+import { duplicateBook, mergeBookEntries, splitBook, splitPoint } from "./books.js";
 import { createBook, createEntry, normalizeTagList } from "./schema.js";
 import { clamp } from "./utils.js";
 
@@ -482,6 +483,65 @@ export function updateActiveBookTokenBudget(value) {
   book.tokenBudget = next;
   book.updatedAt = Date.now();
   return book;
+}
+
+export function duplicateActiveBook() {
+  const book = getActiveBook();
+
+  if (!book) {
+    return null;
+  }
+
+  captureHistory("duplicate-book", false);
+  const copy = duplicateBook(book);
+  const index = state.books.findIndex((item) => item.id === book.id);
+  state.books.splice(index + 1, 0, copy);
+  state.activeBookId = copy.id;
+  state.activeEntryId = copy.entries[0]?.id ?? null;
+  clearSelection();
+  return copy;
+}
+
+export function splitActiveBook(entryIds) {
+  const book = getActiveBook();
+
+  if (!book) {
+    return null;
+  }
+
+  const ids = Array.isArray(entryIds) && entryIds.length ? entryIds : splitPoint(book.entries);
+
+  if (!ids.length || ids.length >= book.entries.length) {
+    return null;
+  }
+
+  captureHistory("split-book", false);
+  const { kept, moved } = splitBook(book, ids);
+  const index = state.books.findIndex((item) => item.id === book.id);
+  state.books.splice(index, 1, kept, moved);
+  state.activeBookId = moved.id;
+  state.activeEntryId = moved.entries[0]?.id ?? null;
+  clearSelection();
+  return moved;
+}
+
+export function mergeActiveBookInto(targetId) {
+  const source = getActiveBook();
+  const target = state.books.find((book) => book.id === targetId);
+
+  if (!source || !target || source.id === target.id) {
+    return null;
+  }
+
+  captureHistory("merge-book", false);
+  const merged = mergeBookEntries(target, source);
+  const targetIndex = state.books.findIndex((book) => book.id === target.id);
+  state.books[targetIndex] = merged;
+  state.books = state.books.filter((book) => book.id !== source.id);
+  state.activeBookId = merged.id;
+  state.activeEntryId = merged.entries[0]?.id ?? null;
+  clearSelection();
+  return merged;
 }
 
 export function deleteBook(id = state.activeBookId) {

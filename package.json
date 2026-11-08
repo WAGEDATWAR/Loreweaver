@@ -1,5 +1,5 @@
 {
-  "name": "lorebook-studio",
+  "name": "loreweaver",
   "version": "0.7.4",
   "private": true,
   "type": "module",
@@ -11,6 +11,8 @@
     "test:e2e": "node --no-warnings e2e/run.mjs",
     "test:all": "npm test && npm run test:e2e",
     "a11y": "node --no-warnings e2e/a11y.mjs",
+    "deferrals": "node scripts/deferrals.mjs",
+    "deferral-scan": "node scripts/deferral-scan.mjs",
     "check": "node scripts/check.mjs",
     "lint": "node scripts/lint.mjs",
     "format": "node scripts/format.mjs",

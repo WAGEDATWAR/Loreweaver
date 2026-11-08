@@ -333,7 +333,7 @@ export class Page {
       await this.navigate(appUrl);
       await this.evaluate(`(() => {
         for (const key of Object.keys(localStorage)) {
-          if (key.startsWith("lorebook-studio:")) localStorage.removeItem(key);
+          if (key.startsWith("loreweaver:") || key.startsWith("lorebook-studio:")) localStorage.removeItem(key);
         }
         return true;
       })()`);
@@ -347,7 +347,7 @@ export class Page {
 
     const script = await this.client.send("Page.addScriptToEvaluateOnNewDocument", {
       source: `(() => {
-        localStorage.setItem("lorebook-studio:project:v1", ${JSON.stringify(JSON.stringify(seed))});
+        localStorage.setItem("loreweaver:project:v1", ${JSON.stringify(JSON.stringify(seed))});
       })();`
     });
 

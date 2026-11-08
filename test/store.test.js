@@ -7,6 +7,7 @@ import {
   canRedo,
   canUndo,
   deleteEntries,
+  duplicateActiveBook,
   duplicateEntry,
   getActiveBook,
   getActiveEntry,
@@ -15,6 +16,7 @@ import {
   getState,
   getTagFilters,
   initStore,
+  mergeActiveBookInto,
   moveEntry,
   redo,
   replaceProject,
@@ -25,6 +27,7 @@ import {
   setEntryFilters,
   setSortMode,
   setTagFilters,
+  splitActiveBook,
   toggleEntryFilter,
   toggleEntrySelection,
   toggleTagFilter,
@@ -219,6 +222,38 @@ test("updates book tags and tag filters", () => {
 
   setTagFilters(["npc", "npc", "vip"]);
   assert.deepEqual(getTagFilters(), ["npc", "vip"]);
+});
+
+test("duplicates the active lorebook with undo", () => {
+  initStore(createTestProject());
+  const originalId = getActiveBook().id;
+  const copy = duplicateActiveBook();
+
+  assert.equal(getState().books.length, 2);
+  assert.equal(copy.name, "Test Book (copy)");
+  assert.equal(getState().activeBookId, copy.id);
+  assert.equal(canUndo(), true);
+
+  assert.equal(undo(), true);
+  assert.equal(getState().books.length, 1);
+  assert.equal(getActiveBook().id, originalId);
+});
+
+test("splits and merges the active lorebook", () => {
+  initStore(createTestProject());
+  const original = getActiveBook();
+  const moved = splitActiveBook([original.entries[2].id]);
+
+  assert.equal(getState().books.length, 2);
+  assert.equal(moved.entries.length, 1);
+  assert.equal(getActiveBook().id, moved.id);
+
+  const targetId = getState().books.find((book) => book.id !== moved.id).id;
+  const merged = mergeActiveBookInto(targetId);
+
+  assert.equal(getState().books.length, 1);
+  assert.equal(merged.entries.length, 3);
+  assert.equal(getActiveBook().id, merged.id);
 });
 
 test("updates the active book token budget", () => {

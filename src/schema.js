@@ -1,6 +1,7 @@
 import { clamp, createId } from "./utils.js";
 
-export const APP_ID = "lorebook-studio";
+export const APP_ID = "loreweaver";
+export const LEGACY_APP_ID = "lorebook-studio";
 export const SCHEMA_VERSION = 2;
 
 export const POSITIONS = [

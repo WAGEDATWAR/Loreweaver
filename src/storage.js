@@ -2,12 +2,19 @@ import { parseProject } from "./format.js";
 import { SCHEMA_VERSION } from "./schema.js";
 import { createSampleProject } from "./sample.js";
 import { createId } from "./utils.js";
-import { createIndexedDbBackend, isIndexedDbAvailable, openDatabase } from "./storage/idb.js";
+import {
+  LEGACY_DATABASE_NAME,
+  createIndexedDbBackend,
+  isIndexedDbAvailable,
+  openDatabase
+} from "./storage/idb.js";
+import { migrateLegacyLocalStorage } from "./storage/legacy.js";
+import { legacyKeyToCurrent, storageKey } from "./storage/namespace.js";
 
-export const STORAGE_KEY = "lorebook-studio:project:v1";
-export const BACKUP_KEY = "lorebook-studio:pre-import-backup:v1";
-export const REVISIONS_KEY = "lorebook-studio:revisions:v1";
-export const REVISION_KEY_PREFIX = "lorebook-studio:revision:v1:";
+export const STORAGE_KEY = storageKey("project:v1");
+export const BACKUP_KEY = storageKey("pre-import-backup:v1");
+export const REVISIONS_KEY = storageKey("revisions:v1");
+export const REVISION_KEY_PREFIX = storageKey("revision:v1:");
 
 const REVISION_LIMIT = 12;
 const REVISION_CHAR_BUDGET = 1_500_000;
@@ -98,10 +105,16 @@ function listLocalStorageKeys() {
 }
 
 function isManagedKey(key) {
-  return key === STORAGE_KEY
-    || key === BACKUP_KEY
-    || key === REVISIONS_KEY
-    || key.startsWith(REVISION_KEY_PREFIX);
+  const currentKey = currentKeyOf(key);
+
+  return currentKey === STORAGE_KEY
+    || currentKey === BACKUP_KEY
+    || currentKey === REVISIONS_KEY
+    || currentKey.startsWith(REVISION_KEY_PREFIX);
+}
+
+function currentKeyOf(key) {
+  return legacyKeyToCurrent(key) ?? key;
 }
 
 async function migrateFromLocalStorage(target) {
@@ -144,7 +157,7 @@ async function migrateFromLocalStorage(target) {
     }
 
     try {
-      await target.set(key, value);
+      await target.set(currentKeyOf(key), value);
       copied.push(key);
     } catch {
       continue;
@@ -162,15 +175,60 @@ async function migrateFromLocalStorage(target) {
   return { migrated: copied.length, cleaned: 0 };
 }
 
+async function migrateLegacyDatabase(target) {
+  let legacyDatabase;
+
+  try {
+    legacyDatabase = await openDatabase(LEGACY_DATABASE_NAME);
+  } catch {
+    return { migrated: 0 };
+  }
+
+  try {
+    const legacy = createIndexedDbBackend(legacyDatabase);
+    const keys = (await legacy.keys()).filter(isManagedKey);
+    const existing = await target.get(STORAGE_KEY);
+    let migrated = 0;
+
+    if (keys.length && existing === null) {
+      for (const key of keys) {
+        try {
+          const value = await legacy.get(key);
+
+          if (value !== null) {
+            await target.set(currentKeyOf(key), value);
+            migrated += 1;
+          }
+        } catch {
+          continue;
+        }
+      }
+    }
+
+    if (keys.length && typeof indexedDB !== "undefined" && indexedDB.deleteDatabase) {
+      indexedDB.deleteDatabase(LEGACY_DATABASE_NAME);
+    }
+
+    return { migrated };
+  } catch {
+    return { migrated: 0 };
+  } finally {
+    legacyDatabase.close();
+  }
+}
+
 export async function initStorage() {
   if (backend) {
     return { ok: true, backend: backendName, migration: null };
   }
 
+  migrateLegacyLocalStorage();
+
   if (isIndexedDbAvailable()) {
     try {
       const database = await openDatabase();
       const idb = createIndexedDbBackend(database);
+      await migrateLegacyDatabase(idb);
       const migration = await migrateFromLocalStorage(idb);
       backend = idb;
       backendName = "indexeddb";

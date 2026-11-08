@@ -33,7 +33,7 @@ export function parseLorebookData(input, options = {}) {
   if (!candidates.length) {
     return {
       ok: false,
-      error: "That file isn't a supported lorebook. Try a Lorebook Studio project, SillyTavern World Info, or Chub lorebook."
+      error: "That file isn't a supported lorebook. Try a Loreweaver project, SillyTavern World Info, or Chub lorebook."
     };
   }
 

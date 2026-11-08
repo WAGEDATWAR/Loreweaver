@@ -15,6 +15,7 @@ import {
   deleteActiveEntry,
   deleteBook,
   deleteEntries,
+  duplicateActiveBook,
   duplicateEntry,
   getActiveBook,
   getActiveEntry,
@@ -25,6 +26,7 @@ import {
   getTagFilters,
   isSampleProject,
   initStore,
+  mergeActiveBookInto,
   moveEntry,
   redo,
   renameActiveBook,
@@ -38,6 +40,7 @@ import {
   setSearchQuery,
   setSortMode,
   setTagFilters,
+  splitActiveBook,
   toggleEntryFilter,
   toggleEntrySelection,
   toggleTagFilter,
@@ -68,6 +71,7 @@ import { IMPORT_STRATEGIES, mergeProject } from "./merge.js";
 import { createSampleProject } from "./sample.js";
 import { createProject, normalizeTagList } from "./schema.js";
 import { searchProject } from "./search.js";
+import { storageKey } from "./storage/namespace.js";
 import {
   CONTEXT_WINDOW_PRESETS,
   DEFAULT_TOKEN_SETTINGS,
@@ -176,6 +180,14 @@ const refs = {
   guideDialog: document.querySelector("#guide-dialog"),
   guideCloseBtn: document.querySelector("#guide-close"),
   bookSelect: document.querySelector("#book-select"),
+  bookActionsBtn: document.querySelector("#book-actions-btn"),
+  bookActionsDialog: document.querySelector("#book-actions-dialog"),
+  bookActionsSummary: document.querySelector("#book-actions-summary"),
+  bookDuplicateBtn: document.querySelector("#book-duplicate"),
+  bookSplitBtn: document.querySelector("#book-split"),
+  bookMergeTarget: document.querySelector("#book-merge-target"),
+  bookMergeBtn: document.querySelector("#book-merge"),
+  bookActionsCloseBtn: document.querySelector("#book-actions-close"),
   newBookBtn: document.querySelector("#new-book-btn"),
   deleteBookBtn: document.querySelector("#delete-book-btn"),
   entrySearch: document.querySelector("#entry-search"),
@@ -322,16 +334,16 @@ let validationFilter = null;
 let tokenSettings = { ...DEFAULT_TOKEN_SETTINGS };
 const numberFormatter = new Intl.NumberFormat("en-US");
 
-const DETAILS_STATE_KEY = "lorebook-studio:details-collapsed:v1";
-const SIDEBAR_STATE_KEY = "lorebook-studio:sidebar-collapsed:v1";
-const SIDEBAR_WIDTH_KEY = "lorebook-studio:sidebar-width:v1";
-const SORT_STATE_KEY = "lorebook-studio:sort:v1";
-const FILTER_STATE_KEY = "lorebook-studio:filters:v1";
-const TAG_FILTER_STATE_KEY = "lorebook-studio:tag-filters:v1";
-const ONBOARDED_KEY = "lorebook-studio:onboarded:v1";
-const TOKEN_SETTINGS_KEY = "lorebook-studio:token-settings:v1";
-const LAST_BACKUP_KEY = "lorebook-studio:last-backup:v1";
-const BACKUP_SNOOZE_KEY = "lorebook-studio:backup-reminder-snooze:v1";
+const DETAILS_STATE_KEY = storageKey("details-collapsed:v1");
+const SIDEBAR_STATE_KEY = storageKey("sidebar-collapsed:v1");
+const SIDEBAR_WIDTH_KEY = storageKey("sidebar-width:v1");
+const SORT_STATE_KEY = storageKey("sort:v1");
+const FILTER_STATE_KEY = storageKey("filters:v1");
+const TAG_FILTER_STATE_KEY = storageKey("tag-filters:v1");
+const ONBOARDED_KEY = storageKey("onboarded:v1");
+const TOKEN_SETTINGS_KEY = storageKey("token-settings:v1");
+const LAST_BACKUP_KEY = storageKey("last-backup:v1");
+const BACKUP_SNOOZE_KEY = storageKey("backup-reminder-snooze:v1");
 const BACKUP_REMINDER_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 const BACKUP_SNOOZE_MS = 3 * 24 * 60 * 60 * 1000;
 const SORT_MODES = new Set(["manual", "title", "order", "updated", "enabled"]);
@@ -717,7 +729,7 @@ function appVersion() {
 
 async function renderAboutDialog() {
   refs.aboutVersion.textContent = `Version ${appVersion()}`;
-  refs.aboutImportFormats.textContent = "Lorebook Studio project, SillyTavern World Info v2, Chub lorebook, character book";
+  refs.aboutImportFormats.textContent = "Loreweaver project, SillyTavern World Info v2, Chub lorebook, character book";
   refs.aboutExportFormats.textContent = [
     "Project backup",
     ...EXPORT_FORMATS.map((format) => format.label)
@@ -1035,6 +1047,7 @@ function buildCommands() {
       refs.bookName.select();
       scheduleSave();
     } },
+    { title: "Lorebook actions", keywords: ["duplicate", "merge", "split", "book"], run: openBookActionsDialog },
     { title: "Save project", hint: "Ctrl+S", keywords: ["persist"], run: async () => {
       if (await flushSave()) {
         toast("Project saved", "success");
@@ -1064,7 +1077,7 @@ function buildCommands() {
     { title: "Search all lorebooks", hint: "Ctrl+Shift+F", keywords: ["global", "find", "everywhere"], run: openGlobalSearchDialog },
     { title: "Token settings", keywords: ["tokenizer", "model", "context window"], run: openTokenSettingsDialog },
     { title: "Check data integrity", keywords: ["repair", "diagnostics", "snapshots"], run: () => openIntegrityDialog() },
-    { title: "About Lorebook Studio", keywords: ["version", "privacy", "info"], run: () => openAboutDialog() }
+    { title: "About Loreweaver", keywords: ["version", "privacy", "info"], run: () => openAboutDialog() }
   ];
 
   if (entry) {
@@ -1105,7 +1118,7 @@ function supportsFileSystemAccess() {
 
 function suggestedProjectFilename() {
   const stamp = new Date().toISOString().slice(0, 10);
-  return `lorebook-studio-project-${stamp}.json`;
+  return `loreweaver-project-${stamp}.json`;
 }
 
 async function ensureWritePermission(handle) {
@@ -1146,7 +1159,7 @@ async function openProjectFile() {
 
   try {
     [handle] = await window.showOpenFilePicker({
-      types: [{ description: "Lorebook Studio project", accept: { "application/json": [".json"] } }],
+      types: [{ description: "Loreweaver project", accept: { "application/json": [".json"] } }],
       multiple: false
     });
   } catch {
@@ -1177,7 +1190,7 @@ async function saveProjectFile({ saveAs = false } = {}) {
     if (!handle || saveAs) {
       handle = await window.showSaveFilePicker({
         suggestedName: suggestedProjectFilename(),
-        types: [{ description: "Lorebook Studio project", accept: { "application/json": [".json"] } }]
+        types: [{ description: "Loreweaver project", accept: { "application/json": [".json"] } }]
       });
     }
 
@@ -1205,7 +1218,7 @@ async function saveProjectFile({ saveAs = false } = {}) {
 
 function updateDocumentTitle() {
   const book = getActiveBook();
-  document.title = `${book?.name.trim() || "Untitled Lorebook"} — Lorebook Studio`;
+  document.title = `${book?.name.trim() || "Untitled Lorebook"} — Loreweaver`;
 }
 
 function updateHistoryButtons() {
@@ -2026,7 +2039,7 @@ async function openExportDialog() {
 
 function exportProjectBackup() {
   const stamp = new Date().toISOString().slice(0, 10);
-  downloadJson(buildExport(getState()), `lorebook-studio-project-${stamp}.json`);
+  downloadJson(buildExport(getState()), `loreweaver-project-${stamp}.json`);
   markBackupExported();
   hideBackupReminder();
   toast("Project backup exported", "success");
@@ -2348,6 +2361,81 @@ async function handleDeleteBook() {
   toast("Lorebook deleted");
 }
 
+function renderBookActionsDialog() {
+  const book = getActiveBook();
+  const entries = book?.entries ?? [];
+  const selected = getSelectedEntryIds().length;
+  const others = getState().books.filter((item) => item.id !== book?.id);
+
+  refs.bookActionsSummary.textContent = selected
+    ? `${selected} of ${entries.length} entries selected.`
+    : `${entries.length} ${entries.length === 1 ? "entry" : "entries"} in this lorebook.`;
+
+  const options = others.map((item) => {
+    const option = document.createElement("option");
+    option.value = item.id;
+    option.textContent = item.name.trim() || "Untitled Lorebook";
+    return option;
+  });
+
+  refs.bookMergeTarget.replaceChildren(...options);
+  refs.bookMergeTarget.disabled = !others.length;
+  refs.bookMergeBtn.disabled = !others.length;
+  refs.bookSplitBtn.disabled = entries.length < 2;
+}
+
+function openBookActionsDialog() {
+  renderBookActionsDialog();
+
+  if (!refs.bookActionsDialog.open) {
+    refs.bookActionsDialog.showModal();
+  }
+}
+
+function handleDuplicateBook() {
+  const copy = duplicateActiveBook();
+
+  if (!copy) {
+    return;
+  }
+
+  refs.bookActionsDialog.close();
+  clearSearch();
+  renderAll();
+  scheduleSave();
+  toast(`Duplicated as ${copy.name}`, "success");
+}
+
+function handleSplitBook() {
+  const moved = splitActiveBook(getSelectedEntryIds());
+
+  if (!moved) {
+    toast("Select some entries to split, or keep at least one entry behind.", "error");
+    return;
+  }
+
+  refs.bookActionsDialog.close();
+  clearSearch();
+  renderAll();
+  scheduleSave();
+  toast(`Split ${moved.entries.length} ${moved.entries.length === 1 ? "entry" : "entries"} into ${moved.name}`, "success");
+}
+
+function handleMergeBook() {
+  const merged = mergeActiveBookInto(refs.bookMergeTarget.value);
+
+  if (!merged) {
+    toast("Choose a different lorebook to merge into.", "error");
+    return;
+  }
+
+  refs.bookActionsDialog.close();
+  clearSearch();
+  renderAll();
+  scheduleSave();
+  toast(`Merged into ${merged.name}`, "success");
+}
+
 function handleBulkEnabled(enabled) {
   const changed = setEntriesEnabled(getSelectedEntryIds(), enabled);
 
@@ -2600,6 +2688,32 @@ refs.newBookBtn.addEventListener("click", () => {
 
 refs.deleteBookBtn.addEventListener("click", () => {
   handleDeleteBook();
+});
+
+refs.bookActionsBtn.addEventListener("click", () => {
+  openBookActionsDialog();
+});
+
+refs.bookDuplicateBtn.addEventListener("click", () => {
+  handleDuplicateBook();
+});
+
+refs.bookSplitBtn.addEventListener("click", () => {
+  handleSplitBook();
+});
+
+refs.bookMergeBtn.addEventListener("click", () => {
+  handleMergeBook();
+});
+
+refs.bookActionsCloseBtn.addEventListener("click", () => {
+  refs.bookActionsDialog.close();
+});
+
+refs.bookActionsDialog.addEventListener("click", (event) => {
+  if (event.target === refs.bookActionsDialog) {
+    refs.bookActionsDialog.close();
+  }
 });
 
 refs.bookSelect.addEventListener("change", (event) => {
@@ -3522,13 +3636,14 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
+await initStorage();
+
 const storedDetailsState = readDetailsState();
 setDetailsCollapsed(storedDetailsState ?? window.matchMedia("(max-width: 720px)").matches, false);
 
 const storedSidebarState = readSidebarState();
 setSidebarCollapsed(storedSidebarState ?? false, false);
 
-await initStorage();
 initStore(await loadProject());
 
 const initialSortMode = readSortMode();

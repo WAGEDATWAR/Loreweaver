@@ -51,6 +51,10 @@ const states = [
     await page.click("#about-btn");
     await page.waitFor('document.querySelector("#about-dialog")?.open');
   } },
+  { name: "book actions dialog", setup: async (page) => {
+    await page.click("#book-actions-btn");
+    await page.waitFor('document.querySelector("#book-actions-dialog")?.open');
+  } },
   { name: "token settings dialog", setup: async (page) => {
     await page.click("#about-btn");
     await page.waitFor('document.querySelector("#about-dialog")?.open');

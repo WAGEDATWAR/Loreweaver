@@ -73,20 +73,20 @@ async function pasteChipKeys(page, selector, text) {
 async function readIndexedDbProject(page) {
   return page.evaluate(`(async () => {
     const database = await new Promise((resolve, reject) => {
-      const request = indexedDB.open("lorebook-studio");
+      const request = indexedDB.open("loreweaver");
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
     const value = await new Promise((resolve, reject) => {
       const transaction = database.transaction("keyval", "readonly");
-      const request = transaction.objectStore("keyval").get("lorebook-studio:project:v1");
+      const request = transaction.objectStore("keyval").get("loreweaver:project:v1");
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
     database.close();
     return {
       value: typeof value === "string" ? value : "",
-      localStorageProject: localStorage.getItem("lorebook-studio:project:v1")
+      localStorageProject: localStorage.getItem("loreweaver:project:v1")
     };
   })()`);
 }
@@ -450,8 +450,8 @@ export const scenarios = [
     async run(page) {
       await resetApp(page);
       await page.evaluate(`(() => {
-        localStorage.setItem("lorebook-studio:last-backup:v1", String(Date.now() - 8 * 24 * 60 * 60 * 1000));
-        localStorage.removeItem("lorebook-studio:backup-reminder-snooze:v1");
+        localStorage.setItem("loreweaver:last-backup:v1", String(Date.now() - 8 * 24 * 60 * 60 * 1000));
+        localStorage.removeItem("loreweaver:backup-reminder-snooze:v1");
         return true;
       })()`);
       await page.reload();
@@ -460,7 +460,7 @@ export const scenarios = [
 
       await page.click("#backup-reminder-export-btn");
       await page.waitFor('document.querySelector("#backup-reminder")?.hidden === true');
-      const last = await page.evaluate('Number(localStorage.getItem("lorebook-studio:last-backup:v1"))');
+      const last = await page.evaluate('Number(localStorage.getItem("loreweaver:last-backup:v1"))');
       assert.ok(Date.now() - last < 60000);
       assert.deepEqual(page.errors, []);
     }
@@ -501,6 +501,56 @@ export const scenarios = [
       const result = await readIndexedDbProject(page);
       assert.ok(result.value.includes("Migrated Book"));
       assert.equal(result.localStorageProject, null);
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "migrates legacy lorebook-studio storage to the loreweaver namespace",
+    async run(page) {
+      const seed = {
+        version: 2,
+        activeBookId: "book_legacy",
+        activeEntryId: "entry_legacy",
+        books: [{
+          id: "book_legacy",
+          name: "Legacy Book",
+          description: "",
+          entries: [{
+            id: "entry_legacy",
+            title: "Legacy Entry",
+            keys: ["legacy"],
+            content: "From the old namespace",
+            order: 10
+          }]
+        }]
+      };
+
+      await page.resetStorage();
+      await page.evaluate(`(async () => {
+        const database = await new Promise((resolve, reject) => {
+          const request = indexedDB.open("loreweaver");
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+        await new Promise((resolve, reject) => {
+          const transaction = database.transaction("keyval", "readwrite");
+          transaction.objectStore("keyval").clear();
+          transaction.oncomplete = () => resolve();
+          transaction.onerror = () => reject(transaction.error);
+        });
+        database.close();
+        localStorage.clear();
+        localStorage.setItem("lorebook-studio:project:v1", ${JSON.stringify(JSON.stringify(seed))});
+        localStorage.setItem("lorebook-studio:sort:v1", "title");
+        return true;
+      })()`);
+      await page.reload();
+      await page.waitFor('document.querySelector("#book-name")?.value === "Legacy Book"');
+      const result = await readIndexedDbProject(page);
+      assert.ok(result.value.includes("Legacy Book"));
+      assert.equal(result.localStorageProject, null);
+      assert.equal(await page.evaluate('localStorage.getItem("lorebook-studio:project:v1")'), null);
+      assert.equal(await page.evaluate('localStorage.getItem("loreweaver:sort:v1")'), "title");
       assert.deepEqual(page.errors, []);
     }
   },
@@ -714,6 +764,41 @@ export const scenarios = [
       await page.click("[data-validation-all]");
       await page.waitFor(`document.querySelectorAll(".validation-issue").length === ${total}`);
       await page.click("#validation-close");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "duplicates, splits, and merges lorebooks",
+    async run(page) {
+      await resetApp(page);
+
+      await page.click("#book-actions-btn");
+      await page.waitFor('document.querySelector("#book-actions-dialog")?.open');
+      await page.click("#book-duplicate");
+      await page.waitFor('document.querySelectorAll("#book-select option").length === 2');
+      let names = await page.evaluate('[...document.querySelectorAll("#book-select option")].map((option) => option.textContent)');
+      assert.deepEqual(names, ["Aurora Vale", "Aurora Vale (copy)"]);
+
+      await page.click("#book-actions-btn");
+      await page.waitFor('document.querySelector("#book-actions-dialog")?.open');
+      await page.click("#book-split");
+      await page.waitFor('document.querySelectorAll("#book-select option").length === 3');
+      names = await page.evaluate('[...document.querySelectorAll("#book-select option")].map((option) => option.textContent)');
+      assert.deepEqual(names, ["Aurora Vale", "Aurora Vale (copy)", "Aurora Vale (copy) (split)"]);
+
+      await page.click("#book-actions-btn");
+      await page.waitFor('document.querySelector("#book-actions-dialog")?.open');
+      await page.evaluate(`(() => {
+        const select = document.querySelector("#book-merge-target");
+        const option = [...select.options].find((item) => item.textContent === "Aurora Vale");
+        select.value = option.value;
+        return true;
+      })()`);
+      await page.click("#book-merge");
+      await page.waitFor('document.querySelectorAll("#book-select option").length === 2');
+
+      const book = await page.evaluate('document.querySelector("#book-name").value');
+      assert.equal(book, "Aurora Vale");
       assert.deepEqual(page.errors, []);
     }
   },

@@ -1,6 +1,6 @@
 # Getting started
 
-Lorebook Studio is a local-first editor for lorebooks used in LLM roleplay frontends. Everything runs in your browser: there are no accounts, no analytics, and no uploads.
+Loreweaver is a local-first editor for lorebooks used in LLM roleplay frontends. Everything runs in your browser: there are no accounts, no analytics, and no uploads.
 
 ## Create your first lorebook
 
@@ -19,7 +19,7 @@ Lorebook Studio is a local-first editor for lorebooks used in LLM roleplay front
 
 ## Import and export
 
-- **Import** accepts Lorebook Studio projects, SillyTavern World Info v2, Chub lorebooks, and character books. The import preview shows a diff and lets you replace, append, or merge by title.
+- **Import** accepts Loreweaver projects, SillyTavern World Info v2, Chub lorebooks, and character books. The import preview shows a diff and lets you replace, append, or merge by title.
 - **Export** produces a full project backup or a single active lorebook as native JSON, SillyTavern World Info v2, Chub, or a standalone character book.
 - Unknown fields from imported files are preserved and restored when you export back to that format.
 
@@ -46,4 +46,4 @@ Lorebook Studio is a local-first editor for lorebooks used in LLM roleplay front
 
 ## Privacy
 
-Lorebook Studio never sends your data anywhere. Projects live in your browser and are only shared when you explicitly export or import a file.
+Loreweaver never sends your data anywhere. Projects live in your browser and are only shared when you explicitly export or import a file.
