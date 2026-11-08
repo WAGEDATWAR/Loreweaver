@@ -89,7 +89,7 @@ import { openCommandPalette } from "./ui/commandPalette.js";
 import { renderEditor, syncEntryStats } from "./ui/editor.js";
 import { createKeyChips } from "./ui/keyChips.js";
 import { confirmAction, toast } from "./ui/overlays.js";
-import { renderSidebar } from "./ui/sidebar.js";
+import { getVisibleEntryIds, renderSidebar } from "./ui/sidebar.js";
 import { clamp } from "./utils.js";
 import { VALIDATION_LABELS, validateBook } from "./validation.js";
 
@@ -358,6 +358,7 @@ let dropPlace = "before";
 let sidebarWidth = 0;
 let sidebarWidthMode = "auto";
 let sidebarDrag = null;
+let virtualScrollFrame = 0;
 
 function readSortMode() {
   try {
@@ -1651,15 +1652,46 @@ function jumpToValidationEntry(entryId) {
 }
 
 function focusEntryCard(id) {
-  const card = Array.from(refs.entryList.querySelectorAll("[data-entry-id]"))
-    .find((element) => element.dataset.entryId === id);
+  let card = findEntryCard(id);
+
+  if (!card) {
+    scrollEntryCardIntoView(id);
+    card = findEntryCard(id);
+  }
+
   card?.focus({ preventScroll: true });
 }
 
+function findEntryCard(id) {
+  return Array.from(refs.entryList.querySelectorAll("[data-entry-id]"))
+    .find((element) => element.dataset.entryId === id) ?? null;
+}
+
 function scrollEntryCardIntoView(id) {
-  const card = Array.from(refs.entryList.querySelectorAll("[data-entry-id]"))
-    .find((element) => element.dataset.entryId === id);
-  card?.scrollIntoView({ block: "nearest" });
+  const card = findEntryCard(id);
+
+  if (card) {
+    card.scrollIntoView({ block: "nearest" });
+    return;
+  }
+
+  const index = visibleEntryIds().indexOf(id);
+
+  if (index === -1) {
+    return;
+  }
+
+  const rowHeight = parseFloat(getComputedStyle(refs.entryList).getPropertyValue("--entry-row-height")) || 56;
+  const top = index * rowHeight;
+  const bottom = top + rowHeight;
+
+  if (top < refs.entryList.scrollTop) {
+    refs.entryList.scrollTop = top;
+  } else if (bottom > refs.entryList.scrollTop + refs.entryList.clientHeight) {
+    refs.entryList.scrollTop = bottom - refs.entryList.clientHeight;
+  }
+
+  renderSidebar(refs);
 }
 
 async function flushSave() {
@@ -2122,8 +2154,7 @@ function clearSearch() {
 }
 
 function visibleEntryIds() {
-  return Array.from(refs.entryList.querySelectorAll("[data-entry-id]"))
-    .map((element) => element.dataset.entryId);
+  return getVisibleEntryIds();
 }
 
 function activateEntryCard(id, { toggle = false, range = false } = {}) {
@@ -2970,6 +3001,17 @@ refs.entryList.addEventListener("drop", (event) => {
 
 refs.entryList.addEventListener("dragend", () => {
   clearDragState();
+});
+
+refs.entryList.addEventListener("scroll", () => {
+  if (!refs.entryList.classList.contains("is-virtual") || virtualScrollFrame) {
+    return;
+  }
+
+  virtualScrollFrame = window.requestAnimationFrame(() => {
+    virtualScrollFrame = 0;
+    renderSidebar(refs);
+  });
 });
 
 refs.entrySort.addEventListener("change", (event) => {

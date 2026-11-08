@@ -24,7 +24,7 @@ convenience note in the editor doc.
 | Doc | Job | Status |
 |---|---|---|
 | `README.md` | What Loreweaver is, the one idea, how to read the set | active |
-| `docs/LOREWEAVER.md` | **The charter.** Pillars, constraints, non-goals, phases P0-P5 | active |
+| `docs/LOREWEAVER.md` | **The charter.** Pillars, constraints, non-goals, phases P0-P6 | active |
 | `TODO.md` | Live phase status and what is next | active |
 | `PLAN.md` | Workflow, gate discipline, the deferral rule | active |
 | `DECISIONS.md` | Locked choices, by series (G, A, E, I, P, C, U) | active |
@@ -46,7 +46,8 @@ convenience note in the editor doc.
 ### Reference (no authority)
 
 `docs/getting-started.md` is the in-app guide, so it targets the same voice as `docs/UI.md`. Prior-art
-notes and the parity audit against SillyTavern and Chub live under `docs/reference/`.
+notes, the parity audit against SillyTavern and Chub, and the audit of what the sibling projects want
+from Loreweaver (`docs/reference/EXTERNAL-ASKS.md`) live under `docs/reference/`.
 
 ## 3. Precedence (highest wins)
 
@@ -62,8 +63,7 @@ A decision beats a design. If they disagree, the design has a bug, not the decis
 
 | Topic | Owner |
 |---|---|
-| Product intent, pillars, constraints, phase order | `docs/LOREWEAVER.md` |
-| Shape, data flow, canonical model, module boundaries | `docs/ARCHITECTURE.md` |
+| Product intent, pillars, constraints, phase order | `docs/LOREWEAVER.md` || Shape, data flow, canonical model, module boundaries | `docs/ARCHITECTURE.md` |
 | Entry fields, keys, templates, selection, bulk and book actions, history | `docs/EDITOR.md` |
 | Formats, detection, field mapping, round-trip, import limits | `docs/INTEROP.md` |
 | Storage, migration, integrity, backup, revision, recovery | `docs/PERSISTENCE.md` |

@@ -59,7 +59,7 @@ interactions that are hard to express with targeted DOM updates. A framework mig
 
 | Layer | May import | Must not |
 |---|---|---|
-| `schema.js`, `books.js`, `validation.js`, `overview.js`, `keys.js`, `simulation.js`, `search.js`, `diff.js`, `merge.js`, `integrity.js` | `utils.js`, each other where noted | DOM, storage, `main.js` |
+| `schema.js`, `books.js`, `validation.js`, `overview.js`, `keys.js`, `simulation.js`, `search.js`, `diff.js`, `merge.js`, `integrity.js`, `windowing.js` | `utils.js`, each other where noted | DOM, storage, `main.js` |
 | `formats/*` | `schema.js`, `formats/helpers.js` | DOM, storage, `main.js` |
 | `storage/*` | `format.js`, `schema.js` | DOM |
 | `ui/*` | `store.js` reads, `refs` | own state |
@@ -168,6 +168,7 @@ ids (see `DECISIONS.md` I-4).
 | `src/storage/namespace.js` | Current and legacy storage key namespaces |
 | `src/storage/legacy.js` | In-place migration of old `lorebook-studio` keys |
 | `src/validation.js` | Book-level content, key and order issue detection |
+| `src/windowing.js` | Pure row-window math for the virtualized entry list |
 | `src/overview.js` | Book metrics, token summaries, key coverage |
 | `src/templates.js` | Built-in entry templates and patch builders |
 | `src/keys.js` | Regex-key detection and parsing with plain-text fallback |
@@ -189,4 +190,5 @@ ids (see `DECISIONS.md` I-4).
 - A new format is one adapter plus its fixture (`docs/INTEROP.md`).
 - A tokenizer preset is one entry in `settings.js` plus ranks.
 - A view is a dialog in `index.html`, a handler in `main.js`, and pure logic in a module.
-- Virtualization slots in at `ui/sidebar.js` without touching the store.
+- Row windowing is decided by `windowing.js`; `ui/sidebar.js` renders only the window, so the store is
+  untouched and the pure window math is unit-tested (`test/windowing.test.js`).

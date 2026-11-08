@@ -28,6 +28,8 @@ C = context, U = surface.
 | G-11 | **The editor captures settings; it does not emulate activation at runtime.** | locked |
 | G-12 | **No account, cloud sync, telemetry or collaboration in v1.** | locked |
 | G-13 | **Content-agnostic.** No explicitness policy; an entry carries what it carries. | locked |
+| G-14 | **The standalone tool is the first and only v1 target.** A reusable component is a separate repository, extracted **after** v1 ships. No ask from a consumer delays a standalone phase. | locked |
+| G-15 | **The pure core is the extraction seam.** `schema`, `books`, `validation`, `overview`, `keys`, `simulation`, `search`, `diff`, `merge`, `integrity` and `windowing` stay DOM-, storage- and `main.js`-free (A-1) so the component can lift them without a rewrite. Extraction never required a second source of truth. | locked |
 
 ## Architecture (A-series)
 

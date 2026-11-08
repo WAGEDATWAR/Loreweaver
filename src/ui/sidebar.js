@@ -1,7 +1,14 @@
 import { analyzeEntryQuery } from "../search.js";
 import { getActiveBook, getSelectedEntryIds, getState } from "../store.js";
+import { computeWindow, shouldVirtualize, VIRTUAL_ROW_HEIGHT } from "../windowing.js";
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+
+let visibleIds = [];
+
+export function getVisibleEntryIds() {
+  return visibleIds.slice();
+}
 
 function entryLabel(entry) {
   return entry.title.trim() || "Untitled entry";
@@ -320,31 +327,68 @@ export function renderSidebar(refs) {
         ? "No entries match the current filters."
         : "No entries yet. Create one to start writing.";
     refs.entryList.append(empty);
+    refs.entryList.classList.remove("is-virtual");
+    refs.entryList.style.removeProperty("--entry-row-height");
+    visibleIds = [];
     refs.entryList.scrollTop = 0;
     return;
   }
 
-  const fragment = document.createDocumentFragment();
+  const items = [];
 
   if (pinnedEntry) {
-    fragment.append(createEntryCard(pinnedEntry, {
-      isActive: true,
-      isSelected: selected.has(pinnedEntry.id),
-      canDrag: false,
-      query,
-      match: matches.get(pinnedEntry.id) ?? null,
-      pinned: true
-    }));
+    items.push({ entry: pinnedEntry, pinned: true });
   }
 
   for (const entry of filtered) {
-    fragment.append(createEntryCard(entry, {
-      isActive: entry.id === state.activeEntryId,
-      isSelected: selected.has(entry.id),
-      canDrag,
+    items.push({ entry, pinned: false });
+  }
+
+  const virtual = shouldVirtualize(items.length);
+  const rowHeight = VIRTUAL_ROW_HEIGHT;
+  visibleIds = items.map((item) => item.entry.id);
+  refs.entryList.classList.toggle("is-virtual", virtual);
+  const window = computeWindow({
+    total: items.length,
+    scrollTop,
+    viewport: refs.entryList.clientHeight,
+    rowHeight
+  });
+
+  if (virtual) {
+    refs.entryList.style.setProperty("--entry-row-height", `${rowHeight}px`);
+  } else {
+    refs.entryList.style.removeProperty("--entry-row-height");
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  if (window.offsetTop > 0) {
+    const spacer = document.createElement("div");
+    spacer.className = "entry-list-spacer";
+    spacer.style.height = `${window.offsetTop}px`;
+    fragment.append(spacer);
+  }
+
+  for (let index = window.start; index < window.end; index += 1) {
+    const item = items[index];
+    fragment.append(createEntryCard(item.entry, {
+      isActive: item.entry.id === state.activeEntryId,
+      isSelected: selected.has(item.entry.id),
+      canDrag: canDrag && !item.pinned,
       query,
-      match: matches.get(entry.id) ?? null
+      match: matches.get(item.entry.id) ?? null,
+      pinned: item.pinned
     }));
+  }
+
+  const tail = window.totalHeight - window.end * rowHeight;
+
+  if (tail > 0) {
+    const spacer = document.createElement("div");
+    spacer.className = "entry-list-spacer";
+    spacer.style.height = `${tail}px`;
+    fragment.append(spacer);
   }
 
   refs.entryList.append(fragment);

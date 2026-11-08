@@ -36,6 +36,9 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Scale benchmark
+        run: npm run benchmark
+
       - name: End-to-end tests
         run: npm run test:e2e
 

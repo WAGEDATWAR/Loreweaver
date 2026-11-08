@@ -57,6 +57,8 @@ because the alternative - editing blobs - makes both properties accidental.
 - Account systems, cloud sync, or collaboration.
 - Image generation or character card artwork editing.
 - Emulating every activation rule at runtime. The editor captures settings; consumers apply them.
+- A reusable embedded component. v1 is the standalone tool; the component is extracted after v1 in its
+  own repository (G-14).
 
 ## 6. Users and jobs
 
@@ -83,6 +85,8 @@ Each phase in `TODO.md` has a gate in `PLAN.md`. A regression blocks the next ph
   regex keys.
 - **P4 - Scale and durability.** IndexedDB, project files, longer retention, virtualization, export diff.
 - **P5 - Release.** Onboarding, palette, themes, guide, a11y audit, browser suite, deployment.
+- **P6 - Component (post-v1, separate repo).** Extract the pure core and a headless surface so a consumer
+  can embed the editor (G-14, G-15). It tracks v1; it does not gate it.
 
 ## 8. Success criteria
 
@@ -91,6 +95,7 @@ Each phase in `TODO.md` has a gate in `PLAN.md`. A regression blocks the next ph
 - A 2,000-entry book stays responsive and an accidental import is recoverable.
 - A new user creates and exports a first lorebook without external documentation.
 - Every gate is green on `main`; `npm run a11y` reports zero serious violations.
+- The pure modules still import no DOM, storage or `main.js` at v1, so extraction stays a lift.
 
 ## 9. Measurement
 

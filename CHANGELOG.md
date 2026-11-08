@@ -6,6 +6,11 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- A virtualized entry list above 120 rows: only the visible window plus an overscan renders, with a
+  pure `src/windowing.js` module and `test/windowing.test.js`. Focus, keyboard navigation and reordering
+  still work across the full list.
+- `npm run benchmark` (2,000-entry filter, sort, overview and window pass against a 250 ms budget),
+  wired into CI, plus a 2,000-entry browser scenario.
 - A lorebook actions dialog to duplicate, split, and merge lorebooks, with id and source-UID remapping on merge.
 - `AGENTS.md`, `DOCUMENTATION-INDEX.md`, `DECISIONS.md`, and `DEFERRALS.md`, plus owned topic docs under `docs/` (`LOREWEAVER`, `ARCHITECTURE`, `EDITOR`, `INTEROP`, `PERSISTENCE`, `CONTEXT`, `UI`) and reference notes under `docs/reference/`.
 - `npm run deferrals` (ledger check) and `npm run deferral-scan` (prose check), with the ledger gate wired into CI.

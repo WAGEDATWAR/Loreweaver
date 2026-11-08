@@ -66,6 +66,8 @@ reserved for dialogs and toasts.
   resulting book and entry changes. It creates a pre-import backup before applying.
 - The export dialog offers a full project backup plus single-book native, SillyTavern, Chub and
   character-book targets, and reports local storage usage.
+- Above 120 entries the sidebar windows the list: only visible rows plus an 8-row overscan render,
+  spacers hold the scroll height, and the active card stays focused.
 - Book descriptions live in a collapsible lorebook-information section with a one-line preview, beside
   the overview and validation controls.
 - The validation control summarizes issues; its dialog groups issues by type, lets category counts
@@ -103,6 +105,8 @@ reserved for dialogs and toasts.
 - A mobile library drawer is deferred (DEF-030).
 - A light theme waits on token stability (DEF-031).
 - There is no density option or remembered text-area height (DEF-032, DEF-033).
+- Virtualized rows hide tag chips and the matched-field note; the full card returns when the list is
+  narrow or below the windowing threshold.
 
 ## 9. Definition of done
 

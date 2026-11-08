@@ -10,9 +10,10 @@ than discovered in a lost scene.
 
 A lorebook is a portable file and a first-class document. That is the whole idea.
 
-**Status:** built and gated (v0.7.x). Foundation, editor depth, interoperability, local recovery and
-context intelligence are complete; scale work (Phase 4) is next. The app is a static module bundle and
-the browser's own storage is the database.
+**Status:** built and gated (v0.7.x). Foundation, editor depth, interoperability, local recovery,
+context intelligence and list scaling are complete; the rest of the scale phase is next. v1 is the
+**standalone tool**; a reusable component is extracted afterwards in its own repository (G-14). The app is
+a static module bundle and the browser's own storage is the database.
 
 ## The one idea
 
@@ -25,7 +26,7 @@ audited; a blob cannot.
 ## Docs
 
 - `DOCUMENTATION-INDEX.md` - topic ownership, precedence, reading order.
-- `docs/LOREWEAVER.md` - **the charter.** Pillars, constraints, non-goals, phases P0-P5.
+- `docs/LOREWEAVER.md` - **the charter.** Pillars, constraints, non-goals, phases P0-P6.
 - `docs/ARCHITECTURE.md` - shape, data flow, canonical model, module boundaries.
 - `docs/EDITOR.md` - authoring, keys, templates, selection, bulk and book actions, history.
 - `docs/INTEROP.md` - adapters, detection, field mapping, round-trip, limits.

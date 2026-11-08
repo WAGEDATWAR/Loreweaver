@@ -555,6 +555,99 @@ export const scenarios = [
     }
   },
   {
+    name: "virtualizes a 2,000-entry book",
+    timeout: 60000,
+    async run(page) {
+      const seed = {
+        version: 2,
+        activeBookId: "book_big",
+        activeEntryId: "entry_big_0",
+        books: [{
+          id: "book_big",
+          name: "Big Book",
+          description: "",
+          entries: Array.from({ length: 2000 }, (_, index) => ({
+            id: `entry_big_${index}`,
+            title: `Entry ${index}`,
+            keys: [`key ${index}`],
+            content: `Content for entry ${index}.`,
+            order: index
+          }))
+        }]
+      };
+
+      await page.resetStorage({ seed });
+      await page.waitFor('document.querySelector("#book-name")?.value === "Big Book"');
+      await page.waitFor('document.querySelector("#entry-list")?.classList.contains("is-virtual")');
+
+      const rendered = await page.evaluate('document.querySelectorAll("#entry-list [data-entry-id]").length');
+      assert.ok(rendered < 120, `rendered ${rendered} cards`);
+      assert.equal(await page.evaluate('document.querySelector("#entry-count").textContent'), "2000");
+
+      const started = Date.now();
+      await page.evaluate('document.querySelector("#entry-list").scrollTop = 2000 * 56; true');
+      await sleep(150);
+      const lateTitles = await page.evaluate('[...document.querySelectorAll("#entry-list [data-entry-id]")].map((item) => item.dataset.entryId)');
+      assert.ok(lateTitles.length > 0);
+      assert.ok(lateTitles.length < 120);
+      assert.ok(!lateTitles.includes("entry_big_0"));
+      assert.ok(Date.now() - started < 4000);
+
+      await page.click('[data-entry-id="entry_big_0"]').catch(() => {});
+      await page.evaluate('document.querySelector("#entry-list").scrollTop = 0; true');
+      await sleep(150);
+      await page.click('[data-entry-id="entry_big_0"]');
+      await page.waitFor('document.querySelector("#entry-title")?.value === "Entry 0"');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "navigates a virtualized list with the keyboard and reorders",
+    timeout: 60000,
+    async run(page) {
+      const seed = {
+        version: 2,
+        activeBookId: "book_big",
+        activeEntryId: "entry_big_0",
+        books: [{
+          id: "book_big",
+          name: "Big Book",
+          description: "",
+          entries: Array.from({ length: 400 }, (_, index) => ({
+            id: `entry_big_${index}`,
+            title: `Entry ${index}`,
+            keys: [`key ${index}`],
+            content: `Content for entry ${index}.`,
+            order: index
+          }))
+        }]
+      };
+
+      await page.resetStorage({ seed });
+      await page.waitFor('document.querySelector("#book-name")?.value === "Big Book"');
+      await dismissOnboarding(page);
+      await page.waitFor('document.querySelector("#entry-list")?.classList.contains("is-virtual")');
+      await page.evaluate('document.querySelector("[data-entry-id=\\"entry_big_0\\"]").focus(); true');
+
+      for (let step = 0; step < 40; step += 1) {
+        await page.evaluate('document.activeElement.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true })); true');
+      }
+
+      await page.waitFor('document.querySelector("#entry-title")?.value === "Entry 40"');
+      assert.equal(await page.evaluate('document.activeElement.dataset.entryId'), "entry_big_40");
+      assert.ok(await page.evaluate('document.querySelector("#entry-list").scrollTop > 0'));
+      const rendered = await page.evaluate('document.querySelectorAll("#entry-list [data-entry-id]").length');
+      assert.ok(rendered < 120, `rendered ${rendered} cards`);
+
+      await page.evaluate('document.activeElement.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", altKey: true, bubbles: true, cancelable: true })); true');
+      await sleep(120);
+      const order = await page.evaluate('[...document.querySelectorAll("#entry-list [data-entry-id]")].map((item) => item.dataset.entryId)');
+      assert.ok(order.indexOf("entry_big_40") < order.indexOf("entry_big_39"));
+      assert.equal(await page.evaluate('document.querySelector("#entry-title").value'), "Entry 40");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "recovers from a failed local save",
     async run(page) {
       await resetApp(page);

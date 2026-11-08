@@ -11,6 +11,7 @@
     "test:e2e": "node --no-warnings e2e/run.mjs",
     "test:all": "npm test && npm run test:e2e",
     "a11y": "node --no-warnings e2e/a11y.mjs",
+    "benchmark": "node scripts/benchmark.mjs",
     "deferrals": "node scripts/deferrals.mjs",
     "deferral-scan": "node scripts/deferral-scan.mjs",
     "check": "node scripts/check.mjs",

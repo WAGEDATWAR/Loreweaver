@@ -54,4 +54,5 @@ key the issue list can flag. A change to matching rules updates both, plus `test
 - Counts are cached only per render, not per entry revision (DEF-020).
 - There is no bulk operation by token size (DEF-021).
 - The activation graph is a list, not a visual graph (DEF-022).
-- There is no benchmark at 1,000 entries or 500,000 characters yet (DEF-023).
+- `npm run benchmark` covers a 2,000-entry filter, sort, overview and window pass against a 250 ms
+  budget; the 500,000-character content profile is still uncovered (DEF-023).

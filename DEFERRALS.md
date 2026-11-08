@@ -56,7 +56,7 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 | DEF-020 | Cache tokenization per entry revision | - | P4 | scheduled |
 | DEF-021 | Bulk operations by token size | - | P4 | scheduled |
 | DEF-022 | A visual activation graph for the simulation | - | P4 | scheduled |
-| DEF-023 | A large-book performance benchmark and virtualization | - | P4 | scheduled |
+| DEF-023 | A large-book performance benchmark and virtualization | windowing and the 2,000-entry benchmark landed v0.7.4+; the 500,000-character content profile is DEF-054 | P4 | done |
 
 ## U. Surface
 
@@ -81,6 +81,9 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 | DEF-042 | Deployment automation to a static host | - | P5 | scheduled |
 | DEF-043 | A manual screen-reader pass on top of axe | U-3 | P5 | scheduled |
 | DEF-044 | Browser coverage for export downloads and shortcuts | - | P4 | scheduled |
+| DEF-054 | Benchmark a 500,000-character single book | content-size profile, separate from the 2,000-entry row benchmark (DEF-023) | P4 | scheduled |
+| DEF-055 | Jump to the offending field from a validation issue | today the issue jumps to the entry, not the field | P4 | scheduled |
+| DEF-056 | A 5,000-entry profile for `npm run benchmark` | consumer ask B-14; 2,000 is bounded (DEF-023) | P4 | scheduled |
 
 ## R. Product and release
 
@@ -90,3 +93,20 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 | DEF-051 | An app icon set and social preview assets | - | P5 | scheduled |
 | DEF-052 | A small beta with real SillyTavern and Chub users | - | P5 | scheduled |
 | DEF-053 | Collect real round-trip failures as fixtures | - | post-v1 | open |
+| DEF-057 | Three-way merge over a common ancestor | consumer ask B-16; `diff.js` is the base | P5 | scheduled |
+| DEF-060 | Decide the Windows build story | consumer ask C-1; Chrysalis S70 needs an answer | P5 | scheduled |
+| DEF-064 | Multi-book attach with per-book weights and a set-level priority order | consumer ask B-8; today one active book | P5 | scheduled |
+
+## X. Component (post-v1, separate repository)
+
+Owned by the P6 phase; see `DECISIONS.md` G-14/G-15 and `docs/reference/EXTERNAL-ASKS.md`. Nothing here
+may delay a v1 phase.
+
+| # | Item | Notes | Owner | Status |
+|---|---|---|---|---|
+| DEF-058 | A canon-ledger facts tab and conflict report | ask B-11; needs a ledger the app does not have | post-v1 | scheduled |
+| DEF-059 | A descriptor registry generating forms, validation and JSON Schema | ask A-5/B-15; component hub, not the app hub | post-v1 | scheduled |
+| DEF-061 | A supported headless API surface | ask A-6/C-4; composes the pure modules without `main.js` | post-v1 | scheduled |
+| DEF-062 | An embedding and vendoring guide with the licence note | asks A-1/C-3 | post-v1 | scheduled |
+| DEF-063 | Extract the pure core into a new component repository | asks A-1 to A-6; the v1 tag is the precondition | post-v1 | scheduled |
+| DEF-065 | Run-level budget arbitration across attached books | ask B-9; the run budget is the outer bound | post-v1 | scheduled |

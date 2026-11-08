@@ -1036,6 +1036,26 @@ body.is-resizing-sidebar {
   overflow-y: auto;
 }
 
+.entry-list.is-virtual {
+  gap: 0;
+}
+
+.entry-list-spacer {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+.entry-list.is-virtual .entry-card {
+  flex: 0 0 auto;
+  height: var(--entry-row-height, 56px);
+  overflow: hidden;
+}
+
+.entry-list.is-virtual .entry-card-tags,
+.entry-list.is-virtual .entry-card-match {
+  display: none;
+}
+
 .entry-card {
   position: relative;
   display: flex;
