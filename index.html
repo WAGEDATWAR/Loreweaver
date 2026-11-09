@@ -237,13 +237,20 @@
               <div id="card-list" class="card-list" role="list" aria-label="Character cards"></div>
             </section>
 
+            <section class="recent-section" aria-labelledby="recent-label">
+              <div class="card-section-head">
+                <span class="section-label" id="recent-label">Recent</span>
+              </div>
+              <div id="recent-list" class="card-list recent-list" role="list" aria-label="Recently edited entries"></div>
+            </section>
+
             <div class="search">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
                 <circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/>
               </svg>
               <label class="sr-only" for="entry-search">Search entries</label>
               <input id="entry-search" type="search" placeholder="Search entries" autocomplete="off" spellcheck="false">
-              <kbd aria-hidden="true">/</kbd>
+              <button id="regex-toggle" class="icon-btn search-regex-toggle" type="button" aria-pressed="false" aria-label="Treat search as a regular expression" title="Treat search as a regular expression">.*</button>
             </div>
 
             <div id="entry-filters" class="entry-filters" role="group" aria-label="Filter entries">
@@ -1012,6 +1019,7 @@
       </div>
       <label class="sr-only" for="global-search-input">Search all lorebooks</label>
       <input id="global-search-input" class="global-search-input" type="search" placeholder="Search titles, content, keys, notes, and tags…" autocomplete="off" spellcheck="false">
+      <button id="global-regex-toggle" class="icon-btn search-regex-toggle" type="button" aria-pressed="false" aria-label="Treat search as a regular expression" title="Treat search as a regular expression">.*</button>
       <div id="global-search-results" class="global-search-results"></div>
       <div class="dialog-actions">
         <button id="global-search-close" class="btn" type="button">Close</button>

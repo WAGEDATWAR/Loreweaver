@@ -30,7 +30,8 @@ function createProjectPayload(state) {
     activeBookId: state.activeBookId,
     activeEntryId: state.activeEntryId,
     books: state.books,
-    cards: state.cards ?? []
+    cards: state.cards ?? [],
+    customTemplates: state.customTemplates ?? []
   };
 }
 

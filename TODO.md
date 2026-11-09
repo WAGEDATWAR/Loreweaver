@@ -56,16 +56,23 @@ Planned in `docs/LOREWEAVER.md` 7. Each gate is measured; a regression blocks th
 
 Ordered by value per effort. Nothing here is outside the current phase.
 
-- [ ] `M` `P5` Entry links `[[Title]]` with broken-link validation (DEF-007).
-- [ ] `L` `P5` Suggested trigger keys from title and content (DEF-008).
-- [ ] `M` `P5` Per-entry token/word/character limits (DEF-005).
-- [ ] `M` `P5` Bulk tag assignment for the selection (DEF-009).
-- [ ] `M` `P5` An inject-peek preview for one entry (DEF-109).
-- [ ] `L` `P5` A "Copy entry" action (DEF-101).
-- [ ] `L` `P5` Ctrl/Cmd+D duplicates the active entry (DEF-103).
-- [ ] `L` `P5` Ctrl/Cmd+Enter runs the simulation from its input (DEF-102).
-- [ ] `L` `P5` A "Reset filters" action and a "Clear search" affordance (DEF-115, DEF-116).
-- [ ] `L` `P5` Remember the last active entry per lorebook (DEF-114).
+- [ ] `M` `P5` Editable advanced SillyTavern and Chub fields (DEF-015).
+- [ ] `M` `P5` RisuAI-native export (DEF-014).
+- [ ] `L` `P5` Drag-and-drop file import onto the window (DEF-019).
+- [ ] `L` `P5` An import audit log of format, warnings and skipped fields (DEF-111).
+- [ ] `M` `P5` A schema reference page generated from the canonical model (DEF-106).
+- [ ] `L` `P5` Print/PDF export for offline review passes (DEF-107).
+- [ ] `M` `P5` Configurable new-entry defaults (DEF-108).
+- [ ] `M` `P5` Per-entry colour labels (DEF-113).
+- [ ] `M` `P5` Markdown preview, only if frontends read it consistently (DEF-110).
+- [ ] `M` `P5` A mobile library drawer (DEF-030).
+- [ ] `L` `P5` Density options, resizable text areas, focus mode, hover hints (DEF-032, DEF-033, DEF-035, DEF-036).
+- [ ] `M` `P5` A keyboard shortcuts reference dialog (DEF-034).
+- [ ] `M` `P5` An app icon set and social preview assets (DEF-051).
+- [ ] `M` `P5` A small beta with real SillyTavern and Chub users (DEF-052).
+- [ ] `M` `P5` A signed release APK and keystore (DEF-067).
+- [ ] `M` `P5` Deployment automation and the PWA (DEF-041, DEF-042).
+- [ ] `M` `P5` Decide the Windows build story (DEF-060).
 
 ## Character cards (P5, built v0.8.0)
 
@@ -75,15 +82,8 @@ adapters, validation, extraction, linking, the library and the parity section al
 
 
 ## Editor and authoring
-
-- [ ] `M` `P5` A lorebook properties dropdown: description, tags, budget (DEF-003).
-- [ ] `M` `P5` Author custom templates and "duplicate as template" (DEF-004).
-- [ ] `M` `P5` Per-entry colour labels for grouping (DEF-113).
-- [ ] `M` `P5` Markdown preview, only if frontends read it consistently (DEF-110).
 - [ ] `M` `P5` Configurable new-entry defaults: always on, selective, case, whole words (DEF-108).
 - [ ] `L` `P5` Hide field hints while a field has content (DEF-095).
-- [ ] `M` `P5` Loading and error states for every async action (DEF-104).
-- [ ] `M` `P5` Richer empty and search states (DEF-002).
 
 ## Interoperability
 
@@ -119,8 +119,6 @@ adapters, validation, extraction, linking, the library and the parity section al
 - [ ] `L` `P5` Hover hint popups for long field explanations (DEF-036).
 - [ ] `L` `P5` `aria-keyshortcuts` on shortcut buttons (DEF-037).
 - [ ] `L` `P5` A changelog link in the About panel (DEF-038).
-- [ ] `L` `P5` Truncate long lorebook names with a full-name tooltip (DEF-099).
-- [ ] `L` `P5` Show the app version in the tab title (DEF-100).
 
 ## QoL and polish
 
@@ -163,6 +161,10 @@ adapters, validation, extraction, linking, the library and the parity section al
 
 ## Recently landed
 
+- A light theme with a persisted toggle and `npm run contrast`, a two-theme WCAG AA gate in CI (v0.8.0+).
+- Organization pass: user-pinned entries (`Alt+P`), a recent-entries list, a regex search mode on both
+  search inputs, and custom templates that persist on the project (v0.8.0+).
+- P5 authoring polish: limits, entry links, suggested keys, bulk tags, inject-peek, shortcuts (v0.8.0+).
 - Character cards end to end: record, PNG `ccv3` chunks, CHARX, detection and validation, book
   extraction and linking, the card library and editor, and card export with its book (v0.8.0+).
 - P4 closed: virtualized list, three benchmark profiles, persisted undo, bulk find/replace, select-by-size,
@@ -173,5 +175,6 @@ adapters, validation, extraction, linking, the library and the parity section al
 - The product rename to Loreweaver, with a namespace migration and legacy-file import (v0.7.4+).
 - Book duplicate, split and merge with id and source-UID remapping.
 - The documentation set reshaped to the topic-owner standard.
+
 
 

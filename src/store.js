@@ -32,7 +32,8 @@ function snapshot() {
     activeEntryId: state.activeEntryId,
     activeCardId: state.activeCardId ?? null,
     books: clone(state.books),
-    cards: clone(state.cards ?? [])
+    cards: clone(state.cards ?? []),
+    customTemplates: clone(state.customTemplates ?? [])
   };
 }
 
@@ -42,6 +43,7 @@ function restore(snapshotValue) {
   state.activeCardId = snapshotValue.activeCardId ?? null;
   state.books = clone(snapshotValue.books);
   state.cards = clone(snapshotValue.cards ?? []);
+  state.customTemplates = clone(snapshotValue.customTemplates ?? []);
   ensureSelections();
 }
 
@@ -333,6 +335,17 @@ export function ensureSelections() {
 
   if (!Array.isArray(state.cards)) {
     state.cards = [];
+  }
+
+  if (!Array.isArray(state.customTemplates)) {
+    state.customTemplates = [];
+  }
+
+  if (!Array.isArray(state.ui.pinnedEntryIds)) {
+    state.ui.pinnedEntryIds = [];
+  } else {
+    const validIds = new Set(state.books.flatMap((book) => book.entries.map((entry) => entry.id)));
+    state.ui.pinnedEntryIds = state.ui.pinnedEntryIds.filter((id) => validIds.has(id));
   }
 
   const activeBook = state.books.find((book) => book.id === state.activeBookId) ?? state.books[0];
@@ -1047,4 +1060,90 @@ export function linkCardBook(cardId, bookId) {
   card.bookId = bookId;
   card.updatedAt = Date.now();
   return true;
+}
+
+export function getCustomTemplates() {
+  return state?.customTemplates ?? [];
+}
+
+export function saveCustomTemplate({ name, patch }) {
+  if (!state) {
+    return null;
+  }
+
+  const label = String(name ?? "").trim() || "Untitled template";
+  captureHistory("save-template", false);
+  state.customTemplates = state.customTemplates ?? [];
+  state.customTemplates.push({
+    id: `template_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+    name: label,
+    patch: clone(patch)
+  });
+  return state.customTemplates.at(-1);
+}
+
+export function deleteCustomTemplate(id) {
+  if (!state?.customTemplates) {
+    return false;
+  }
+
+  const index = state.customTemplates.findIndex((template) => template.id === id);
+
+  if (index === -1) {
+    return false;
+  }
+
+  captureHistory("delete-template", false);
+  state.customTemplates.splice(index, 1);
+  return true;
+}
+
+export function togglePinnedEntry(id) {
+  const book = getActiveBook();
+
+  if (!book || !book.entries.some((entry) => entry.id === id)) {
+    return false;
+  }
+
+  const pinned = state.ui.pinnedEntryIds ?? [];
+  const index = pinned.indexOf(id);
+
+  if (index === -1) {
+    pinned.push(id);
+  } else {
+    pinned.splice(index, 1);
+  }
+
+  state.ui.pinnedEntryIds = pinned;
+  return index === -1;
+}
+
+export function getPinnedEntryIds() {
+  return [...(state?.ui?.pinnedEntryIds ?? [])];
+}
+
+export function getRecentEntries() {
+  const book = getActiveBook();
+
+  if (!book) {
+    return [];
+  }
+
+  return [...book.entries]
+    .sort((left, right) => right.updatedAt - left.updatedAt)
+    .slice(0, 5)
+    .map((entry) => ({ id: entry.id, title: entry.title.trim() || "Untitled entry" }));
+}
+
+export function setSearchRegex(active) {
+  if (!state?.ui) {
+    return false;
+  }
+
+  state.ui.searchRegex = active === true;
+  return state.ui.searchRegex;
+}
+
+export function getSearchRegex() {
+  return state?.ui?.searchRegex === true;
 }

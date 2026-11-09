@@ -447,6 +447,47 @@ export const scenarios = [
     }
   },
   {
+    name: "pins an entry and searches with a regex",
+    async run(page) {
+      await resetApp(page);
+      const title = await page.evaluate('document.querySelector("#entry-title").value');
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "p", altKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('document.querySelector(".entry-pin-user")');
+      assert.equal(await page.evaluate('document.querySelector(".entry-pin-user").textContent'), "Pinned");
+
+      await page.click("#regex-toggle");
+      await page.waitFor('document.querySelector("#regex-toggle")?.getAttribute("aria-pressed") === "true"');
+      await setValue(page, "#entry-search", "^" + title.slice(0, 6));
+      await page.waitFor(`document.querySelectorAll(".entry-card").length >= 1`);
+      await setValue(page, "#entry-search", "zzzq");
+      await page.waitFor('document.querySelector("#entry-count")?.textContent === "1/3" || document.querySelector(".entry-list-empty") !== null');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "saves and reuses a custom entry template",
+    async run(page) {
+      await resetApp(page);
+      await setValue(page, "#entry-title", "Signal Tower");
+      await setValue(page, "#entry-content", "A tall tower with a signal fire.");
+      await page.click("#template-btn");
+      await page.waitFor('document.querySelector("#template-dialog")?.open');
+      await page.click("[data-save-as-template]");
+      await page.waitFor('document.querySelector("#confirm-dialog")?.open');
+      await page.click("#confirm-accept");
+      await page.waitFor('document.querySelectorAll(".template-option").length === 6');
+      await page.click("#template-close");
+
+      await page.click("#add-entry-btn");
+      await page.waitFor('document.querySelector("#entry-title")?.value === ""');
+      await page.click("#template-btn");
+      await page.waitFor('document.querySelector("#template-dialog")?.open');
+      await page.click('[data-template-id^="template_"]');
+      await page.waitFor('document.querySelector("#entry-title")?.value === "Signal Tower"');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "toggles a persistent light theme",
     async run(page) {
       await resetApp(page);

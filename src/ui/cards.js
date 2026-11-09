@@ -1,7 +1,41 @@
-import { getActiveCard, getCards, getState } from "../store.js";
+import { getActiveCard, getCards, getRecentEntries, getState } from "../store.js";
 
 function cardLabel(card) {
   return card.name.trim() || "Untitled card";
+}
+
+export function renderRecentList(refs) {
+  if (!refs.recentList || !refs.recentSection) {
+    return;
+  }
+
+  const recent = getRecentEntries();
+  refs.recentList.replaceChildren();
+
+  if (!recent.length) {
+    refs.recentList.hidden = true;
+    refs.recentSection.hidden = true;
+    return;
+  }
+
+  refs.recentList.hidden = false;
+  refs.recentSection.hidden = false;
+  const fragment = document.createDocumentFragment();
+
+  for (const item of recent) {
+    const row = document.createElement("div");
+    row.setAttribute("role", "listitem");
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "recent-item";
+    button.dataset.recentEntryId = item.id;
+    button.textContent = item.title;
+    row.append(button);
+    fragment.append(row);
+  }
+
+  refs.recentList.append(fragment);
 }
 
 export function renderCardList(refs) {

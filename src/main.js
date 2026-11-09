@@ -20,10 +20,13 @@ import {
   clearSelection,
   deleteActiveEntry,
   deleteBook,
+  deleteCustomTemplate,
   deleteEntries,
   duplicateActiveBook,
   duplicateEntry,
   getActiveBook,
+  getCustomTemplates,
+  saveCustomTemplate,
   getActiveEntry,
   getEntryFilters,
   getHistory,
@@ -47,6 +50,8 @@ import {
   setEntriesOrder,
   setEntryFilters,
   resetFilters,
+  getSearchRegex,
+  setSearchRegex,
   setSearchQuery,
   setSortMode,
   setTagFilters,
@@ -59,6 +64,9 @@ import {
   updateActiveBookTags,
   updateActiveBookTokenBudget,
   updateActiveEntry,
+  getPinnedEntryIds,
+  getRecentEntries,
+  togglePinnedEntry,
   addCard,
   getActiveCard,
   getCards,
@@ -105,14 +113,13 @@ import { SIMULATION_REASONS, simulateContext } from "./simulation.js";
 import { buildActivationGraph } from "./activationGraph.js";
 import { createTokenizer, estimateTokens } from "./tokenizer/client.js";
 import { buildBookOverview } from "./overview.js";
-import { ENTRY_TEMPLATES, buildTemplatePatch, getEntryTemplate } from "./templates.js";
-import { showDiffDialog } from "./ui/diff.js";
+import { ENTRY_TEMPLATES, buildTemplatePatch, getEntryTemplate } from "./templates.js";import { showDiffDialog } from "./ui/diff.js";
 import { openCommandPalette } from "./ui/commandPalette.js";
 import { renderEditor, syncEntryStats } from "./ui/editor.js";
 import { createKeyChips } from "./ui/keyChips.js";
 import { confirmAction, toast } from "./ui/overlays.js";
 import { getVisibleEntryIds, renderSidebar } from "./ui/sidebar.js";
-import { fillCardForm, readCardForm, renderCardList } from "./ui/cards.js";
+import { fillCardForm, readCardForm, renderCardList, renderRecentList } from "./ui/cards.js";
 import { clamp } from "./utils.js";
 import { selectEntriesByTokenSize } from "./bulk.js";
 import { applyReplace, parseReplaceQuery, planReplace } from "./replace.js";
@@ -132,6 +139,8 @@ const refs = {
   bookTokenBudget: document.querySelector("#book-token-budget"),
   bookBudgetStatus: document.querySelector("#book-budget-status"),
   cardList: document.querySelector("#card-list"),
+  recentList: document.querySelector("#recent-list"),
+  recentSection: document.querySelector(".recent-section"),
   cardCount: document.querySelector("#card-count"),
   newCardBtn: document.querySelector("#new-card-btn"),
   cardDialog: document.querySelector("#card-dialog"),
@@ -243,6 +252,8 @@ const refs = {
   newBookBtn: document.querySelector("#new-book-btn"),
   deleteBookBtn: document.querySelector("#delete-book-btn"),
   entrySearch: document.querySelector("#entry-search"),
+  regexToggle: document.querySelector("#regex-toggle"),
+  globalRegexToggle: document.querySelector("#global-regex-toggle"),
   entrySort: document.querySelector("#entry-sort"),
   entryFilters: document.querySelector("#entry-filters"),
   tagFilters: document.querySelector("#tag-filters"),
@@ -1042,12 +1053,19 @@ async function handleIntegrityRepair() {
 
 function renderGlobalSearch() {
   const query = refs.globalSearchInput.value;
-  const result = searchProject(getState(), query);
+  const regex = getSearchRegex();
+  const result = searchProject(getState(), query, { regex });
 
+  refs.globalRegexToggle?.setAttribute("aria-pressed", String(regex));
   refs.globalSearchResults.replaceChildren();
 
   if (!result.query) {
     refs.globalSearchSummary.textContent = "Type to search every lorebook.";
+    return;
+  }
+
+  if (regex && !result.total) {
+    refs.globalSearchSummary.textContent = "No entries match this pattern.";
     return;
   }
 
@@ -1309,6 +1327,12 @@ function buildCommands() {
     commands.splice(2, 0,
       { title: "Duplicate entry", hint: "Ctrl+D", keywords: ["copy"], run: handleDuplicateEntry },
       { title: "Copy entry", keywords: ["clipboard", "copy"], run: handleCopyEntry },
+      {
+        title: getPinnedEntryIds().includes(entry.id) ? "Unpin entry" : "Pin entry",
+        hint: "Alt+P",
+        keywords: ["pin", "favourite"],
+        run: handleTogglePin
+      },
       { title: "Delete entry", keywords: ["remove"], run: handleDeleteEntry }
     );
   }
@@ -1470,6 +1494,7 @@ function renderAll() {
   refs.bookTagChips?.setKeys(book?.tags ?? []);
   renderSidebar(refs);
   renderCardList(refs);
+  renderRecentList(refs);
   renderEditor(refs);
   updateHistoryButtons();
   updateValidationIndicator();
@@ -2638,28 +2663,90 @@ function renderTemplateDialog() {
   const fragment = document.createDocumentFragment();
 
   for (const template of ENTRY_TEMPLATES) {
-    const option = document.createElement("button");
-    const info = document.createElement("span");
-    const name = document.createElement("span");
-    const description = document.createElement("span");
-    const action = document.createElement("span");
+    fragment.append(templateOption(template, "Use"));
+  }
 
-    option.type = "button";
-    option.className = "template-option";
-    option.dataset.templateId = template.id;
-    info.className = "template-option-info";
-    name.className = "template-option-name";
-    name.textContent = template.name;
-    description.className = "template-option-description";
-    description.textContent = template.description;
-    action.className = "template-option-action";
-    action.textContent = "Use";
-    info.append(name, description);
-    option.append(info, action);
+  for (const template of getCustomTemplates()) {
+    const option = templateOption(template, "Use");
+    option.dataset.customTemplateId = template.id;
+
+    const remove = document.createElement("span");
+    remove.className = "template-option-remove";
+    remove.dataset.removeTemplateId = template.id;
+    remove.textContent = "Delete";
+    remove.setAttribute("role", "button");
+    remove.tabIndex = 0;
+    option.append(remove);
     fragment.append(option);
   }
 
+  const entry = getActiveEntry();
+
+  if (entry) {
+    const save = document.createElement("button");
+    save.type = "button";
+    save.className = "btn btn-block";
+    save.dataset.saveAsTemplate = "1";
+    save.textContent = "Save the active entry as a template";
+    fragment.append(save);
+  }
+
   refs.templateList.append(fragment);
+}
+
+function templateOption(template, actionLabel) {
+  const option = document.createElement("button");
+  const info = document.createElement("span");
+  const name = document.createElement("span");
+  const description = document.createElement("span");
+  const action = document.createElement("span");
+
+  option.type = "button";
+  option.className = "template-option";
+  option.dataset.templateId = template.id;
+  info.className = "template-option-info";
+  name.className = "template-option-name";
+  name.textContent = template.name;
+  description.className = "template-option-description";
+  description.textContent = template.description ?? "Custom template";
+  action.className = "template-option-action";
+  action.textContent = actionLabel;
+  info.append(name, description);
+  option.append(info, action);
+  return option;
+}
+
+async function handleSaveAsTemplate() {
+  const entry = getActiveEntry();
+
+  if (!entry) {
+    return;
+  }
+
+  const accepted = await confirmAction({
+    title: "Save as template?",
+    message: `"${entry.title.trim() || "Untitled entry"}" is saved as a reusable template with its keys and content.`,
+    confirmLabel: "Save template",
+    tone: "primary"
+  });
+
+  if (!accepted) {
+    return;
+  }
+
+  saveCustomTemplate({
+    name: entry.title.trim() || "Untitled template",
+    patch: {
+      title: entry.title,
+      keys: entry.keys,
+      secondaryKeys: entry.secondaryKeys,
+      content: entry.content,
+      notes: entry.notes
+    }
+  });
+  renderTemplateDialog();
+  scheduleSave();
+  toast("Template saved", "success");
 }
 
 function openTemplateDialog() {
@@ -2668,8 +2755,9 @@ function openTemplateDialog() {
 }
 
 function handleTemplatePick(templateId) {
-  const template = getEntryTemplate(templateId);
-  const patch = buildTemplatePatch(template);
+  const custom = getCustomTemplates().find((template) => template.id === templateId);
+  const template = custom ?? getEntryTemplate(templateId);
+  const patch = custom ? { ...custom.patch } : buildTemplatePatch(template);
 
   if (!patch) {
     return;
@@ -2687,7 +2775,7 @@ function handleTemplatePick(templateId) {
   refs.entryTitle.focus();
   refs.entryTitle.select();
   scheduleSave();
-  toast(`${template.name} entry added`, "success");
+  toast(`${(custom ? custom.name : template.name) || "Custom"} entry added`, "success");
 }
 
 function handleUndo() {
@@ -2708,6 +2796,19 @@ function handleRedo() {
   clearSelection();
   renderAll();
   scheduleSave();
+}
+
+function handleTogglePin() {
+  const entry = getActiveEntry();
+
+  if (!entry) {
+    return;
+  }
+
+  const pinned = togglePinnedEntry(entry.id);
+  renderSidebar(refs);
+  scheduleSave();
+  toast(pinned ? "Entry pinned" : "Entry unpinned");
 }
 
 async function handleCopyEntry() {
@@ -3517,6 +3618,20 @@ refs.cardList.addEventListener("click", (event) => {
   }
 });
 
+refs.recentList.addEventListener("click", (event) => {
+  const item = event.target.closest("[data-recent-entry-id]");
+
+  if (!item) {
+    return;
+  }
+
+  clearSearch();
+  setActiveEntry(item.dataset.entryId);
+  renderAll();
+  scrollEntryCardIntoView(item.dataset.entryId);
+  focusEntryCard(item.dataset.entryId);
+});
+
 refs.cardList.addEventListener("keydown", (event) => {
   const item = event.target.closest("[data-card-id]");
 
@@ -3641,6 +3756,27 @@ refs.entrySearch.addEventListener("input", (event) => {
   renderSidebar(refs);
 });
 
+function syncRegexToggles() {
+  const active = getSearchRegex();
+  refs.regexToggle.setAttribute("aria-pressed", String(active));
+  refs.regexToggle.classList.toggle("is-active", active);
+  refs.globalRegexToggle.setAttribute("aria-pressed", String(active));
+  refs.globalRegexToggle.classList.toggle("is-active", active);
+}
+
+function handleRegexToggle() {
+  setSearchRegex(!getSearchRegex());
+  syncRegexToggles();
+  renderSidebar(refs);
+
+  if (refs.globalSearchDialog.open) {
+    renderGlobalSearch();
+  }
+}
+
+refs.regexToggle.addEventListener("click", handleRegexToggle);
+refs.globalRegexToggle.addEventListener("click", handleRegexToggle);
+
 refs.entrySearch.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     event.preventDefault();
@@ -3659,6 +3795,21 @@ refs.templateCloseBtn.addEventListener("click", () => {
 });
 
 refs.templateList.addEventListener("click", (event) => {
+  const remove = event.target.closest("[data-remove-template-id]");
+
+  if (remove) {
+    deleteCustomTemplate(remove.dataset.removeTemplateId);
+    renderTemplateDialog();
+    scheduleSave();
+    toast("Template deleted");
+    return;
+  }
+
+  if (event.target.closest("[data-save-as-template]")) {
+    handleSaveAsTemplate();
+    return;
+  }
+
   const option = event.target.closest("[data-template-id]");
 
   if (option) {
@@ -4662,6 +4813,12 @@ document.addEventListener("keydown", async (event) => {
   if (modifier && event.shiftKey && key === "s" && supportsFileSystemAccess()) {
     event.preventDefault();
     await saveProjectFile({ saveAs: true });
+    return;
+  }
+
+  if (event.altKey && !modifier && (event.key === "p" || event.key === "P") && getActiveEntry()) {
+    event.preventDefault();
+    handleTogglePin();
     return;
   }
 

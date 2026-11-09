@@ -82,6 +82,7 @@ export function buildExport(state) {
       extensions: { ...book.extensions },
       entries: book.entries.map((entry) => ({ ...entry }))
     })),
+    customTemplates: JSON.parse(JSON.stringify(state.customTemplates ?? [])),
     cards: (state.cards ?? []).map((card) => ({
       ...card,
       tags: [...(card.tags ?? [])],

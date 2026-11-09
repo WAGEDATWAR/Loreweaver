@@ -125,6 +125,9 @@ export function createProject(patch = {}) {
     ?? activeBook?.entries[0]
     ?? null;
   const cards = Array.isArray(patch.cards) ? patch.cards.map((card) => createCard(card)) : [];
+  const customTemplates = Array.isArray(patch.customTemplates)
+    ? patch.customTemplates.filter((template) => template && typeof template === "object" && typeof template.name === "string")
+    : [];
 
   return {
     version: SCHEMA_VERSION,
@@ -132,6 +135,7 @@ export function createProject(patch = {}) {
     activeEntryId: activeEntry?.id ?? null,
     ui: { searchQuery: "" },
     books,
-    cards
+    cards,
+    customTemplates
   };
 }

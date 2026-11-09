@@ -4425,3 +4425,51 @@ button.book-action:disabled {
   color: var(--text);
   background: var(--surface);
 }
+
+.template-option-remove {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  color: var(--danger);
+  font-size: 10px;
+  border: 1px solid var(--danger-border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.template-option-remove:hover {
+  background: var(--danger-soft);
+}
+
+.template-list .btn {
+  margin-top: 6px;
+}
+
+.recent-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recent-item {
+  padding: 5px 8px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11.5px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.recent-item:hover {
+  color: var(--text-soft);
+  background: var(--surface-hover);
+}
+
+.recent-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}

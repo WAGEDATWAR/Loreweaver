@@ -19,14 +19,14 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 |---|---|---|---|---|
 | DEF-001 | Bulk find and replace across entries with a preview diff | `replace.js` + dialog; preview reuses the diff engine, scoped to the selection | P4 | done |
 | DEF-002 | Richer empty and search states | - | P5 | scheduled |
-| DEF-003 | A lorebook properties dropdown holding description, tags and budget | - | P5 | scheduled |
-| DEF-004 | Author custom templates and "duplicate as template" | - | P5 | scheduled |
+| DEF-003 | A lorebook properties dropdown holding description, tags and budget | folded: those fields already have one editing surface, the Lorebook info section; a second dropdown would be a duplicate owner | P5 | dropped |
+| DEF-004 | Author custom templates and "duplicate as template" | templates persist on the project; save/delete from the template dialog | P5 | done |
 | DEF-005 | Per-entry word/character/token limits | token and character limits with validation | P5 | done |
 | DEF-006 | Undo history that survives reload | E-5; 20-step bounded history in `history.js` | P4 | done |
 | DEF-007 | Entry links (`[[Title]]`) with broken-link validation | `entryLinks.js`, folded into validation | P5 | done |
 | DEF-008 | Suggested trigger keys from title and content | `suggestKeys.js` with a Suggest keys button | P5 | done |
 | DEF-009 | Bulk tag assignment for selected entries | bulk tag dialog, add and remove | P5 | done |
-| DEF-108 | A configurable default for new-entry flags (always on, selective, case sensitive, whole words) | per-project defaults, not a hidden global | P5 | scheduled |
+| DEF-108 | A configurable default for new-entry flags (always on, selective, case sensitive, whole words) | per-project defaults | P5 | scheduled |
 | DEF-109 | An inject-peek preview of an entry's rendered text | peek dialog with token cost | P5 | done |
 | DEF-110 | Markdown preview for content | only if the target frontends read it consistently | P5 | scheduled |
 | DEF-113 | Per-entry colour labels for visual grouping | distinct from tags | P5 | scheduled |
@@ -67,9 +67,9 @@ never learns a card quirk.
 
 | # | Item | Notes | Owner | Status |
 |---|---|---|---|---|
-| DEF-092 | User-pinned entries per book | distinct from the auto "Current" pin | P5 | scheduled |
-| DEF-093 | A recent-entries list | last edited, cross-book | P5 | scheduled |
-| DEF-094 | A regex search mode in the entry list | complements regex keys | P5 | scheduled |
+| DEF-092 | User-pinned entries per book | Alt+P and a palette action; pinned entries survive filters and sort first in manual order | P5 | done |
+| DEF-093 | A recent-entries list | last five edited entries in the sidebar, click to jump | P5 | done |
+| DEF-094 | A regex search mode in the entry list | `.*` toggle on both search inputs; invalid patterns match nothing | P5 | done |
 
 
 ## C. Context
@@ -187,6 +187,9 @@ may delay a v1 phase.
 | DEF-062 | An embedding and vendoring guide with the licence note | asks A-1/C-3 | post-v1 | scheduled |
 | DEF-063 | Extract the pure core into a new component repository | asks A-1 to A-6; the v1 tag is the precondition | post-v1 | scheduled |
 | DEF-065 | Run-level budget arbitration across attached books | ask B-9; the run budget is the outer bound | post-v1 | scheduled |
+
+
+
 
 
 

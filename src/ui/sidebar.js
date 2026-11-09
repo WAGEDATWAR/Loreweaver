@@ -1,5 +1,11 @@
 import { analyzeEntryQuery } from "../search.js";
-import { getActiveBook, getSelectedEntryIds, getState } from "../store.js";
+import {
+  getActiveBook,
+  getRecentEntries,
+  getSelectedEntryIds,
+  getPinnedEntryIds,
+  getState
+} from "../store.js";
 import { computeWindow, shouldVirtualize, VIRTUAL_ROW_HEIGHT } from "../windowing.js";
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
@@ -162,7 +168,7 @@ export function sortEntries(entries, mode) {
 }
 
 function createEntryCard(entry, options) {
-  const { isActive, isSelected, canDrag, query = "", match = null, pinned = false } = options;
+  const { isActive, isSelected, canDrag, query = "", match = null, pinned = false, userPinned = false } = options;
   const card = document.createElement("div");
   card.dataset.entryId = entry.id;
   card.className = "entry-card";
@@ -220,6 +226,14 @@ function createEntryCard(entry, options) {
     const pin = document.createElement("span");
     pin.className = "entry-pin";
     pin.textContent = "Current";
+    top.append(pin);
+  }
+
+  if (userPinned) {
+    const pin = document.createElement("span");
+    pin.className = "entry-pin entry-pin-user";
+    pin.textContent = "Pinned";
+    pin.title = "Pinned by you. Right-click to unpin.";
     top.append(pin);
   }
 
@@ -312,6 +326,7 @@ export function renderSidebar(refs) {
   const state = getState();
   const book = getActiveBook();
   const query = state.ui.searchQuery.trim().toLowerCase();
+  const regex = state.ui.searchRegex === true;
   const entries = book?.entries ?? [];
   const filters = state.ui.filters ?? {};
   const tagFilters = Array.isArray(state.ui.tagFilters) ? state.ui.tagFilters : [];
@@ -319,14 +334,23 @@ export function renderSidebar(refs) {
   const hasTagFilters = tagFilters.length > 0;
   const narrowing = Boolean(query) || hasFilters || hasTagFilters;
   const matches = new Map();
+  const userPinnedSet = new Set(getPinnedEntryIds());
   const filtered = sortEntries(
     entries.filter((entry) => {
-      const match = analyzeEntryQuery(entry, query);
+      if (userPinnedSet.has(entry.id)) {
+        matches.set(entry.id, analyzeEntryQuery(entry, query, { regex }));
+        return true;
+      }
+
+      const match = analyzeEntryQuery(entry, query, { regex });
       matches.set(entry.id, match);
       return match.matched && matchesFilters(entry, filters) && matchesTagFilters(entry, tagFilters);
     }),
     state.ui.sortMode
   );
+  const pinnedFirst = state.ui.sortMode === "manual"
+    ? filtered
+    : [...filtered.filter((entry) => userPinnedSet.has(entry.id)), ...filtered.filter((entry) => !userPinnedSet.has(entry.id))];
   const availableTags = [...new Set(entries.flatMap((entry) => entry.tags ?? []))].sort(collator.compare);
   const activeEntry = entries.find((entry) => entry.id === state.activeEntryId) ?? null;
   const activeVisible = filtered.some((entry) => entry.id === state.activeEntryId);
@@ -375,7 +399,7 @@ export function renderSidebar(refs) {
     items.push({ entry: pinnedEntry, pinned: true });
   }
 
-  for (const entry of filtered) {
+  for (const entry of pinnedFirst) {
     items.push({ entry, pinned: false });
   }
 
@@ -413,7 +437,8 @@ export function renderSidebar(refs) {
       canDrag: canDrag && !item.pinned,
       query,
       match: matches.get(item.entry.id) ?? null,
-      pinned: item.pinned
+      pinned: item.pinned,
+      userPinned: userPinnedSet.has(item.entry.id)
     }));
   }
 

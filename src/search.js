@@ -7,22 +7,41 @@ const QUERY_FIELDS = [
   { key: "tags", label: "tags", read: (entry) => (entry.tags ?? []).join(", ") }
 ];
 
-export function analyzeEntryQuery(entry, query) {
-  const needle = String(query ?? "").trim().toLowerCase();
+function analyzeWithNeedle(entry, needle) {
+  return QUERY_FIELDS
+    .filter((field) => String(field.read(entry)).toLowerCase().includes(needle))
+    .map((field) => field.label);
+}
+
+export function analyzeEntryQuery(entry, query, { regex = false } = {}) {
+  const needle = String(query ?? "").trim();
 
   if (!needle) {
     return { matched: true, fields: [] };
   }
 
-  const fields = QUERY_FIELDS
-    .filter((field) => String(field.read(entry)).toLowerCase().includes(needle))
-    .map((field) => field.label);
+  if (regex) {
+    let pattern;
 
+    try {
+      pattern = new RegExp(needle, "i");
+    } catch {
+      return { matched: false, fields: [], invalid: true };
+    }
+
+    const fields = QUERY_FIELDS
+      .filter((field) => pattern.test(String(field.read(entry))))
+      .map((field) => field.label);
+
+    return { matched: fields.length > 0, fields };
+  }
+
+  const fields = analyzeWithNeedle(entry, needle.toLowerCase());
   return { matched: fields.length > 0, fields };
 }
 
-export function searchProject(project, query) {
-  const needle = String(query ?? "").trim().toLowerCase();
+export function searchProject(project, query, { regex = false } = {}) {
+  const needle = String(query ?? "").trim();
   const groups = [];
   let total = 0;
 
@@ -34,7 +53,7 @@ export function searchProject(project, query) {
     const entries = [];
 
     for (const entry of book.entries ?? []) {
-      const match = analyzeEntryQuery(entry, needle);
+      const match = analyzeEntryQuery(entry, needle, { regex });
 
       if (match.matched) {
         entries.push({ entry, fields: match.fields });
