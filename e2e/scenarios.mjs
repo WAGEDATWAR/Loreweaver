@@ -566,6 +566,26 @@ export const scenarios = [
     }
   },
   {
+    name: "imports by drag and drop and logs the audit",
+    async run(page, context) {
+      await resetApp(page);
+      await page.setFileInput("#import-input", [context.fixture("sillytavern-world-info.json")]);
+      await page.waitFor('document.querySelector("#diff-dialog")?.open');
+      await page.click("#diff-accept");
+      await page.waitFor('!document.querySelector("#diff-dialog")?.open');
+      await sleep(300);
+
+      await page.click("#about-btn");
+      await page.waitFor('document.querySelector("#about-dialog")?.open');
+      await page.waitFor('document.querySelector("#about-audit")?.textContent.includes("sillytavern-world-info.json")');
+      const log = await page.evaluate('document.querySelector("#about-audit").textContent');
+      assert.match(log, /SillyTavern/);
+      assert.match(log, /SillyTavern/);
+      await page.click("#about-close");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "imports a PNG card and extracts its book",
     async run(page, context) {
       await resetApp(page);

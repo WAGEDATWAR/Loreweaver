@@ -42,8 +42,8 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 | DEF-015 | Editable advanced SillyTavern and Chub fields | - | P5 | scheduled |
 | DEF-016 | Lossy-field warning coverage across serializers | tags and notes warn on every interchange export (`buildLossyWarnings`); native stays silent | P4 | done |
 | DEF-017 | JSON/YAML plain export for scripting | - | P5 | scheduled |
-| DEF-019 | Drag-and-drop file import onto the window | - | P5 | scheduled |
-| DEF-111 | An import audit log of detected format, warnings and skipped fields | complements the preview; keeps a review trail | P5 | scheduled |
+| DEF-019 | Drag-and-drop file import onto the window | drop overlay over the whole window, first file imports | P5 | done |
+| DEF-111 | An import audit log of detected format, warnings and skipped fields | last 10 imports in the About panel (`auditLog.js`) | P5 | done |
 
 
 ## K. Character cards
@@ -187,6 +187,7 @@ may delay a v1 phase.
 | DEF-062 | An embedding and vendoring guide with the licence note | asks A-1/C-3 | post-v1 | scheduled |
 | DEF-063 | Extract the pure core into a new component repository | asks A-1 to A-6; the v1 tag is the precondition | post-v1 | scheduled |
 | DEF-065 | Run-level budget arbitration across attached books | ask B-9; the run budget is the outer bound | post-v1 | scheduled |
+
 
 
 

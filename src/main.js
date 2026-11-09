@@ -98,6 +98,7 @@ import { parseHistory, serializeHistory } from "./history.js";
 import { IMPORT_STRATEGIES, mergeProject } from "./merge.js";
 import { createSampleProject } from "./sample.js";
 import { createCard, createProject, normalizeTagList } from "./schema.js";
+import { formatAudit, recordAudit } from "./auditLog.js";
 import { searchProject } from "./search.js";
 import { suggestKeys } from "./suggestKeys.js";
 import { storageKey } from "./storage/namespace.js";
@@ -183,6 +184,7 @@ const refs = {
   saveFileBtn: document.querySelector("#save-file-btn"),
   fileName: document.querySelector("#file-name"),
   importInput: document.querySelector("#import-input"),
+  dropOverlay: document.querySelector("#drop-overlay"),
   exportDialog: document.querySelector("#export-dialog"),
   exportBookName: document.querySelector("#export-book-name"),
   exportOptions: document.querySelector("#export-options"),
@@ -218,6 +220,7 @@ const refs = {
   aboutStorage: document.querySelector("#about-storage"),
   aboutGuideBtn: document.querySelector("#about-guide-btn"),
   aboutThemeBtn: document.querySelector("#about-theme-btn"),
+  aboutAuditLog: document.querySelector("#about-audit"),
   aboutTokenBtn: document.querySelector("#about-token-btn"),
   aboutIntegrityBtn: document.querySelector("#about-integrity-btn"),
   tokenSettingsDialog: document.querySelector("#token-settings-dialog"),
@@ -441,6 +444,7 @@ const FILTER_STATE_KEY = storageKey("filters:v1");
 const TAG_FILTER_STATE_KEY = storageKey("tag-filters:v1");
 const ONBOARDED_KEY = storageKey("onboarded:v1");
 const THEME_KEY = storageKey("theme:v1");
+const AUDIT_KEY = storageKey("audit:v1");
 const TOKEN_SETTINGS_KEY = storageKey("token-settings:v1");
 const LAST_BACKUP_KEY = storageKey("last-backup:v1");
 const BACKUP_SNOOZE_KEY = storageKey("backup-reminder-snooze:v1");
@@ -925,6 +929,10 @@ async function renderAboutDialog() {
   const backend = usage.backend === "indexeddb" ? "IndexedDB" : "localStorage";
   const total = Number.isFinite(usage.usage) ? `, ${formatBytes(usage.usage)} used` : "";
   refs.aboutStorage.textContent = `${backend}${total}`;
+
+  if (refs.aboutAuditLog) {
+    refs.aboutAuditLog.textContent = formatAudit(readAuditLog());
+  }
 }
 
 async function openAboutDialog() {
@@ -3581,6 +3589,15 @@ async function handleImport(file, { fileHandle = null } = {}) {
   renderAll();
   await flushSave();
   await recordRevision(`Imported ${file.name}`);
+  recordAndSaveAudit({
+    file: file.name,
+    format: parsed.format,
+    books: parsed.project.books.length,
+    entries: entryCount,
+    cards: parsed.project.cards?.length ?? 0,
+    strategy,
+    warnings: (parsed.warnings ?? []).length
+  });
   toast(importResultMessage(strategy, parsed, merged.stats, entryCount), "success");
 
   if (backup.ok) {
@@ -4449,6 +4466,33 @@ refs.importInput.addEventListener("change", async () => {
   }
 });
 
+window.addEventListener("dragover", (event) => {
+  if (event.dataTransfer?.types?.includes("Files")) {
+    event.preventDefault();
+    refs.dropOverlay.hidden = false;
+  }
+});
+
+window.addEventListener("dragleave", (event) => {
+  if (!event.relatedTarget && refs.dropOverlay && !refs.dropOverlay.hidden) {
+    refs.dropOverlay.hidden = true;
+  }
+});
+
+window.addEventListener("drop", async (event) => {
+  if (!event.dataTransfer?.types?.includes("Files")) {
+    return;
+  }
+
+  event.preventDefault();
+  refs.dropOverlay.hidden = true;
+  const file = event.dataTransfer.files?.[0];
+
+  if (file) {
+    await handleImport(file);
+  }
+});
+
 refs.commandBtn.addEventListener("click", () => {
   openCommandPalette(buildCommands());
 });
@@ -4952,3 +4996,20 @@ if (supportsFileSystemAccess()) {
 maybeRemindBackup();
 maybeShowSessionSummary();
 maybeShowOnboarding();
+
+
+function readAuditLog() {
+  try {
+    return JSON.parse(localStorage.getItem(AUDIT_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+}
+
+function recordAndSaveAudit(record) {
+  try {
+    localStorage.setItem(AUDIT_KEY, JSON.stringify(recordAudit(readAuditLog(), record)));
+  } catch {
+    return;
+  }
+}

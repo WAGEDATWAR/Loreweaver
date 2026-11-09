@@ -1068,6 +1068,10 @@
         <dt>Local storage</dt>
         <dd id="about-storage">&mdash;</dd>
       </dl>
+      <div class="about-audit">
+        <span class="section-label">Import log</span>
+        <pre id="about-audit" class="about-audit-log"></pre>
+      </div>
       <div class="dialog-actions">
         <button id="about-guide-btn" class="btn btn-primary" type="button">Getting started</button>
         <button id="about-theme-btn" class="btn" type="button" aria-pressed="false">Light theme</button>
@@ -1100,6 +1104,13 @@
   </dialog>
 
   <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+
+  <div id="drop-overlay" class="drop-overlay" role="status" aria-label="Drop a file to import" hidden>
+    <div class="drop-overlay-card">
+      <strong>Drop to import</strong>
+      <span>A lorebook, project or character card.</span>
+    </div>
+  </div>
 
   <input id="import-input" type="file" accept=".json,.lwproj,.png,.charx,application/json,image/png" hidden>
 

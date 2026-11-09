@@ -4473,3 +4473,56 @@ button.book-action:disabled {
   outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
+
+.drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  background: rgba(11, 13, 18, 0.7);
+  backdrop-filter: blur(3px);
+}
+
+.drop-overlay-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 24px;
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-lg);
+}
+
+.drop-overlay-card strong {
+  font-size: 15px;
+}
+
+.drop-overlay-card span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.about-audit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.about-audit-log {
+  max-height: 120px;
+  margin: 0;
+  padding: 8px 10px;
+  overflow: auto;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
