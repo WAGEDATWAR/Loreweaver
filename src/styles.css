@@ -4526,3 +4526,39 @@ button.book-action:disabled {
   border: 1px solid var(--border);
   border-radius: 8px;
 }
+
+.shortcuts-dialog {
+  width: min(520px, calc(100vw - 32px));
+}
+
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 14px 0 0;
+}
+
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+.shortcut-row:nth-child(odd) {
+  background: var(--surface-sunken);
+}
+
+.shortcut-keys {
+  flex: 0 0 42%;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.shortcut-label {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12.5px;
+}

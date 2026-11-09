@@ -91,6 +91,12 @@ const states = [
     await page.click("#about-guide-btn");
     await page.waitFor('document.querySelector("#guide-dialog")?.open');
   } },
+  { name: "shortcuts dialog", setup: async (page) => {
+    await page.click("#about-btn");
+    await page.waitFor('document.querySelector("#about-dialog")?.open');
+    await page.click("#about-shortcuts-btn");
+    await page.waitFor('document.querySelector("#shortcuts-dialog")?.open');
+  } },
   { name: "peek dialog", setup: async (page) => {
     await page.click("#peek-btn");
     await page.waitFor('document.querySelector("#peek-dialog")?.open');

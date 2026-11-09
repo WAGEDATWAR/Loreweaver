@@ -102,8 +102,8 @@ never learns a card quirk.
 | DEF-112 | A pre-commit contrast check over the token set | `npm run contrast` (scripts/contrast.mjs), wired into CI | P5 | done |
 | DEF-032 | Density options for compact lists | - | P5 | scheduled |
 | DEF-033 | Resizable text areas with remembered heights | - | P5 | scheduled |
-| DEF-034 | A keyboard shortcuts reference dialog | - | P5 | scheduled |
-| DEF-035 | A focus mode that hides the sidebar | - | P5 | scheduled |
+| DEF-034 | A keyboard shortcuts reference dialog | About panel button, palette entry, `aria-keyshortcuts` per row | P5 | done |
+| DEF-035 | A focus mode that hides the sidebar | `Ctrl+\\` reuses the collapsed rail | P5 | done |
 | DEF-036 | Hover hint popups for long field explanations | - | P5 | scheduled |
 | DEF-037 | `aria-keyshortcuts` on shortcut buttons | undo, redo, export, add entry | P5 | done |
 | DEF-038 | A changelog link in the About panel | - | P5 | scheduled |
@@ -187,6 +187,7 @@ may delay a v1 phase.
 | DEF-062 | An embedding and vendoring guide with the licence note | asks A-1/C-3 | post-v1 | scheduled |
 | DEF-063 | Extract the pure core into a new component repository | asks A-1 to A-6; the v1 tag is the precondition | post-v1 | scheduled |
 | DEF-065 | Run-level budget arbitration across attached books | ask B-9; the run budget is the outer bound | post-v1 | scheduled |
+
 
 
 

@@ -12,6 +12,7 @@ All notable changes to Loreweaver are documented here. The format is based on [K
   container is an adapter), plus ledger series K (DEF-084 to DEF-091).
 - Ledger series O (pinned/recent entries, regex search) and N (fine polish), and DEF-106 to DEF-116.
 - `TODO.md` restructured into phase-tagged area sections with an ordered Next Up slice.
+- A keyboard shortcuts reference dialog and a focus mode (`Ctrl+\\` collapses the sidebar) (DEF-034, DEF-035).
 - Drag-and-drop import with a drop overlay, plus an import audit log (the last ten imports, with format,
   counts and warnings) shown in the About panel (DEF-019, DEF-111).
 - A light theme with a persisted toggle plus `npm run contrast` as a two-theme WCAG AA gate in CI (DEF-031, DEF-112).
@@ -222,6 +223,7 @@ Mobile preview builds, bulk authoring tools and the completed scale phase.
 - Canonical project, book, and entry schema.
 - Native project import/export, single-book export, and pre-import backups.
 - Search, autosave, sample project, and the dark application shell.
+
 
 
 

@@ -221,6 +221,10 @@ const refs = {
   aboutGuideBtn: document.querySelector("#about-guide-btn"),
   aboutThemeBtn: document.querySelector("#about-theme-btn"),
   aboutAuditLog: document.querySelector("#about-audit"),
+  shortcutsDialog: document.querySelector("#shortcuts-dialog"),
+  shortcutsList: document.querySelector("#shortcuts-list"),
+  shortcutsClose: document.querySelector("#shortcuts-close"),
+  aboutShortcutsBtn: document.querySelector("#about-shortcuts-btn"),
   aboutTokenBtn: document.querySelector("#about-token-btn"),
   aboutIntegrityBtn: document.querySelector("#about-integrity-btn"),
   tokenSettingsDialog: document.querySelector("#token-settings-dialog"),
@@ -697,6 +701,17 @@ function setSidebarCollapsed(collapsed, persist = true) {
       return;
     }
   }
+}
+
+function toggleFocusMode() {
+  const collapsed = !refs.sidebar.classList.contains("is-collapsed");
+  setSidebarCollapsed(collapsed);
+
+  if (collapsed) {
+    refs.editorPane?.scrollIntoView({ block: "start" });
+  }
+
+  toast(collapsed ? "Focus mode on — Ctrl+\\ to exit" : "Focus mode off");
 }
 
 function finishSidebarResize() {
@@ -1299,6 +1314,8 @@ function buildCommands() {
     { title: "Bulk find and replace", hint: "Ctrl+H", keywords: ["replace", "bulk", "find"], run: openReplaceDialog },
     { title: "New character card", keywords: ["card", "character", "avatar"], run: () => openCardDialog() },
     { title: "Toggle light theme", keywords: ["theme", "colour", "dark"], run: toggleTheme },
+    { title: "Keyboard shortcuts", keywords: ["keys", "help"], run: openShortcutsDialog },
+    { title: "Toggle focus mode", hint: "Ctrl+\\", keywords: ["focus", "sidebar"], run: toggleFocusMode },
     { title: "Save project", hint: "Ctrl+S", keywords: ["persist"], run: async () => {
       if (await flushSave()) {
         toast("Project saved", "success");
@@ -4557,6 +4574,19 @@ refs.aboutGuideBtn.addEventListener("click", () => {
   openGuideDialog();
 });
 
+refs.aboutShortcutsBtn.addEventListener("click", () => {
+  refs.aboutDialog.close();
+  openShortcutsDialog();
+});
+
+refs.shortcutsClose.addEventListener("click", () => refs.shortcutsDialog.close());
+
+refs.shortcutsDialog.addEventListener("click", (event) => {
+  if (event.target === refs.shortcutsDialog) {
+    refs.shortcutsDialog.close();
+  }
+});
+
 refs.aboutThemeBtn.addEventListener("click", () => {
   toggleTheme();
 });
@@ -4812,6 +4842,12 @@ document.addEventListener("keydown", async (event) => {
     return;
   }
 
+  if (modifier && !event.altKey && event.key === "\\") {
+    event.preventDefault();
+    toggleFocusMode();
+    return;
+  }
+
   if (modifier && !event.shiftKey && !event.altKey && key === "h") {
     event.preventDefault();
     openReplaceDialog();
@@ -5012,4 +5048,47 @@ function recordAndSaveAudit(record) {
   } catch {
     return;
   }
+}
+
+
+const KEYBOARD_SHORTCUTS = [
+  { keys: "Ctrl+K", label: "Command palette" },
+  { keys: "Alt+N", label: "New entry" },
+  { keys: "Ctrl+D", label: "Duplicate entry" },
+  { keys: "Alt+P", label: "Pin or unpin the active entry" },
+  { keys: "Ctrl+Z", label: "Undo" },
+  { keys: "Ctrl+Shift+Z", label: "Redo" },
+  { keys: "/", label: "Search entries" },
+  { keys: "Ctrl+Shift+F", label: "Search all lorebooks" },
+  { keys: "Ctrl+H", label: "Bulk find and replace" },
+  { keys: "Ctrl+Shift+E", label: "Export" },
+  { keys: "Ctrl+S", label: "Save the project locally" },
+  { keys: "Ctrl+Enter", label: "Run the simulation (dialog open)" },
+  { keys: "Alt+ArrowUp / Alt+ArrowDown", label: "Reorder in manual order" },
+  { keys: "ArrowUp / ArrowDown / Home / End", label: "Move in the entry list" },
+  { keys: "Ctrl+Click / Shift+Click", label: "Multi-select entries" }
+];
+
+function openShortcutsDialog() {
+  refs.shortcutsList.replaceChildren();
+
+  const fragment = document.createDocumentFragment();
+
+  for (const shortcut of KEYBOARD_SHORTCUTS) {
+    const row = document.createElement("div");
+    const keys = document.createElement("dt");
+    const label = document.createElement("dd");
+    row.className = "shortcut-row";
+    keys.className = "shortcut-keys";
+    label.className = "shortcut-label";
+    keys.setAttribute("aria-keyshortcuts", shortcut.keys);
+    keys.textContent = shortcut.keys;
+    label.textContent = shortcut.label;
+    row.append(keys, label);
+    fragment.append(row);
+  }
+
+  refs.shortcutsList.append(fragment);
+  refs.shortcutsDialog.showModal();
+  refs.shortcutsClose.focus();
 }

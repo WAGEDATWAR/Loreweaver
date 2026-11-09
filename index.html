@@ -1052,6 +1052,20 @@
     </div>
   </dialog>
 
+  <dialog id="shortcuts-dialog" class="dialog shortcuts-dialog" aria-labelledby="shortcuts-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading">
+        <p class="eyebrow">Shortcuts</p>
+        <h2 id="shortcuts-title">Keyboard shortcuts</h2>
+        <p class="dialog-copy">Everything the interface does has a keyboard path. Ctrl is Cmd on macOS.</p>
+      </div>
+      <dl id="shortcuts-list" class="shortcuts-list"></dl>
+      <div class="dialog-actions">
+        <button id="shortcuts-close" class="btn" type="button">Close</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog id="about-dialog" class="dialog about-dialog" aria-labelledby="about-title">
     <div class="dialog-inner">
       <div class="dialog-heading">
@@ -1076,6 +1090,7 @@
         <button id="about-guide-btn" class="btn btn-primary" type="button">Getting started</button>
         <button id="about-theme-btn" class="btn" type="button" aria-pressed="false">Light theme</button>
         <button id="about-token-btn" class="btn" type="button">Token settings</button>
+        <button id="about-shortcuts-btn" class="btn" type="button">Shortcuts</button>
         <button id="about-integrity-btn" class="btn" type="button">Check data integrity</button>
         <button id="about-close" class="btn" type="button">Close</button>
       </div>
