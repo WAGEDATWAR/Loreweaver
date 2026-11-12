@@ -1,4 +1,5 @@
 import { slugify } from "../utils.js";
+import { contentFormatAdapter } from "./contentFormat.js";
 import { cardAdapter } from "./card.js";
 import { characterBookAdapter } from "./characterBook.js";
 import { chubAdapter } from "./chub.js";
@@ -6,7 +7,9 @@ import { isRecord } from "./helpers.js";
 import { nativeAdapter } from "./native.js";
 import { sillyTavernAdapter } from "./sillytavern.js";
 
-const adapters = [nativeAdapter, chubAdapter, sillyTavernAdapter, characterBookAdapter];
+// The shared interchange adapter leads: a file another frontend wrote (or we wrote for it) reads
+// without any frontend-specific guessing. Native Loreweaver files come next.
+const adapters = [nativeAdapter, contentFormatAdapter, chubAdapter, sillyTavernAdapter, characterBookAdapter];
 
 export const CARD_ADAPTER = cardAdapter;
 
@@ -17,7 +20,7 @@ export const EXPORT_FORMATS = adapters
     label: adapter.exportLabel || adapter.label,
     description: adapter.exportDescription || "",
     capabilities: { ...adapter.capabilities },
-    primary: adapter.primary === true
+    primary: adapter.primary === true,
   }))
   .sort((left, right) => Number(right.primary) - Number(left.primary));
 
@@ -32,7 +35,7 @@ export async function parseLorebookData(input, options = {}) {
     .map((adapter, index) => ({
       adapter,
       index,
-      score: adapter.detect(input)
+      score: adapter.detect(input),
     }))
     .filter((candidate) => candidate.score > 0)
     .sort((left, right) => right.score - left.score || left.index - right.index);
@@ -42,7 +45,7 @@ export async function parseLorebookData(input, options = {}) {
       ok: false,
       error: binary
         ? "That file isn't a supported card or container."
-        : "That file isn't a supported lorebook. Try a Loreweaver project, SillyTavern World Info, Chub lorebook or a character card."
+        : "That file isn't a supported lorebook. Try a Loreweaver project, SillyTavern World Info, Chub lorebook or a character card.",
     };
   }
 
@@ -56,7 +59,7 @@ export async function parseLorebookData(input, options = {}) {
     ...parsed,
     formatId: candidates[0].adapter.id,
     format: parsed.format || candidates[0].adapter.label,
-    capabilities: { ...candidates[0].adapter.capabilities }
+    capabilities: { ...candidates[0].adapter.capabilities },
   };
 }
 
@@ -82,6 +85,6 @@ export function serializeLorebook(formatId, book) {
     label: adapter.exportLabel || adapter.label,
     filename,
     capabilities: { ...adapter.capabilities },
-    warnings: serialized.warnings || []
+    warnings: serialized.warnings || [],
   };
 }

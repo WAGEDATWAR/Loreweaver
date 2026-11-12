@@ -443,7 +443,7 @@ test("native export stays lossless and warning-free", async () => {
 test("publishes export capabilities for every book format", async () => {
   assert.deepEqual(
     EXPORT_FORMATS.map((format) => format.id),
-    ["sillytavern", "native", "chub", "characterbook"]
+    ["sillytavern", "native", "content-format", "chub", "characterbook"]
   );
   assert.equal(EXPORT_FORMATS[0].primary, true);
   assert.equal(EXPORT_FORMATS.filter((format) => format.primary).length, 1);
