@@ -4,6 +4,16 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ## [Unreleased]
 
+### Changed
+
+- **One interchange model, shared with Synthesis (Y-17).** The canonical entry/book model and the
+  SillyTavern, Chub, character-book and interchange adapters now live once in `src/content-format/`;
+  `src/formats/*` adapt them to a project. Synthesis vendors the same modules, so a lorebook authored
+  in either app opens in the other. Fixed: an entry's `title` was ignored when no `name`/`comment` was
+  present (the first key became the title), and canonical `secondaryKeys` did not read back on a
+  round trip.
+- New export target: **Interchange lorebook** (the canonical file any frontend can read).
+
 ### Added
 
 - `docs/CARDS.md` and `docs/reference/LEGACY-BACKLOG.md`. The retired `Lorebook Tool` backlog is audited
