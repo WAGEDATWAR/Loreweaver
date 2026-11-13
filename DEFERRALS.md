@@ -129,8 +129,8 @@ Small, low-risk surface fixes carried from the old backlog.
 | DEF-115 | A "Reset filters" action when a search or filter hides everything | empty-state button | P5 | done |
 | DEF-116 | A "Clear search" affordance in the sidebar empty state | empty-state button | P5 | done |
 | DEF-105 | An optional UI-state block in project files | session layout, opt-in | P5 | scheduled |
-| DEF-106 | A schema reference page generated from the canonical model | held to the model by a test | P5 | scheduled |
-| DEF-107 | Print/PDF export for offline review passes | - | P5 | scheduled |
+| DEF-106 | A schema reference page generated from the canonical model | `schemaPage.js` + dialog; `test/schemaPage.test.js` holds it to the model | P5 | done |
+| DEF-107 | Print/PDF export for offline review passes | print stylesheet + `buildPrintRows`, from the palette | P5 | done |
 
 
 
@@ -187,6 +187,7 @@ may delay a v1 phase.
 | DEF-062 | An embedding and vendoring guide with the licence note | asks A-1/C-3 | post-v1 | scheduled |
 | DEF-063 | Extract the pure core into a new component repository | asks A-1 to A-6; the v1 tag is the precondition | post-v1 | scheduled |
 | DEF-065 | Run-level budget arbitration across attached books | ask B-9; the run budget is the outer bound | post-v1 | scheduled |
+
 
 
 

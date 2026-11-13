@@ -102,6 +102,8 @@ import { createSampleProject } from "./sample.js";
 import { createCard, createProject, normalizeTagList, ENTRY_COLOR_VALUES } from "./schema.js";
 import { formatAudit, recordAudit } from "./auditLog.js";
 import { writeAdvancedField } from "./advanced.js";
+import { buildSchemaPage } from "./schemaPage.js";
+import { buildPrintRows } from "./printView.js";
 import { searchProject } from "./search.js";
 import { suggestKeys } from "./suggestKeys.js";
 import { storageKey } from "./storage/namespace.js";
@@ -232,6 +234,12 @@ const refs = {
   shortcutsList: document.querySelector("#shortcuts-list"),
   shortcutsClose: document.querySelector("#shortcuts-close"),
   aboutShortcutsBtn: document.querySelector("#about-shortcuts-btn"),
+  schemaDialog: document.querySelector("#schema-dialog"),
+  schemaBody: document.querySelector("#schema-body"),
+  schemaVersion: document.querySelector("#schema-version"),
+  schemaClose: document.querySelector("#schema-close"),
+  aboutSchemaBtn: document.querySelector("#about-schema-btn"),
+  printRoot: document.querySelector("#print-root"),
   aboutTokenBtn: document.querySelector("#about-token-btn"),
   aboutIntegrityBtn: document.querySelector("#about-integrity-btn"),
   tokenSettingsDialog: document.querySelector("#token-settings-dialog"),
@@ -1325,6 +1333,8 @@ function buildCommands() {
     { title: "New character card", keywords: ["card", "character", "avatar"], run: () => openCardDialog() },
     { title: "Toggle light theme", keywords: ["theme", "colour", "dark"], run: toggleTheme },
     { title: "Keyboard shortcuts", keywords: ["keys", "help"], run: openShortcutsDialog },
+    { title: "Schema reference", keywords: ["schema", "docs", "fields"], run: openSchemaDialog },
+    { title: "Print lorebook", keywords: ["print", "pdf", "review"], run: printActiveBook },
     { title: "Toggle focus mode", hint: "Ctrl+\\", keywords: ["focus", "sidebar"], run: toggleFocusMode },
     { title: "Save project", hint: "Ctrl+S", keywords: ["persist"], run: async () => {
       if (await flushSave()) {
@@ -4686,6 +4696,19 @@ refs.aboutGuideBtn.addEventListener("click", () => {
   openGuideDialog();
 });
 
+refs.aboutSchemaBtn.addEventListener("click", () => {
+  refs.aboutDialog.close();
+  openSchemaDialog();
+});
+
+refs.schemaClose.addEventListener("click", () => refs.schemaDialog.close());
+
+refs.schemaDialog.addEventListener("click", (event) => {
+  if (event.target === refs.schemaDialog) {
+    refs.schemaDialog.close();
+  }
+});
+
 refs.aboutShortcutsBtn.addEventListener("click", () => {
   refs.aboutDialog.close();
   openShortcutsDialog();
@@ -5203,4 +5226,106 @@ function openShortcutsDialog() {
   refs.shortcutsList.append(fragment);
   refs.shortcutsDialog.showModal();
   refs.shortcutsClose.focus();
+}
+
+
+function openSchemaDialog() {
+  const page = buildSchemaPage();
+  refs.schemaVersion.textContent = `Schema version ${page.version}. Generated from the canonical model; adapters map this to each frontend format.`;
+  refs.schemaBody.replaceChildren();
+
+  const fragment = document.createDocumentFragment();
+
+  for (const section of page.sections) {
+    const details = document.createElement("details");
+    const summary = document.createElement("summary");
+    const title = document.createElement("span");
+    title.textContent = section.title;
+    const count = document.createElement("span");
+    count.className = "count";
+    count.textContent = String(section.fields.length);
+    summary.append(title, count);
+
+    const list = document.createElement("dl");
+    list.className = "schema-list";
+
+    for (const field of section.fields) {
+      const term = document.createElement("dt");
+      term.textContent = field.name;
+      const type = document.createElement("span");
+      type.className = "schema-type";
+      type.textContent = field.type;
+      term.append(type);
+      const note = document.createElement("dd");
+      note.textContent = field.note;
+      list.append(term, note);
+    }
+
+    details.append(summary, list);
+    fragment.append(details);
+  }
+
+  refs.schemaBody.append(fragment);
+  refs.schemaDialog.showModal();
+  refs.schemaClose.focus();
+}
+
+
+function renderPrintView() {
+  const view = buildPrintRows(getActiveBook(), (text) => tokenizer.count(text));
+  refs.printRoot.replaceChildren();
+
+  const head = document.createElement("header");
+  head.className = "print-head";
+  const title = document.createElement("h1");
+  title.textContent = view.bookName;
+  const meta = document.createElement("p");
+  meta.textContent = `${view.description ? `${view.description} \u00b7 ` : ""}${view.totalEntries} ${view.totalEntries === 1 ? "entry" : "entries"} \u00b7 ~${numberFormatter.format(view.totalTokens)} tokens`;
+  head.append(title, meta);
+
+  const fragment = document.createDocumentFragment();
+
+  for (const row of view.rows) {
+    const article = document.createElement("article");
+    article.className = "print-entry";
+    const heading = document.createElement("h2");
+    heading.className = "print-entry-title";
+    heading.textContent = row.title;
+    const info = document.createElement("p");
+    info.className = "print-entry-meta";
+    info.textContent = [
+      row.constant ? "Always on" : row.keys ? `Keys: ${row.keys}` : "No keys",
+      row.secondaryKeys ? `Secondary: ${row.secondaryKeys}` : "",
+      `Order ${row.order}`,
+      `~${numberFormatter.format(row.tokens)} tokens`,
+      row.enabled ? "" : "Disabled"
+    ].filter(Boolean).join(" \u00b7 ");
+    const content = document.createElement("div");
+    content.className = "print-entry-content";
+    content.textContent = row.content;
+    article.append(heading, info, content);
+
+    if (row.notes) {
+      const notes = document.createElement("div");
+      notes.className = "print-entry-notes";
+      notes.textContent = `Author notes: ${row.notes}`;
+      article.append(notes);
+    }
+
+    fragment.append(article);
+  }
+
+  refs.printRoot.append(head, fragment);
+}
+
+function printActiveBook() {
+  const book = getActiveBook();
+
+  if (!book) {
+    toast("There is no lorebook to print.", "error");
+    return;
+  }
+
+  renderPrintView();
+  window.print();
 }

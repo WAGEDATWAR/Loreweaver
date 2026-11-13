@@ -97,6 +97,13 @@ const states = [
     await page.click("#about-shortcuts-btn");
     await page.waitFor('document.querySelector("#shortcuts-dialog")?.open');
   } },
+  { name: "schema dialog", setup: async (page) => {
+    await page.click("#about-btn");
+    await page.waitFor('document.querySelector("#about-dialog")?.open');
+    await page.click("#about-schema-btn");
+    await page.waitFor('document.querySelector("#schema-dialog")?.open');
+    await page.waitFor('document.querySelector("#schema-body")?.childElementCount > 0');
+  } },
   { name: "peek dialog", setup: async (page) => {
     await page.click("#peek-btn");
     await page.waitFor('document.querySelector("#peek-dialog")?.open');

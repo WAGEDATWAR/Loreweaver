@@ -23,6 +23,8 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 - Ledger series O (pinned/recent entries, regex search) and N (fine polish), and DEF-106 to DEF-116.
 - `TODO.md` restructured into phase-tagged area sections with an ordered Next Up slice.
 - A keyboard shortcuts reference dialog and a focus mode (`Ctrl+\\` collapses the sidebar) (DEF-034, DEF-035).
+- A schema reference dialog generated from the canonical model and held to it by a test, plus a
+  print/PDF view of the active lorebook from the command palette (DEF-106, DEF-107).
 - RisuAI lorebook export, editable advanced SillyTavern/Chub fields (depth, role, groups, recursion,
   sticky, cooldown, scan depth) through the Advanced section, configurable new-entry defaults, and
   per-entry colour labels (DEF-014, DEF-015, DEF-108, DEF-113).
@@ -236,6 +238,7 @@ Mobile preview builds, bulk authoring tools and the completed scale phase.
 - Canonical project, book, and entry schema.
 - Native project import/export, single-book export, and pre-import backups.
 - Search, autosave, sample project, and the dark application shell.
+
 
 
 

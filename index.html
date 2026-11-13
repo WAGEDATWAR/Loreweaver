@@ -1070,6 +1070,20 @@
     </div>
   </dialog>
 
+  <dialog id="schema-dialog" class="dialog schema-dialog" aria-labelledby="schema-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading">
+        <p class="eyebrow">Reference</p>
+        <h2 id="schema-title">Schema reference</h2>
+        <p id="schema-version" class="dialog-copy"></p>
+      </div>
+      <div id="schema-body" class="schema-body"></div>
+      <div class="dialog-actions">
+        <button id="schema-close" class="btn" type="button">Close</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog id="shortcuts-dialog" class="dialog shortcuts-dialog" aria-labelledby="shortcuts-title">
     <div class="dialog-inner">
       <div class="dialog-heading">
@@ -1109,6 +1123,7 @@
         <button id="about-theme-btn" class="btn" type="button" aria-pressed="false">Light theme</button>
         <button id="about-token-btn" class="btn" type="button">Token settings</button>
         <button id="about-shortcuts-btn" class="btn" type="button">Shortcuts</button>
+        <button id="about-schema-btn" class="btn" type="button">Schema reference</button>
         <button id="about-integrity-btn" class="btn" type="button">Check data integrity</button>
         <button id="about-close" class="btn" type="button">Close</button>
       </div>
@@ -1137,6 +1152,8 @@
   </dialog>
 
   <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+
+  <div id="print-root" class="print-root" aria-hidden="true"></div>
 
   <div id="drop-overlay" class="drop-overlay" role="status" aria-label="Drop a file to import" hidden>
     <div class="drop-overlay-card">
