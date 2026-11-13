@@ -4768,3 +4768,41 @@ button.book-action:disabled {
     white-space: pre-wrap;
   }
 }
+
+:root[data-density="compact"] {
+  --topbar-height: 48px;
+}
+
+:root[data-density="compact"] .entry-card {
+  padding: 4px 10px 4px 12px;
+  gap: 1px;
+}
+
+:root[data-density="compact"] .entry-card-title {
+  font-size: 12px;
+}
+
+:root[data-density="compact"] .entry-list {
+  gap: 1px;
+}
+
+:root[data-density="compact"] .field {
+  gap: 4px;
+}
+
+:root[data-density="compact"] .field input,
+:root[data-density="compact"] .field select,
+:root[data-density="compact"] .field textarea {
+  height: 30px;
+}
+
+:root[data-density="compact"] .entry-list.is-virtual .entry-card {
+  height: 44px;
+}
+
+.content-area,
+.notes-area,
+.book-description-input {
+  resize: vertical;
+  max-height: 720px;
+}

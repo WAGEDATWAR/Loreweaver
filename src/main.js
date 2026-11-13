@@ -104,6 +104,7 @@ import { formatAudit, recordAudit } from "./auditLog.js";
 import { writeAdvancedField } from "./advanced.js";
 import { buildSchemaPage } from "./schemaPage.js";
 import { buildPrintRows } from "./printView.js";
+import { applyHeight, readHeights, serializeHeights } from "./textAreaHeights.js";
 import { searchProject } from "./search.js";
 import { suggestKeys } from "./suggestKeys.js";
 import { storageKey } from "./storage/namespace.js";
@@ -229,6 +230,7 @@ const refs = {
   aboutStorage: document.querySelector("#about-storage"),
   aboutGuideBtn: document.querySelector("#about-guide-btn"),
   aboutThemeBtn: document.querySelector("#about-theme-btn"),
+  aboutDensityBtn: document.querySelector("#about-density-btn"),
   aboutAuditLog: document.querySelector("#about-audit"),
   shortcutsDialog: document.querySelector("#shortcuts-dialog"),
   shortcutsList: document.querySelector("#shortcuts-list"),
@@ -466,6 +468,8 @@ const FILTER_STATE_KEY = storageKey("filters:v1");
 const TAG_FILTER_STATE_KEY = storageKey("tag-filters:v1");
 const ONBOARDED_KEY = storageKey("onboarded:v1");
 const THEME_KEY = storageKey("theme:v1");
+const DENSITY_KEY = storageKey("density:v1");
+const TEXTAREA_HEIGHTS_KEY = storageKey("textarea-heights:v1");
 const AUDIT_KEY = storageKey("audit:v1");
 const TOKEN_SETTINGS_KEY = storageKey("token-settings:v1");
 const LAST_BACKUP_KEY = storageKey("last-backup:v1");
@@ -1021,6 +1025,46 @@ function toggleTheme() {
   }
 }
 
+function readDensity() {
+  try {
+    return localStorage.getItem(DENSITY_KEY) === "compact" ? "compact" : "cozy";
+  } catch {
+    return "cozy";
+  }
+}
+
+function applyDensity(density) {
+  const value = density === "compact" ? "compact" : "cozy";
+
+  if (value === "compact") {
+    document.documentElement.dataset.density = "compact";
+  } else {
+    delete document.documentElement.dataset.density;
+  }
+
+  try {
+    localStorage.setItem(DENSITY_KEY, value);
+  } catch {
+    return;
+  }
+
+  syncDensityButton();
+}
+
+function syncDensityButton() {
+  if (!refs.aboutDensityBtn) {
+    return;
+  }
+
+  const compact = document.documentElement.dataset.density === "compact";
+  refs.aboutDensityBtn.setAttribute("aria-pressed", String(compact));
+  refs.aboutDensityBtn.textContent = compact ? "Cozy density" : "Compact density";
+}
+
+function toggleDensity() {
+  applyDensity(document.documentElement.dataset.density === "compact" ? "cozy" : "compact");
+}
+
 async function renderIntegrityDialog() {
   const projectReport = checkProjectIntegrity(getState());
   const revisionReport = await getRevisionIntegrity();
@@ -1547,6 +1591,7 @@ function renderAll() {
   renderRecentList(refs);
   renderEditor(refs);
   updateHistoryButtons();
+  applyTextareaHeights();
   updateValidationIndicator();
   updateBudgetStatus();
   updateSampleBadge();
@@ -4726,6 +4771,10 @@ refs.aboutThemeBtn.addEventListener("click", () => {
   toggleTheme();
 });
 
+refs.aboutDensityBtn.addEventListener("click", () => {
+  toggleDensity();
+});
+
 refs.aboutTokenBtn.addEventListener("click", () => {
   refs.aboutDialog.close();
   openTokenSettingsDialog();
@@ -5090,7 +5139,54 @@ document.addEventListener("visibilitychange", () => {
 });
 
 await initStorage();
+const TEXTAREA_KEYS = ["entry-content", "entry-notes", "book-description"];
+let textareaHeights = {};
+
+function readTextareaHeights() {
+  try {
+    return readHeights(localStorage.getItem(TEXTAREA_HEIGHTS_KEY));
+  } catch {
+    return {};
+  }
+}
+
+function persistTextareaHeights() {
+  try {
+    localStorage.setItem(TEXTAREA_HEIGHTS_KEY, serializeHeights(textareaHeights));
+  } catch {
+    return;
+  }
+}
+
+function applyTextareaHeights() {
+  for (const key of TEXTAREA_KEYS) {
+    const element = document.querySelector(`#${key}`);
+    applyHeight(element, textareaHeights[key]);
+  }
+}
+
+function watchTextareaHeights() {
+  for (const key of TEXTAREA_KEYS) {
+    const element = document.querySelector(`#${key}`);
+
+    if (!element) {
+      continue;
+    }
+
+    element.addEventListener("mouseup", () => {
+      const height = element.getBoundingClientRect().height;
+
+      if (Math.round(height) !== textareaHeights[key]) {
+        textareaHeights[key] = Math.round(height);
+        persistTextareaHeights();
+      }
+    });
+  }
+}
 applyTheme(readTheme());
+applyDensity(readDensity());
+textareaHeights = readTextareaHeights();
+watchTextareaHeights();
 
 const storedDetailsState = readDetailsState();
 setDetailsCollapsed(storedDetailsState ?? window.matchMedia("(max-width: 720px)").matches, false);

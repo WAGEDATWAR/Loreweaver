@@ -488,6 +488,31 @@ export const scenarios = [
     }
   },
   {
+    name: "toggles compact density and keeps textarea heights",
+    async run(page) {
+      await resetApp(page);
+      await page.click("#about-btn");
+      await page.waitFor('document.querySelector("#about-dialog")?.open');
+      await page.click("#about-density-btn");
+      await page.waitFor('document.documentElement.dataset.density === "compact"');
+      await page.click("#about-close");
+
+      await page.evaluate(`(() => {
+        const textarea = document.querySelector("#entry-content");
+        textarea.style.height = "300px";
+        textarea.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+        return true;
+      })()`);
+      await sleep(120);
+
+      await page.reload();
+      await page.waitFor('document.querySelector("#book-name")?.value');
+      assert.equal(await page.evaluate('document.documentElement.dataset.density'), "compact");
+      assert.ok(await page.evaluate('document.querySelector("#entry-content").getBoundingClientRect().height >= 280'));
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "toggles a persistent light theme",
     async run(page) {
       await resetApp(page);
