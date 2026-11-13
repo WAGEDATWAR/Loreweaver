@@ -1,6 +1,6 @@
 import { duplicateBook, mergeBookEntries, splitBook, splitPoint } from "./books.js";
 import { applyReplace } from "./replace.js";
-import { createBook, createEntry, normalizeTagList } from "./schema.js";
+import { createBook, createEntry, normalizeTagList, createCard } from "./schema.js";
 import { clamp } from "./utils.js";
 
 const HISTORY_LIMIT = 60;
@@ -1021,6 +1021,26 @@ export function updateCard(id, patch) {
   captureHistory(`update-card:${id}:${Object.keys(patch).join(",")}`);
   Object.assign(card, patch, { updatedAt: Date.now() });
   return card;
+}
+
+export function duplicateCard(id) {
+  const source = getCard(id);
+
+  if (!source || !state) {
+    return null;
+  }
+
+  captureHistory("duplicate-card", false);
+  const copy = createCard({
+    ...clone(source),
+    id: undefined,
+    name: `${source.name.trim() || "Untitled card"} copy`,
+    createdAt: undefined,
+    updatedAt: undefined
+  });
+  state.cards.push(copy);
+  state.activeCardId = copy.id;
+  return copy;
 }
 
 export function deleteCard(id) {

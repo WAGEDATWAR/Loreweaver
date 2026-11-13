@@ -86,9 +86,10 @@ export function renderCardList(refs) {
     name.className = "card-item-name";
     name.textContent = cardLabel(card);
     meta.className = "card-item-meta";
-    meta.textContent = card.bookId
+    const linked = card.bookId
       ? getState().books.find((book) => book.id === card.bookId)?.name ?? "Linked book gone"
       : "No linked book";
+    meta.textContent = card.tags?.length ? `${linked} · ${card.tags.slice(0, 3).join(", ")}` : linked;
     main.append(name, meta);
     item.append(avatar, main);
     item.title = cardLabel(card);
@@ -98,8 +99,146 @@ export function renderCardList(refs) {
   refs.cardList.append(fragment);
 }
 
+const SEVERITY_LABELS = { error: "Error", warning: "Warning", info: "Note" };
+
+function setGreetingRowState(container) {
+  const rows = [...container.querySelectorAll(".greeting-row")];
+
+  rows.forEach((row, index) => {
+    row.querySelector("textarea").setAttribute("aria-label", `${container.dataset.label} ${index + 1}`);
+    row.querySelector("[data-greeting-up]").disabled = index === 0;
+    row.querySelector("[data-greeting-down]").disabled = index === rows.length - 1;
+  });
+}
+
+function createGreetingRow(container, value) {
+  const row = document.createElement("div");
+  const area = document.createElement("textarea");
+  const actions = document.createElement("div");
+
+  row.className = "greeting-row";
+  area.rows = 3;
+  area.value = value;
+  actions.className = "greeting-actions";
+
+  for (const [attribute, label, glyph] of [
+    ["data-greeting-up", "Move up", "↑"],
+    ["data-greeting-down", "Move down", "↓"],
+    ["data-greeting-remove", "Remove", "×"]
+  ]) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "icon-btn";
+    button.setAttribute(attribute, "");
+    button.setAttribute("aria-label", `${label} ${container.dataset.label.toLowerCase()}`);
+    button.title = label;
+    button.textContent = glyph;
+    actions.append(button);
+  }
+
+  row.append(area, actions);
+  return row;
+}
+
+export function renderGreetingList(container, values, label) {
+  container.dataset.label = label;
+  container.replaceChildren(...values.map((value) => createGreetingRow(container, value)));
+  setGreetingRowState(container);
+}
+
+export function addGreetingRow(container, value = "") {
+  const row = createGreetingRow(container, value);
+  container.append(row);
+  setGreetingRowState(container);
+  row.querySelector("textarea").focus();
+}
+
+export function handleGreetingClick(container, target) {
+  const row = target.closest(".greeting-row");
+
+  if (!row || !container.contains(row)) {
+    return false;
+  }
+
+  if (target.closest("[data-greeting-remove]")) {
+    row.remove();
+  } else if (target.closest("[data-greeting-up]") && row.previousElementSibling) {
+    row.previousElementSibling.before(row);
+  } else if (target.closest("[data-greeting-down]") && row.nextElementSibling) {
+    row.nextElementSibling.after(row);
+  } else {
+    return false;
+  }
+
+  setGreetingRowState(container);
+  return true;
+}
+
+export function readGreetingList(container) {
+  return [...container.querySelectorAll("textarea")].map((area) => area.value).filter((value) => value.trim());
+}
+
+export function renderCardSummary(refs, report, issues) {
+  refs.cardTokensAlways.textContent = String(report.always);
+  refs.cardTokensExamples.textContent = String(report.examples);
+  refs.cardTokensOpening.textContent = String(report.opening);
+  refs.cardTokensTotal.textContent = String(report.total);
+
+  const badges = {
+    "card-description": report.fields.description,
+    "card-personality": report.fields.personality,
+    "card-scenario": report.fields.scenario,
+    "card-first-message": report.fields.firstMessage,
+    "card-example-messages": report.fields.exampleMessages,
+    "card-system-prompt": report.fields.systemPrompt,
+    "card-post-history": report.fields.postHistoryInstructions,
+    "card-depth-prompt": report.fields.depthPrompt
+  };
+
+  for (const badge of refs.cardDialog.querySelectorAll("[data-token-for]")) {
+    const value = badges[badge.dataset.tokenFor];
+    badge.textContent = value ? `${value} tokens` : "";
+  }
+
+  refs.cardAltTokens.textContent = report.fields.alternateGreetings ? `${report.fields.alternateGreetings} tokens` : "";
+  refs.cardGroupTokens.textContent = report.fields.groupOnlyGreetings ? `${report.fields.groupOnlyGreetings} tokens` : "";
+  refs.cardIssues.replaceChildren();
+
+  if (!issues.length) {
+    const ok = document.createElement("li");
+    ok.className = "card-issue is-ok";
+    ok.textContent = "No problems found.";
+    refs.cardIssues.append(ok);
+    return;
+  }
+
+  for (const issue of issues) {
+    const item = document.createElement("li");
+    const tag = document.createElement("strong");
+    item.className = `card-issue is-${issue.severity}`;
+    tag.textContent = SEVERITY_LABELS[issue.severity];
+    item.append(tag, document.createTextNode(` ${issue.message}`));
+    refs.cardIssues.append(item);
+  }
+}
+
+export function renderCardAvatar(refs, dataUrl) {
+  refs.cardAvatar.replaceChildren();
+
+  if (dataUrl) {
+    const img = document.createElement("img");
+    img.alt = "Card image";
+    img.src = dataUrl;
+    refs.cardAvatar.append(img);
+  }
+
+  refs.cardAvatarRemove.hidden = !dataUrl;
+}
+
 export function fillCardForm(refs, card) {
   refs.cardName.value = card?.name ?? "";
+  refs.cardNickname.value = card?.nickname ?? "";
+  refs.cardDescription.value = card?.description ?? "";
   refs.cardPersonality.value = card?.personality ?? "";
   refs.cardScenario.value = card?.scenario ?? "";
   refs.cardFirstMessage.value = card?.firstMessage ?? "";
@@ -109,14 +248,18 @@ export function fillCardForm(refs, card) {
   refs.cardCreator.value = card?.creator ?? "";
   refs.cardVersion.value = card?.characterVersion ?? "";
   refs.cardCreatorNotes.value = card?.creatorNotes ?? "";
-  refs.cardAvatar.replaceChildren();
-
-  if (card?.avatarDataUrl) {
-    const img = document.createElement("img");
-    img.alt = "Card image";
-    img.src = card.avatarDataUrl;
-    refs.cardAvatar.append(img);
-  }
+  refs.cardDepthPrompt.value = card?.depthPrompt?.prompt ?? "";
+  refs.cardDepthDepth.value = String(card?.depthPrompt?.depth ?? 4);
+  refs.cardDepthRole.value = card?.depthPrompt?.role ?? "system";
+  refs.cardTalkativeness.value = String(card?.talkativeness ?? 0.5);
+  refs.cardTalkativenessOutput.textContent = Number(refs.cardTalkativeness.value).toFixed(2);
+  refs.cardTagChips.setKeys(card?.tags ?? []);
+  renderGreetingList(refs.cardAltGreetings, card?.alternateGreetings ?? [], "Alternate greeting");
+  renderGreetingList(refs.cardGroupGreetings, card?.groupOnlyGreetings ?? [], "Group greeting");
+  refs.cardAdvanced.open = Boolean(
+    card?.groupOnlyGreetings?.length || card?.depthPrompt?.prompt || (card?.talkativeness ?? 0.5) !== 0.5
+  );
+  renderCardAvatar(refs, card?.avatarDataUrl ?? "");
 
   const options = [{ value: "", label: "No linked lorebook" }];
 
@@ -134,17 +277,30 @@ export function fillCardForm(refs, card) {
 }
 
 export function readCardForm(refs) {
+  const depth = Number.parseInt(refs.cardDepthDepth.value, 10);
+
   return {
     name: refs.cardName.value,
+    nickname: refs.cardNickname.value,
+    description: refs.cardDescription.value,
     personality: refs.cardPersonality.value,
     scenario: refs.cardScenario.value,
     firstMessage: refs.cardFirstMessage.value,
+    alternateGreetings: readGreetingList(refs.cardAltGreetings),
+    groupOnlyGreetings: readGreetingList(refs.cardGroupGreetings),
     exampleMessages: refs.cardExampleMessages.value,
     systemPrompt: refs.cardSystemPrompt.value,
     postHistoryInstructions: refs.cardPostHistory.value,
     creator: refs.cardCreator.value,
     characterVersion: refs.cardVersion.value,
     creatorNotes: refs.cardCreatorNotes.value,
+    tags: refs.cardTagChips.getKeys(),
+    depthPrompt: {
+      prompt: refs.cardDepthPrompt.value,
+      depth: Number.isFinite(depth) ? depth : 4,
+      role: refs.cardDepthRole.value
+    },
+    talkativeness: Number(refs.cardTalkativeness.value),
     bookId: refs.cardLinkBook.value || null
   };
 }

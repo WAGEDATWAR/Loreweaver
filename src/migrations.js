@@ -26,8 +26,42 @@ const MIGRATIONS = [
         cards: Array.isArray(data.cards) ? data.cards : []
       };
     }
+  },
+  {
+    from: 3,
+    to: 4,
+    description: "Add card description, nickname, group greetings, depth prompt and talkativeness.",
+    migrate(data) {
+      return {
+        ...data,
+        version: 4,
+        cards: (Array.isArray(data.cards) ? data.cards : []).map(migrateCard)
+      };
+    }
   }
 ];
+
+function migrateCard(card) {
+  const source = card && typeof card === "object" ? card : {};
+  const fields = source.extensions?.sourceFields;
+  const legacyDescription = fields && typeof fields.description === "string" ? fields.description : "";
+  const rest = { ...(fields && typeof fields === "object" ? fields : {}) };
+  delete rest.description;
+  delete rest.nickname;
+  delete rest.group_only_greetings;
+
+  return {
+    ...source,
+    description: typeof source.description === "string" ? source.description : legacyDescription,
+    nickname: typeof source.nickname === "string"
+      ? source.nickname
+      : typeof fields?.nickname === "string" ? fields.nickname : "",
+    groupOnlyGreetings: Array.isArray(source.groupOnlyGreetings)
+      ? source.groupOnlyGreetings
+      : Array.isArray(fields?.group_only_greetings) ? fields.group_only_greetings : [],
+    extensions: fields ? { ...source.extensions, sourceFields: rest } : source.extensions
+  };
+}
 
 function migrateBook(book) {
   const source = book && typeof book === "object" ? book : {};

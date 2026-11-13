@@ -44,6 +44,8 @@ C = context, U = surface.
 | A-6 | **Frontend quirks belong in adapters**, never in the canonical model. | locked |
 | A-7 | **SillyTavern World Info v2 is the primary v1 export target.** It sorts first, is marked primary, and carries the most complete round-trip. | locked |
 | A-8 | **A card container is an adapter, not a model change.** PNG text chunks and CHARX live at the rim; the card record and its book stay canonical. | locked |
+| A-9 | **Cards get the same care as books**: store-owned mutations with undo, pure validation and token reports, and a draft editor that writes only on Save. | locked |
+| A-10 | **One writer tab.** A cross-tab guard pauses saving in a tab another tab has outdated and asks the user; it never overwrites silently. | locked |
 
 ## Editor (E-series)
 
@@ -68,6 +70,8 @@ C = context, U = surface.
 | I-5 | **Exported UIDs are collision-free**, retaining numeric source ids when possible. | locked |
 | I-6 | **Duplicate source UIDs are remapped on import.** | locked |
 | I-7 | **Import strategies are replace, append-by-name and merge-by-title**, previewed as a diff. | locked |
+| I-8 | **A PNG card writes both `ccv3` (V3) and `chara` (V2)**, and V3 is the default JSON export; V2 export warns about the V3-only fields it drops. | locked |
+| I-9 | **A card's `data.extensions` and unknown keys are preserved verbatim**, and an embedded book is serialized by the shared character-book adapter, never a private snapshot. | locked |
 
 ## Persistence (P-series)
 
@@ -94,6 +98,7 @@ migration of the `lorebook-studio` namespace on load. | locked |
 | C-4 | **The simulation shares matching rules with validation**; a change updates both and both tests. | locked |
 | C-5 | **The simulation is a preview**, not a runtime; recursion and groups stay consumer-side. | locked |
 | C-6 | **A per-book token budget drives a visible over-budget warning.** | locked |
+| C-7 | **A card's tokens are reported by when a frontend sends them**: always-sent (description, personality, scenario, prompts, depth prompt), examples, opening. Always-sent text over 1,500 tokens warns. | provisional |
 
 ## Surface (U-series)
 

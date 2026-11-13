@@ -16,6 +16,13 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- Character card parity with lorebooks: a full editor (description, nickname, alternate and group-only
+  greetings, tags, depth prompt, talkativeness), a live token report split into always-sent, examples
+  and opening, a card checks panel, duplicate, a discard-changes guard, image conversion to PNG, and
+  export as PNG (V3 + V2 chunks), CHARX, JSON V3 or JSON V2 with loss warnings. Schema version 4
+  upgrades stored cards. Decisions A-9, I-8, I-9 and C-7; deferrals DEF-117 to DEF-124.
+- `docs/ARCHITECTURE.md` gains a full Character cards section and an updated module map.
+
 - `docs/CARDS.md` and `docs/reference/LEGACY-BACKLOG.md`. The retired `Lorebook Tool` backlog is audited
   item by item and every open entry either ships, gains a ledger row, or is folded.
 - Character cards as a first-class P5 workstream: decisions G-16 (a card is a record) and A-8 (a
@@ -87,6 +94,10 @@ Mobile preview builds, bulk authoring tools and the completed scale phase.
 
 ### Fixed
 
+- Character cards: the V2/V3 `description` field was missing (it sat unseen in the unknown-fields bucket),
+  a card's `data.extensions` (world, depth prompt, talkativeness, regex scripts) was dropped on import,
+  an embedded lorebook was exported through a lossy private snapshot, a PNG card was written with only
+  `ccv3`, and a V3 card with no first message or personality failed to import. All fixed with fixtures.
 - Two tabs on one project no longer overwrite each other: a cross-tab guard pauses saving in a stale
   tab and offers Load latest or Keep this version. The app also requests persistent storage and shows
   the result in the storage panel.

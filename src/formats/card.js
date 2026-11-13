@@ -1,4 +1,5 @@
-import { parseCard, serializeCard, validateCard } from "../cardCodec.js";
+import { cardLossWarnings, parseCard, serializeCard, validateCard } from "../cardCodec.js";
+import { characterBookAdapter } from "../content-format/adapters.js";
 import { isPng, readCardChunk, writeCardChunk } from "../cardPng.js";
 import { createProject } from "../schema.js";
 import { buildZip, isZip, listZip } from "../zip.js";
@@ -126,7 +127,7 @@ export const cardAdapter = {
   id: "card",
   label: "Character card",
   exportLabel: "Character card (PNG)",
-  exportDescription: "A PNG card with its data embedded in a ccv3 text chunk.",
+  exportDescription: "A PNG card with V3 and V2 data embedded, for any frontend.",
   exportFilenameSuffix: "card",
   capabilities: {
     bookExport: false,
@@ -168,7 +169,7 @@ export const cardAdapter = {
     }
 
     const book = extractBook(parsed.card.body);
-    const cardResult = parseCard(parsed.card.body);
+    const cardResult = parseCard(parsed.card);
 
     if (!cardResult.ok) {
       return cardResult;
@@ -215,7 +216,7 @@ export const cardAdapter = {
       warnings
     };
   },
-  serialize(card, { book = null, avatarDataUrl = "" } = {}) {
+  exportCard(card, { format = "png", book = null, avatarDataUrl = "", now = Date.now() } = {}) {
     if (!isRecord(card)) {
       return { ok: false, error: "There is no card to export." };
     }
@@ -224,65 +225,74 @@ export const cardAdapter = {
       return { ok: false, error: "Give the card a name before exporting." };
     }
 
-    const payload = serializeCard(card);
+    const warnings = [];
+    let characterBook = null;
 
     if (book) {
-      payload.data.character_book = bookSnapshot(book);
+      const serializedBook = characterBookAdapter.serialize(book);
+
+      if (!serializedBook.ok) {
+        return serializedBook;
+      }
+
+      characterBook = serializedBook.data;
+      warnings.push(...(serializedBook.warnings ?? []));
+    } else {
+      warnings.push("The card carries no linked lorebook.");
     }
 
+    const spec = format === "json-v2" ? "v2" : "v3";
+    const payload = serializeCard(card, { spec, characterBook, now });
+    warnings.push(...cardLossWarnings(card, spec));
+    const slug = card.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "card";
     const source = base64ToBytes(avatarDataUrl || card.avatarDataUrl);
 
-    if (!source || source.type !== "image/png") {
-      return {
-        ok: true,
-        dataUrl: true,
-        json: JSON.stringify(payload),
-        filename: "card.json",
-        warnings: ["The card has no PNG image; it exports as JSON only."]
-      };
+    if (format === "json-v3" || format === "json-v2") {
+      if (source) {
+        warnings.push("JSON cards do not carry the image; export a PNG or CHARX to keep it.");
+      }
+
+      return { ok: true, json: JSON.stringify(payload), filename: `${slug}.${spec}.json`, type: "application/json", warnings };
     }
 
-    const written = writeCardChunk(source.bytes, JSON.stringify(payload));
+    if (format === "charx") {
+      const files = [{ name: "card.json", bytes: new TextEncoder().encode(JSON.stringify(payload)) }];
+
+      if (source) {
+        const extension = source.type.split("/")[1] === "jpeg" ? "jpg" : source.type.split("/")[1];
+        files.push({ name: `avatar.${extension}`, bytes: source.bytes });
+      }
+
+      return { ok: true, bytes: buildZip(files), type: "application/zip", filename: `${slug}.charx`, warnings };
+    }
+
+    if (!source || source.type !== "image/png") {
+      warnings.unshift(source
+        ? "Only PNG images can carry a card; this card's image is not a PNG, so it exports as JSON."
+        : "The card has no PNG image, so it exports as JSON. Add a PNG image to export a PNG card.");
+      return { ok: true, json: JSON.stringify(payload), filename: `${slug}.v3.json`, type: "application/json", warnings };
+    }
+
+    const legacy = serializeCard(card, { spec: "v2", characterBook, now });
+    const written = writeCardChunk(source.bytes, JSON.stringify(payload), JSON.stringify(legacy));
 
     if (!written.ok) {
       return written;
     }
 
-    return {
-      ok: true,
-      bytes: written.bytes,
-      type: "image/png",
-      filename: `${card.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "card"}.png`,
-      warnings: book ? [] : ["The card carries no linked lorebook."]
-    };
+    return { ok: true, bytes: written.bytes, type: "image/png", filename: `${slug}.png`, warnings };
   },
-  serializeCharx(card, { book = null, avatarDataUrl = "" } = {}) {
-    const serialized = this.serialize(card);
+  serialize(card, options = {}) {
+    const exported = this.exportCard(card, { ...options, format: "png" });
 
-    if (!serialized.ok) {
-      return serialized;
+    if (exported.ok && exported.json) {
+      return { ...exported, dataUrl: true };
     }
 
-    const payload = serializeCard(card);
-
-    if (book) {
-      payload.data.character_book = bookSnapshot(book);
-    }
-
-    const files = [{ name: "ccv3.json", bytes: new TextEncoder().encode(JSON.stringify(payload)) }];
-    const source = base64ToBytes(avatarDataUrl || card.avatarDataUrl);
-
-    if (source) {
-      files.push({ name: `avatar.${source.type.split("/")[1] === "jpeg" ? "jpg" : source.type.split("/")[1]}`, bytes: source.bytes });
-    }
-
-    return {
-      ok: true,
-      bytes: buildZip(files),
-      type: "application/zip",
-      filename: `${payload.data.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "card"}.charx`,
-      warnings: serialized.warnings
-    };
+    return exported;
+  },
+  serializeCharx(card, options = {}) {
+    return this.exportCard(card, { ...options, format: "charx" });
   }
 };
 
@@ -300,23 +310,4 @@ export function extractBook(body) {
   }
 
   return null;
-}
-
-function bookSnapshot(book) {
-  return {
-    name: book.name,
-    description: book.description,
-    entries: book.entries.map((entry) => ({
-      keys: [...entry.keys],
-      secondary_keys: [...entry.secondaryKeys],
-      comment: entry.title,
-      content: entry.content,
-      enabled: entry.enabled,
-      constant: entry.constant,
-      selective: entry.selective,
-      insertion_order: entry.order,
-      case_sensitive: entry.caseSensitive,
-      match_whole_words: entry.matchWholeWords
-    }))
-  };
 }

@@ -2,7 +2,7 @@ import { clamp, createId } from "./utils.js";
 
 export const APP_ID = "loreweaver";
 export const LEGACY_APP_ID = "lorebook-studio";
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 export const POSITIONS = [
   { value: "before_char", label: "Before character" },
@@ -93,18 +93,35 @@ export function createBook(patch = {}) {
   };
 }
 
+export const DEPTH_PROMPT_ROLES = ["system", "user", "assistant"];
+
+function normalizeDepthPrompt(value) {
+  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+
+  return {
+    prompt: typeof source.prompt === "string" ? source.prompt : "",
+    depth: Number.isFinite(source.depth) ? clamp(Math.round(source.depth), 0, 999) : 4,
+    role: DEPTH_PROMPT_ROLES.includes(source.role) ? source.role : "system"
+  };
+}
+
+function normalizeStringList(value) {
+  return Array.isArray(value) ? value.map((item) => String(item)).filter((item) => item.trim()) : [];
+}
+
 export function createCard(patch = {}) {
   const now = Date.now();
 
   return {
     id: typeof patch.id === "string" && patch.id ? patch.id : createId("card"),
     name: typeof patch.name === "string" ? patch.name : "",
+    nickname: typeof patch.nickname === "string" ? patch.nickname : "",
+    description: typeof patch.description === "string" ? patch.description : "",
     personality: typeof patch.personality === "string" ? patch.personality : "",
     scenario: typeof patch.scenario === "string" ? patch.scenario : "",
     firstMessage: typeof patch.firstMessage === "string" ? patch.firstMessage : "",
-    alternateGreetings: Array.isArray(patch.alternateGreetings)
-      ? patch.alternateGreetings.map((greeting) => String(greeting)).filter(Boolean)
-      : [],
+    alternateGreetings: normalizeStringList(patch.alternateGreetings),
+    groupOnlyGreetings: normalizeStringList(patch.groupOnlyGreetings),
     exampleMessages: typeof patch.exampleMessages === "string" ? patch.exampleMessages : "",
     systemPrompt: typeof patch.systemPrompt === "string" ? patch.systemPrompt : "",
     postHistoryInstructions: typeof patch.postHistoryInstructions === "string"
@@ -114,6 +131,8 @@ export function createCard(patch = {}) {
     creatorNotes: typeof patch.creatorNotes === "string" ? patch.creatorNotes : "",
     characterVersion: typeof patch.characterVersion === "string" ? patch.characterVersion : "",
     tags: normalizeTagList(patch.tags),
+    talkativeness: Number.isFinite(patch.talkativeness) ? clamp(patch.talkativeness, 0, 1) : 0.5,
+    depthPrompt: normalizeDepthPrompt(patch.depthPrompt),
     avatarDataUrl: typeof patch.avatarDataUrl === "string" ? patch.avatarDataUrl : "",
     bookId: typeof patch.bookId === "string" && patch.bookId ? patch.bookId : null,
     createdAt: Number.isFinite(patch.createdAt) ? patch.createdAt : now,

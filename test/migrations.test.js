@@ -38,7 +38,7 @@ test("upgrades a version 1 project to the current schema", async () => {
   assert.equal(result.isProject, true);
   assert.equal(result.from, 1);
   assert.equal(result.newer, false);
-  assert.equal(result.applied.length, 2);
+  assert.equal(result.applied.length, 3);
   assert.equal(result.data.version, SCHEMA_VERSION);
   assert.deepEqual(result.data.cards, []);
   assert.deepEqual(result.data.books[0].tags, []);
@@ -52,7 +52,7 @@ test("treats unversioned project data as the baseline version", async () => {
   const result = migrateProjectData({ books: [{ name: "Unversioned", entries: [] }] });
 
   assert.equal(result.from, 1);
-  assert.equal(result.applied.length, 2);
+  assert.equal(result.applied.length, 3);
   assert.equal(result.data.version, SCHEMA_VERSION);
 });
 
@@ -82,7 +82,7 @@ test("parseProject upgrades a stored project and reports the migration", async (
   assert.equal(result.project.version, SCHEMA_VERSION);
   assert.deepEqual(result.project.books[0].tags, []);
   assert.ok(result.warnings.some((warning) => /Upgraded project schema 1/.test(warning)));
-  assert.equal(result.migrations.length, 2);
+  assert.equal(result.migrations.length, 3);
 });
 
 test("parseProject warns about projects from a newer schema", async () => {
@@ -94,4 +94,23 @@ test("parseProject warns about projects from a newer schema", async () => {
 
   assert.equal(result.ok, true);
   assert.ok(result.warnings.some((warning) => /newer version/.test(warning)));
+});
+
+test("upgrades a version 3 project's cards with the new fields", async () => {
+  const result = migrateProjectData({
+    version: 3,
+    books: [],
+    cards: [{
+      id: "card_1",
+      name: "Mara",
+      extensions: { sourceFields: { description: "A smuggler.", nickname: "M", group_only_greetings: ["Hi all"], keep: 1 } }
+    }]
+  });
+  const card = result.data.cards[0];
+
+  assert.equal(result.applied.length, 1);
+  assert.equal(card.description, "A smuggler.");
+  assert.equal(card.nickname, "M");
+  assert.deepEqual(card.groupOnlyGreetings, ["Hi all"]);
+  assert.deepEqual(card.extensions.sourceFields, { keep: 1 });
 });

@@ -75,7 +75,8 @@ import {
   updateCard,
   deleteCard,
   setActiveCard,
-  linkCardBook
+  linkCardBook,
+  duplicateCard
 } from "./store.js";
 import {
   getProjectBackupInfo,
@@ -127,7 +128,18 @@ import { renderEditor, syncEntryStats } from "./ui/editor.js";
 import { createKeyChips } from "./ui/keyChips.js";
 import { confirmAction, toast } from "./ui/overlays.js";
 import { getVisibleEntryIds, renderSidebar } from "./ui/sidebar.js";
-import { fillCardForm, readCardForm, renderCardList, renderRecentList } from "./ui/cards.js";
+import {
+  addGreetingRow,
+  fillCardForm,
+  handleGreetingClick,
+  readCardForm,
+  renderCardAvatar,
+  renderCardList,
+  renderCardSummary,
+  renderRecentList
+} from "./ui/cards.js";
+import { buildCardTokenReport } from "./cardTokens.js";
+import { validateCardRecord } from "./cardValidation.js";
 import { clamp } from "./utils.js";
 import { createTabGuard } from "./tabGuard.js";
 import { selectEntriesByTokenSize } from "./bulk.js";
@@ -158,6 +170,31 @@ const refs = {
   newCardBtn: document.querySelector("#new-card-btn"),
   cardDialog: document.querySelector("#card-dialog"),
   cardName: document.querySelector("#card-name"),
+  cardNickname: document.querySelector("#card-nickname"),
+  cardDescription: document.querySelector("#card-description"),
+  cardAltGreetings: document.querySelector("#card-alt-greetings"),
+  cardAltAdd: document.querySelector("#card-alt-add"),
+  cardAltTokens: document.querySelector("#card-alt-tokens"),
+  cardGroupGreetings: document.querySelector("#card-group-greetings"),
+  cardGroupAdd: document.querySelector("#card-group-add"),
+  cardGroupTokens: document.querySelector("#card-group-tokens"),
+  cardTagsContainer: document.querySelector("#card-tags"),
+  cardTagsInput: document.querySelector("#card-tags-input"),
+  cardAdvanced: document.querySelector(".card-advanced"),
+  cardDepthPrompt: document.querySelector("#card-depth-prompt"),
+  cardDepthDepth: document.querySelector("#card-depth-depth"),
+  cardDepthRole: document.querySelector("#card-depth-role"),
+  cardTalkativeness: document.querySelector("#card-talkativeness"),
+  cardTalkativenessOutput: document.querySelector("#card-talkativeness-output"),
+  cardBookInfo: document.querySelector("#card-book-info"),
+  cardTokensAlways: document.querySelector("#card-tokens-always"),
+  cardTokensExamples: document.querySelector("#card-tokens-examples"),
+  cardTokensOpening: document.querySelector("#card-tokens-opening"),
+  cardTokensTotal: document.querySelector("#card-tokens-total"),
+  cardIssues: document.querySelector("#card-issues"),
+  cardAvatarRemove: document.querySelector("#card-avatar-remove"),
+  cardDuplicate: document.querySelector("#card-duplicate"),
+  cardExportFormat: document.querySelector("#card-export-format"),
   cardPersonality: document.querySelector("#card-personality"),
   cardScenario: document.querySelector("#card-scenario"),
   cardFirstMessage: document.querySelector("#card-first-message"),
@@ -452,6 +489,16 @@ refs.bookTagChips = createKeyChips({
     updateActiveBookTags(tags);
     renderSidebar(refs);
     scheduleSave();
+  }
+});
+
+refs.cardTagChips = createKeyChips({
+  container: refs.cardTagsContainer,
+  input: refs.cardTagsInput,
+  label: "card tag",
+  regex: false,
+  onChange: () => {
+    markCardDirty();
   }
 });
 
@@ -1695,6 +1742,10 @@ function updateBudgetStatus() {
 }
 
 function handleTokenUpdate() {
+  if (refs.cardDialog.open) {
+    refreshCardSummary();
+  }
+
   const entry = getActiveEntry();
 
   if (entry) {
@@ -2257,6 +2308,20 @@ function renderExportOptions() {
       description: "The card as a CHARX zip with its image and linked lorebook.",
       meta: "Card"
     }));
+
+    options.push(createExportOption({
+      id: "card-json-v3",
+      title: `Card JSON (V3) \u00b7 ${label}`,
+      description: "The V3 card as plain JSON, for scripting or frontends that import JSON.",
+      meta: "Card"
+    }));
+
+    options.push(createExportOption({
+      id: "card-json-v2",
+      title: `Card JSON (V2) \u00b7 ${label}`,
+      description: "The older V2 card format, for frontends that do not read V3.",
+      meta: "Card"
+    }));
   }
 
   refs.exportOptions.replaceChildren(...options);
@@ -2586,7 +2651,7 @@ function saveProjectDownload() {
   toast("Project downloaded", "success");
 }
 
-async function exportActiveCard(asCharx = false) {
+async function exportActiveCard(format = "png") {
   const card = getActiveCard();
 
   if (!card) {
@@ -2596,9 +2661,7 @@ async function exportActiveCard(asCharx = false) {
 
   const label = card.name.trim() || "Untitled card";
   const book = card.bookId ? getState().books.find((item) => item.id === card.bookId) : null;
-  const exported = asCharx
-    ? CARD_ADAPTER.serializeCharx(card, { book })
-    : CARD_ADAPTER.serialize(card, { book });
+  const exported = CARD_ADAPTER.exportCard(card, { format, book });
 
   if (!exported.ok) {
     toast(exported.error, "error");
@@ -2623,7 +2686,7 @@ async function exportActiveCard(asCharx = false) {
     refs.exportDialog.close();
   }
 
-  if (exported.dataUrl) {
+  if (exported.json) {
     downloadJson(JSON.parse(exported.json), exported.filename);
   } else {
     downloadBytes(exported.bytes, exported.filename, exported.type);
@@ -2639,8 +2702,8 @@ async function handleExport(formatId) {
     return;
   }
 
-  if (formatId === "card-png" || formatId === "card-charx") {
-    await exportActiveCard(formatId === "card-charx");
+  if (formatId.startsWith("card-")) {
+    await exportActiveCard(formatId.slice("card-".length));
     return;
   }
 
@@ -3508,15 +3571,57 @@ function importResultMessage(strategy, parsed, stats, entryCount) {
 let editingCardId = null;
 let editingAvatarDataUrl = "";
 
+let cardDirty = false;
+let cardSummaryFrame = 0;
+
+function markCardDirty() {
+  cardDirty = true;
+  refreshCardSummary();
+}
+
+function currentCardDraft() {
+  const base = editingCardId ? getCards().find((item) => item.id === editingCardId) : null;
+  return { ...(base ?? createCard()), ...readCardForm(refs), avatarDataUrl: editingAvatarDataUrl };
+}
+
+function refreshCardSummary() {
+  if (cardSummaryFrame) {
+    return;
+  }
+
+  cardSummaryFrame = window.requestAnimationFrame(() => {
+    cardSummaryFrame = 0;
+
+    if (!refs.cardDialog.open) {
+      return;
+    }
+
+    const draft = currentCardDraft();
+    const count = (text) => {
+      tokenizer.request(text);
+      return tokenizer.count(text) ?? Math.ceil(String(text ?? "").length / 4);
+    };
+    const books = getState().books;
+    const book = draft.bookId ? books.find((item) => item.id === draft.bookId) : null;
+    const issues = validateCardRecord(draft, { bookExists: (id) => books.some((item) => item.id === id), count });
+    renderCardSummary(refs, buildCardTokenReport(draft, count), issues);
+    refs.cardBookInfo.textContent = book
+      ? `${book.entries.length} ${book.entries.length === 1 ? "entry" : "entries"} travel inside the card.`
+      : "Linking a lorebook embeds it in exported cards.";
+  });
+}
+
 function openCardDialog(cardId = null) {
   const card = cardId ? getCards().find((item) => item.id === cardId) : null;
   editingCardId = card?.id ?? null;
   editingAvatarDataUrl = card?.avatarDataUrl ?? "";
   refs.cardDialog.querySelector("#card-title").textContent = card ? "Edit card" : "New character card";
   refs.cardDelete.hidden = !card;
-  refs.cardExport.hidden = !card;
+  refs.cardDuplicate.hidden = !card;
   refs.cardStatus.textContent = "";
   fillCardForm(refs, card ?? {});
+  cardDirty = false;
+  refreshCardSummary();
   refs.cardDialog.showModal();
   refs.cardName.focus();
 }
@@ -3525,6 +3630,38 @@ function closeCardDialog() {
   refs.cardDialog.close();
   editingCardId = null;
   editingAvatarDataUrl = "";
+  cardDirty = false;
+}
+
+async function requestCloseCardDialog() {
+  if (cardDirty) {
+    const accepted = await confirmAction({
+      title: "Discard card changes?",
+      message: "This card has edits that are not saved.",
+      confirmLabel: "Discard changes"
+    });
+
+    if (!accepted) {
+      return;
+    }
+  }
+
+  closeCardDialog();
+}
+
+function convertImageToPng(dataUrl) {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      canvas.getContext("2d").drawImage(image, 0, 0);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    image.onerror = () => resolve("");
+    image.src = dataUrl;
+  });
 }
 
 async function readAvatarFile(file) {
@@ -3554,7 +3691,18 @@ async function readAvatarFile(file) {
     return null;
   }
 
-  return dataUrl;
+  if (file.type === "image/png") {
+    return dataUrl;
+  }
+
+  const converted = await convertImageToPng(dataUrl);
+
+  if (!converted) {
+    toast("Couldn't convert that image to PNG.", "error");
+    return null;
+  }
+
+  return converted;
 }
 
 function handleSaveCard() {
@@ -3582,6 +3730,23 @@ function handleSaveCard() {
   scheduleSave();
 }
 
+function handleDuplicateCard() {
+  if (!editingCardId) {
+    return;
+  }
+
+  const copy = duplicateCard(editingCardId);
+
+  if (!copy) {
+    return;
+  }
+
+  closeCardDialog();
+  renderAll();
+  scheduleSave();
+  toast(`Duplicated as "${copy.name}"`, "success");
+}
+
 async function handleDeleteCard() {
   const card = editingCardId ? getCards().find((item) => item.id === editingCardId) : null;
 
@@ -3607,31 +3772,36 @@ async function handleDeleteCard() {
 }
 
 async function handleExportCard() {
-  const card = editingCardId ? getCards().find((item) => item.id === editingCardId) : null;
-
-  if (!card) {
-    return;
-  }
-
-  const values = readCardForm(refs);
-  const book = values.bookId ? getState().books.find((item) => item.id === values.bookId) : null;
-  const exported = CARD_ADAPTER.serialize(
-    { ...card, ...values, avatarDataUrl: editingAvatarDataUrl },
-    { book, avatarDataUrl: editingAvatarDataUrl }
-  );
+  const draft = currentCardDraft();
+  const book = draft.bookId ? getState().books.find((item) => item.id === draft.bookId) : null;
+  const exported = CARD_ADAPTER.exportCard(draft, { format: refs.cardExportFormat.value, book });
 
   if (!exported.ok) {
     refs.cardStatus.textContent = exported.error;
     return;
   }
 
-  if (exported.dataUrl) {
+  if (exported.warnings.length) {
+    const accepted = await confirmAction({
+      title: `Export ${draft.name.trim() || "card"}?`,
+      message: "The card exports with what it has. These points affect the file:",
+      warnings: exported.warnings,
+      confirmLabel: "Export anyway",
+      tone: "primary"
+    });
+
+    if (!accepted) {
+      return;
+    }
+  }
+
+  if (exported.json) {
     downloadJson(JSON.parse(exported.json), exported.filename);
   } else {
     downloadBytes(exported.bytes, exported.filename, exported.type);
   }
 
-  toast(`Exported ${values.name.trim()} as a card`, "success");
+  toast(`Exported ${draft.name.trim() || "card"}`, "success");
 }
 
 async function handleImport(file, { fileHandle = null } = {}) {
@@ -3828,22 +3998,62 @@ refs.cardAvatarInput.addEventListener("change", async (event) => {
   }
 
   editingAvatarDataUrl = dataUrl;
-  refs.cardAvatar.replaceChildren();
-
-  const img = document.createElement("img");
-  img.alt = "Card image";
-  img.src = dataUrl;
-  refs.cardAvatar.append(img);
+  renderCardAvatar(refs, dataUrl);
+  markCardDirty();
 });
 
-refs.cardCancel.addEventListener("click", closeCardDialog);
+refs.cardAvatarRemove.addEventListener("click", () => {
+  editingAvatarDataUrl = "";
+  renderCardAvatar(refs, "");
+  markCardDirty();
+});
+
+refs.cardAltAdd.addEventListener("click", () => {
+  addGreetingRow(refs.cardAltGreetings);
+  markCardDirty();
+});
+
+refs.cardGroupAdd.addEventListener("click", () => {
+  addGreetingRow(refs.cardGroupGreetings);
+  markCardDirty();
+});
+
+for (const container of [refs.cardAltGreetings, refs.cardGroupGreetings]) {
+  container.addEventListener("click", (event) => {
+    if (handleGreetingClick(container, event.target)) {
+      markCardDirty();
+    }
+  });
+}
+
+refs.cardDialog.addEventListener("input", (event) => {
+  if (event.target === refs.cardTalkativeness) {
+    refs.cardTalkativenessOutput.textContent = Number(refs.cardTalkativeness.value).toFixed(2);
+  }
+
+  markCardDirty();
+});
+
+refs.cardDialog.addEventListener("change", (event) => {
+  if (event.target === refs.cardLinkBook || event.target === refs.cardDepthRole) {
+    markCardDirty();
+  }
+});
+
+refs.cardDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  requestCloseCardDialog();
+});
+
+refs.cardCancel.addEventListener("click", requestCloseCardDialog);
 refs.cardSave.addEventListener("click", handleSaveCard);
 refs.cardDelete.addEventListener("click", handleDeleteCard);
+refs.cardDuplicate.addEventListener("click", handleDuplicateCard);
 refs.cardExport.addEventListener("click", handleExportCard);
 
 refs.cardDialog.addEventListener("click", (event) => {
   if (event.target === refs.cardDialog) {
-    closeCardDialog();
+    requestCloseCardDialog();
   }
 });
 

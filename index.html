@@ -972,68 +972,151 @@
       <div class="dialog-heading">
         <p class="eyebrow">Character card</p>
         <h2 id="card-title">Edit card</h2>
-        <p class="dialog-copy">Card fields travel with a PNG or CHARX file. A linked lorebook exports inside the card.</p>
       </div>
-      <div class="card-avatar-row">
-        <div id="card-avatar" class="card-avatar" aria-hidden="true"></div>
-        <div class="card-avatar-side">
-          <label class="btn" for="card-avatar-input">Choose image</label>
-          <input id="card-avatar-input" type="file" accept="image/png,image/webp,image/jpeg" hidden>
-          <span class="hint">PNG recommended. The image is imported, never painted.</span>
+      <div class="card-editor">
+        <div class="card-editor-main">
+          <div class="card-avatar-row">
+            <div id="card-avatar" class="card-avatar" aria-hidden="true"></div>
+            <div class="card-avatar-side">
+              <div class="card-avatar-actions">
+                <label class="btn" for="card-avatar-input">Choose image</label>
+                <button id="card-avatar-remove" class="btn" type="button">Remove image</button>
+              </div>
+              <input id="card-avatar-input" type="file" accept="image/png,image/webp,image/jpeg" hidden>
+              <span class="hint">Images are converted to PNG so the card can embed in them. The image is stored, never edited.</span>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="card-name">Name</label>
+              <input id="card-name" type="text" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="card-nickname">Nickname <span class="hint">optional</span></label>
+              <input id="card-nickname" type="text" autocomplete="off">
+            </div>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-description">Description</label><span class="card-token-badge" data-token-for="card-description" aria-hidden="true"></span></div>
+            <textarea id="card-description" rows="6"></textarea>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-personality">Personality</label><span class="card-token-badge" data-token-for="card-personality" aria-hidden="true"></span></div>
+            <textarea id="card-personality" rows="2"></textarea>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-scenario">Scenario</label><span class="card-token-badge" data-token-for="card-scenario" aria-hidden="true"></span></div>
+            <textarea id="card-scenario" rows="2"></textarea>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-first-message">First message</label><span class="card-token-badge" data-token-for="card-first-message" aria-hidden="true"></span></div>
+            <textarea id="card-first-message" rows="4"></textarea>
+          </div>
+          <div class="field">
+            <div class="card-field-head"><span id="card-alt-label" class="field-label">Alternate greetings</span><span class="card-token-badge" id="card-alt-tokens" aria-hidden="true"></span></div>
+            <div id="card-alt-greetings" class="greeting-list" role="group" aria-labelledby="card-alt-label"></div>
+            <button id="card-alt-add" class="btn" type="button">Add greeting</button>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-example-messages">Example messages</label><span class="card-token-badge" data-token-for="card-example-messages" aria-hidden="true"></span></div>
+            <textarea id="card-example-messages" rows="4"></textarea>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-system-prompt">System prompt</label><span class="card-token-badge" data-token-for="card-system-prompt" aria-hidden="true"></span></div>
+            <textarea id="card-system-prompt" rows="2"></textarea>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-post-history">Post-history instructions</label><span class="card-token-badge" data-token-for="card-post-history" aria-hidden="true"></span></div>
+            <textarea id="card-post-history" rows="2"></textarea>
+          </div>
+          <div class="field">
+            <label for="card-tags-input">Tags <span class="hint">optional</span></label>
+            <div id="card-tags" class="key-chips tag-chips">
+              <input id="card-tags-input" class="key-chips-input" type="text" placeholder="fantasy, npc" autocomplete="off" spellcheck="false">
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="card-creator">Creator</label>
+              <input id="card-creator" type="text" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="card-version">Version</label>
+              <input id="card-version" type="text" autocomplete="off">
+            </div>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-creator-notes">Creator notes</label><span class="card-token-badge" data-token-for="card-creator-notes" aria-hidden="true"></span></div>
+            <textarea id="card-creator-notes" rows="2"></textarea>
+          </div>
+          <details class="card-advanced">
+            <summary>Advanced</summary>
+            <div class="field">
+              <div class="card-field-head"><span id="card-group-label" class="field-label">Group-only greetings</span><span class="card-token-badge" id="card-group-tokens" aria-hidden="true"></span></div>
+              <div id="card-group-greetings" class="greeting-list" role="group" aria-labelledby="card-group-label"></div>
+              <button id="card-group-add" class="btn" type="button">Add group greeting</button>
+              <span class="hint">V3 only. Used instead of the normal greetings in group chats.</span>
+            </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-depth-prompt">Depth prompt</label><span class="card-token-badge" data-token-for="card-depth-prompt" aria-hidden="true"></span></div>
+            <textarea id="card-depth-prompt" rows="2"></textarea>
+          </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="card-depth-depth">Depth</label>
+                <input id="card-depth-depth" type="number" min="0" max="999" step="1">
+              </div>
+              <div class="field">
+                <label for="card-depth-role">Role</label>
+                <select id="card-depth-role">
+                  <option value="system">System</option>
+                  <option value="user">User</option>
+                  <option value="assistant">Assistant</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="card-talkativeness">Talkativeness <output id="card-talkativeness-output">0.5</output></label>
+              <input id="card-talkativeness" type="range" min="0" max="1" step="0.05" value="0.5">
+              <span class="hint">How often the character speaks in group chats (SillyTavern).</span>
+            </div>
+          </details>
+          <div class="field">
+            <label for="card-link-book">Linked lorebook</label>
+            <select id="card-link-book">
+              <option value="">No linked lorebook</option>
+            </select>
+            <span id="card-book-info" class="hint"></span>
+          </div>
         </div>
-      </div>
-      <div class="field">
-        <label for="card-name">Name</label>
-        <input id="card-name" type="text" autocomplete="off">
-      </div>
-      <div class="field">
-        <label for="card-personality">Personality</label>
-        <textarea id="card-personality" rows="2"></textarea>
-      </div>
-      <div class="field">
-        <label for="card-scenario">Scenario</label>
-        <textarea id="card-scenario" rows="2"></textarea>
-      </div>
-      <div class="field">
-        <label for="card-first-message">First message</label>
-        <textarea id="card-first-message" rows="3"></textarea>
-      </div>
-      <div class="field">
-        <label for="card-example-messages">Example messages</label>
-        <textarea id="card-example-messages" rows="3"></textarea>
-      </div>
-      <div class="field">
-        <label for="card-system-prompt">System prompt</label>
-        <textarea id="card-system-prompt" rows="2"></textarea>
-      </div>
-      <div class="field">
-        <label for="card-post-history">Post-history instructions</label>
-        <textarea id="card-post-history" rows="2"></textarea>
-      </div>
-      <div class="field-grid">
-        <div class="field">
-          <label for="card-creator">Creator</label>
-          <input id="card-creator" type="text" autocomplete="off">
-        </div>
-        <div class="field">
-          <label for="card-version">Version</label>
-          <input id="card-version" type="text" autocomplete="off">
-        </div>
-      </div>
-      <div class="field">
-        <label for="card-creator-notes">Creator notes</label>
-        <textarea id="card-creator-notes" rows="2"></textarea>
-      </div>
-      <div class="field">
-        <label for="card-link-book">Linked lorebook</label>
-        <select id="card-link-book">
-          <option value="">No linked lorebook</option>
-        </select>
+        <aside class="card-editor-side" aria-label="Card summary">
+          <section class="card-summary" aria-labelledby="card-tokens-title">
+            <h3 id="card-tokens-title">Token cost</h3>
+            <dl class="card-token-list">
+              <dt>Sent every turn</dt><dd id="card-tokens-always">0</dd>
+              <dt>Example messages</dt><dd id="card-tokens-examples">0</dd>
+              <dt>Opening message</dt><dd id="card-tokens-opening">0</dd>
+              <dt>Total</dt><dd id="card-tokens-total">0</dd>
+            </dl>
+          </section>
+          <section class="card-summary" aria-labelledby="card-issues-title">
+            <h3 id="card-issues-title">Checks</h3>
+            <ul id="card-issues" class="card-issues"></ul>
+          </section>
+        </aside>
       </div>
       <p id="card-status" class="hint" aria-live="polite"></p>
-      <div class="dialog-actions">
-        <button id="card-delete" class="btn btn-danger" type="button">Delete card</button>
-        <button id="card-export" class="btn" type="button">Export PNG</button>
+      <div class="dialog-actions card-actions">
+        <button id="card-delete" class="btn btn-danger" type="button">Delete</button>
+        <button id="card-duplicate" class="btn" type="button">Duplicate</button>
+        <label class="sr-only" for="card-export-format">Export format</label>
+        <select id="card-export-format" class="card-export-format">
+          <option value="png">PNG card (V3 + V2)</option>
+          <option value="charx">CHARX</option>
+          <option value="json-v3">JSON, V3</option>
+          <option value="json-v2">JSON, V2</option>
+        </select>
+        <button id="card-export" class="btn" type="button">Export</button>
         <button id="card-cancel" class="btn" type="button">Cancel</button>
         <button id="card-save" class="btn btn-primary" type="button">Save card</button>
       </div>

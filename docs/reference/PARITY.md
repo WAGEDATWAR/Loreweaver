@@ -54,14 +54,20 @@ catch.
 | Field | Class | Note |
 |---|---|---|
 | `name` | edit | - |
-| `personality` | edit | - |
-| `scenario` | edit | - |
+| `description` | edit | the main definition; sent every turn |
+| `personality` / `scenario` | edit | - |
 | `first_mes` | edit | - |
-| `mes_example` | edit | - |
+| `alternate_greetings` | edit | ordered list with add, remove, move |
+| `group_only_greetings` | edit | V3 only; dropped from a V2 export with a warning |
+| `mes_example` | edit | flagged when it lacks `<START>` |
 | `system_prompt` / `post_history_instructions` | edit | - |
 | `creator` / `creator_notes` / `character_version` | edit | - |
-| `alternate_greetings` | keep | round-trips, edited only through import |
-| `tags` | keep | round-trips, edited only through import |
-| `character_book` | edit | extracted to a linked lorebook |
-| `avatar` | keep | image bytes preserved, never painted (G-16) |
+| `tags` | edit | chips |
+| `nickname` | edit | V3 only |
+| `extensions.depth_prompt` | edit | prompt, depth, role |
+| `extensions.talkativeness` | edit | 0 to 1 |
+| other `extensions` (world, fav, regex scripts, vendor keys) | keep | preserved verbatim in `extensions.cardExtensions` |
+| `character_book` | edit | extracted to a linked lorebook; re-embedded through the character book adapter |
+| `assets`, `source`, `creator_notes_multilingual`, dates | keep | preserved in `extensions.sourceFields`; dropped from V2 with a warning |
+| image | keep | PNG data URL, stored and never edited; other types are converted to PNG on upload |
 | unknown `data` keys | keep | preserved in `extensions.sourceFields` |

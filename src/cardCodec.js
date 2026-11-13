@@ -1,11 +1,13 @@
-import { createCard } from "./schema.js";
+import { DEPTH_PROMPT_ROLES, createCard } from "./schema.js";
 import { isRecord } from "./formats/helpers.js";
 
 export const CARD_SPEC = "chara_card_v3";
 export const LEGACY_CARD_SPEC = "chara_card_v2";
+export const CARD_SPECS = Object.freeze({ v3: CARD_SPEC, v2: LEGACY_CARD_SPEC });
 
 export const CARD_FIELDS = Object.freeze({
   name: "name",
+  description: "description",
   personality: "personality",
   scenario: "scenario",
   firstMessage: "first_mes",
@@ -17,17 +19,28 @@ export const CARD_FIELDS = Object.freeze({
   characterVersion: "character_version"
 });
 
+const V3_ONLY_KEYS = Object.freeze([
+  "nickname",
+  "group_only_greetings",
+  "assets",
+  "source",
+  "creator_notes_multilingual",
+  "creation_date",
+  "modification_date"
+]);
+
 const KNOWN_KEYS = new Set([
   "spec",
   "spec_version",
   "data",
   ...Object.values(CARD_FIELDS),
   "alternate_greetings",
+  "group_only_greetings",
+  "nickname",
   "tags",
   "character_book",
-  "avatar",
   "extensions",
-  "create_date"
+  "avatar"
 ]);
 
 function readString(value) {
@@ -54,6 +67,20 @@ function collectUnknown(source) {
   return unknown;
 }
 
+function readAvatar(value) {
+  return typeof value === "string" && /^data:image\/[a-z0-9.+-]+;base64,/i.test(value) ? value : "";
+}
+
+function readTalkativeness(value) {
+  const number = typeof value === "string" ? Number(value) : value;
+  return Number.isFinite(number) ? Math.min(1, Math.max(0, number)) : undefined;
+}
+
+function looksLikeFlatCard(input) {
+  return typeof input.name === "string"
+    && ["first_mes", "personality", "scenario", "mes_example"].some((key) => typeof input[key] === "string");
+}
+
 export function detectCardSpec(input) {
   if (!isRecord(input)) {
     return { ok: false, reason: "not-an-object" };
@@ -70,15 +97,14 @@ export function detectCardSpec(input) {
   }
 
   if (typeof input.spec === "string" && input.spec !== "lorebook_v3") {
-    // A lorebook_v3 wrapper is a book, not a card.
     return { ok: false, reason: "not-a-card" };
   }
 
-  if (isRecord(input.data) && (typeof input.data.first_mes === "string" || typeof input.data.personality === "string")) {
+  if (isRecord(input.data) && looksLikeFlatCard(input.data)) {
     return { ok: true, spec: CARD_SPEC, wrapped: true, guessed: true };
   }
 
-  if (typeof input.name === "string" && (typeof input.first_mes === "string" || typeof input.personality === "string")) {
+  if (looksLikeFlatCard(input)) {
     return { ok: true, spec: LEGACY_CARD_SPEC, wrapped: false };
   }
 
@@ -100,9 +126,8 @@ export function validateCard(input) {
 
   const body = detection.wrapped ? input.data : input;
   const warnings = [];
-  const name = readString(body.name).trim();
 
-  if (!name) {
+  if (!readString(body.name).trim()) {
     warnings.push("This card has no name.");
   }
 
@@ -114,19 +139,27 @@ export function validateCard(input) {
     warnings.push("The card has no spec marker; it was read as a V3 card by its fields.");
   }
 
-  return { ok: true, body, warnings, spec: detection.spec };
+  if (!detection.wrapped) {
+    warnings.push("This is a flat V1-style card; it is upgraded to V3 on export.");
+  }
+
+  return { ok: true, raw: input, body, warnings, spec: detection.spec, wrapped: detection.wrapped };
 }
 
 export function parseCard(input) {
-  const validation = validateCard(input);
+  const validation = input?.ok === true && input.body ? input : validateCard(input);
 
   if (!validation.ok) {
     return validation;
   }
 
   const { body } = validation;
-  const greetingList = readStringList(body.alternate_greetings);
   const warnings = [...validation.warnings];
+  const cardExtensions = isRecord(body.extensions) ? structuredClone(body.extensions) : {};
+  const depth = isRecord(cardExtensions.depth_prompt) ? cardExtensions.depth_prompt : null;
+  const talkativeness = readTalkativeness(cardExtensions.talkativeness);
+  const sourceFields = collectUnknown(body);
+  const outerAvatar = validation.wrapped && isRecord(validation.raw) ? readAvatar(validation.raw.avatar) : "";
 
   if (isRecord(body.character_book)) {
     warnings.push("The card carries an embedded lorebook; import it separately.");
@@ -134,10 +167,13 @@ export function parseCard(input) {
 
   const card = createCard({
     name: readString(body.name),
+    nickname: readString(body.nickname),
+    description: readString(body.description),
     personality: readString(body.personality),
     scenario: readString(body.scenario),
     firstMessage: readString(body.first_mes),
-    alternateGreetings: greetingList,
+    alternateGreetings: readStringList(body.alternate_greetings),
+    groupOnlyGreetings: readStringList(body.group_only_greetings),
     exampleMessages: readString(body.mes_example),
     systemPrompt: readString(body.system_prompt),
     postHistoryInstructions: readString(body.post_history_instructions),
@@ -145,37 +181,101 @@ export function parseCard(input) {
     creatorNotes: readString(body.creator_notes),
     characterVersion: readString(body.character_version),
     tags: readStringList(body.tags),
-    avatarDataUrl: readString(body.avatar),
+    talkativeness,
+    depthPrompt: depth
+      ? { prompt: readString(depth.prompt), depth: depth.depth, role: DEPTH_PROMPT_ROLES.includes(depth.role) ? depth.role : "system" }
+      : undefined,
+    avatarDataUrl: readAvatar(body.avatar) || outerAvatar,
     extensions: {
       spec: validation.spec,
-      sourceFields: collectUnknown(body)
+      cardExtensions,
+      sourceFields
     }
   });
 
   return { ok: true, card, warnings };
 }
 
-export function serializeCard(card) {
+function buildExtensions(card) {
+  const extensions = isRecord(card.extensions?.cardExtensions) ? structuredClone(card.extensions.cardExtensions) : {};
+  const depth = card.depthPrompt ?? { prompt: "", depth: 4, role: "system" };
+
+  if (depth.prompt.trim() || isRecord(extensions.depth_prompt)) {
+    extensions.depth_prompt = { prompt: depth.prompt, depth: depth.depth, role: depth.role };
+  }
+
+  if (Number.isFinite(card.talkativeness) && (card.talkativeness !== 0.5 || "talkativeness" in extensions)) {
+    extensions.talkativeness = card.talkativeness;
+  }
+
+  return extensions;
+}
+
+/**
+ * Serialize a card to a V3 (default) or V2 payload. `characterBook` is an already-serialized character_book
+ * object. V3-only fields are dropped from a V2 payload; `cardLossWarnings` reports them.
+ */
+export function serializeCard(card, { spec = "v3", characterBook = null, now = Date.now() } = {}) {
+  const sourceFields = isRecord(card.extensions?.sourceFields) ? { ...card.extensions.sourceFields } : {};
   const data = {
     name: card.name,
+    description: card.description ?? "",
     personality: card.personality,
     scenario: card.scenario,
     first_mes: card.firstMessage,
     mes_example: card.exampleMessages,
+    creator_notes: card.creatorNotes,
     system_prompt: card.systemPrompt,
     post_history_instructions: card.postHistoryInstructions,
-    creator: card.creator,
-    creator_notes: card.creatorNotes,
-    character_version: card.characterVersion,
     alternate_greetings: [...(card.alternateGreetings ?? [])],
     tags: [...(card.tags ?? [])],
-    ...(isRecord(card.extensions?.sourceFields) ? card.extensions.sourceFields : {})
+    creator: card.creator,
+    character_version: card.characterVersion,
+    extensions: buildExtensions(card),
+    ...sourceFields
   };
 
-  return {
-    spec: CARD_SPEC,
-    spec_version: "3.0",
-    data,
-    ...(card.avatarDataUrl ? { avatar: card.avatarDataUrl } : {})
-  };
+  if (characterBook) {
+    data.character_book = characterBook;
+  }
+
+  if (spec === "v2") {
+    for (const key of V3_ONLY_KEYS) {
+      delete data[key];
+    }
+
+    return { spec: LEGACY_CARD_SPEC, spec_version: "2.0", data };
+  }
+
+  data.nickname = card.nickname ?? "";
+  data.group_only_greetings = [...(card.groupOnlyGreetings ?? [])];
+  data.creation_date = Number.isFinite(sourceFields.creation_date) ? sourceFields.creation_date : Math.floor(card.createdAt / 1000 || now / 1000);
+  data.modification_date = Math.floor(now / 1000);
+
+  return { spec: CARD_SPEC, spec_version: "3.0", data };
+}
+
+export function cardLossWarnings(card, spec = "v3") {
+  if (spec !== "v2") {
+    return [];
+  }
+
+  const sourceFields = isRecord(card.extensions?.sourceFields) ? card.extensions.sourceFields : {};
+  const dropped = [];
+
+  if (card.nickname) {
+    dropped.push("nickname");
+  }
+
+  if ((card.groupOnlyGreetings ?? []).length) {
+    dropped.push("group-only greetings");
+  }
+
+  for (const key of ["assets", "source", "creator_notes_multilingual"]) {
+    if (key in sourceFields) {
+      dropped.push(key.replace(/_/g, " "));
+    }
+  }
+
+  return dropped.length ? [`The V2 card format has no place for: ${dropped.join(", ")}. They are left out of this export.`] : [];
 }

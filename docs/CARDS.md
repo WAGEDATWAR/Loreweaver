@@ -5,7 +5,8 @@
 > `docs/ARCHITECTURE.md` 5; the surface is `docs/UI.md`.
 
 **Status:** built. Decided by G-16 (a card is a record) and A-8 (a container is an adapter). Modules:
-`cardCodec.js`, `cardPng.js`, `zip.js`, `formats/card.js`, `ui/cards.js`.
+`cardCodec.js`, `cardTokens.js`, `cardValidation.js`, `cardPng.js`, `zip.js`, `formats/card.js`, `ui/cards.js`.
+The flow is in `docs/ARCHITECTURE.md` 9.
 
 ---
 
@@ -20,33 +21,35 @@ book that extracts on import. The book model never learns a card field (A-8).
 
 ## 2. The record
 
+The full field table lives in `docs/ARCHITECTURE.md` 5 (Card). In short:
+
 ```text
 Card {
-  id
-  name, personality, scenario
-  firstMessage, alternateGreetings[]
+  id, name, nickname, description, personality, scenario
+  firstMessage, alternateGreetings[], groupOnlyGreetings[]
   exampleMessages, systemPrompt, postHistoryInstructions
-  creator, creatorNotes, characterVersion
-  tags[], avatarBytes, avatarType
-  bookId | null
-  source          { format, unknownFields }
+  creator, creatorNotes, characterVersion, tags[]
+  depthPrompt { prompt, depth, role }, talkativeness
+  avatarDataUrl, bookId | null
+  extensions { spec, cardExtensions, sourceFields }
   createdAt, updatedAt
 }
 ```
 
-`avatarBytes` holds the container image as bytes, imported only; the card artwork is never edited
+`avatarDataUrl` holds the container image as a data URL, imported only; the card artwork is never edited
 (G-16, charter non-goal). `bookId` is a link, not an embed: the book lives once and both the card and the
-library point at it.
+library point at it. `extensions.cardExtensions` and `extensions.sourceFields` keep what the editor does not
+understand (I-2).
 
 ## 3. Containers
 
 Both containers are adapters at the rim:
 
-- **PNG** - the card JSON rides in a `tEXt` chunk keyed `ccv3` (and the legacy `chara`), base64-encoded.
-  Read and write both keys; prefer `ccv3` on write. Every other chunk and the pixel data are preserved
-  verbatim.
-- **CHARX** - a zip holding the card and its assets. It is read as a container and rewritten from scratch
-  on export, preserving unknown entries in the archive.
+- **PNG** - the card JSON rides in `tEXt` chunks, base64-encoded: `ccv3` holds the V3 payload and
+  `chara` the V2 payload. Both are written so a V2-only frontend still opens the card; V3 wins on read.
+  Every other chunk and the pixel data are preserved verbatim, in order.
+- **CHARX** - a zip holding `card.json` and the avatar. It is rewritten from scratch on export.
+- **JSON** - the bare payload, V3 (`chara_card_v3`) or V2 (`chara_card_v2`). JSON carries no image.
 
 A malformed or absent chunk warns and falls back rather than guessing a format (DEF-087).
 
@@ -61,8 +64,26 @@ A malformed or absent chunk warns and falls back rather than guessing a format (
 ## 5. Field mapping
 
 Card fields map onto the container's JSON keys one to one and are recorded in
-`docs/reference/PARITY.md` with the rest of the parity audit. A card field the app does not understand
-lands in `source.unknownFields` and round-trips unchanged (I-2).
+`docs/reference/PARITY.md` with the rest of the parity audit. A V2 export drops the V3-only fields
+(`nickname`, `group_only_greetings`, `assets`, `source`, `creator_notes_multilingual`, the dates) and
+warns about each one that held data. A card key the app does not understand lands in
+`extensions.sourceFields`, and the card's `data.extensions` object in `extensions.cardExtensions`; both
+round-trip unchanged (I-2). The export stamps `modification_date` and keeps the original `creation_date`.
+
+## 5.1 Authoring
+
+The card editor is a dialog that edits a draft and writes it on Save. It gives a card the same care a
+lorebook gets:
+
+- **Token cost**: a live report of text sent every turn, example messages and the opening message,
+  with a per-field badge. Always-sent text above 1,500 tokens is flagged.
+- **Checks** (`cardValidation.js`): missing name (error), missing description or first message, duplicate
+  greetings, legacy `<USER>`/`<BOT>` macros, examples without `<START>`, a missing linked lorebook, heavy
+  always-sent text, and an invalid or empty depth prompt.
+- **Greetings**: alternate and group-only greetings are ordered lists with add, remove and move.
+- **Library**: avatar thumbnail, linked lorebook and tags per card; duplicate, delete (confirmed) and
+  discard-changes confirmation.
+- **Export**: PNG (V3 + V2), CHARX, JSON V3 and JSON V2, each from the card dialog or the export dialog.
 
 ## 6. Invariants
 
@@ -79,6 +100,8 @@ lands in `source.unknownFields` and round-trips unchanged (I-2).
 - `zTXt`/`iTXt` card chunks are read only when uncompressed; a compressed chunk falls back to `tEXt`
   or reports the card unreadable.
 - CHARX entries are written uncompressed (stored) rather than deflated.
+- The card editor is still a dialog, not a workspace; card search, templates, diff on re-import, bulk
+  operations and a prompt-assembly preview are scheduled (DEF-117 to DEF-124).
 
 ## 8. Definition of done
 

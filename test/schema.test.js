@@ -145,7 +145,7 @@ test("creates an empty project when no books are supplied", () => {
 
 test("exposes the canonical app identity", () => {
   assert.equal(APP_ID, "loreweaver");
-  assert.equal(SCHEMA_VERSION, 3);
+  assert.equal(SCHEMA_VERSION, 4);
 });
 
 

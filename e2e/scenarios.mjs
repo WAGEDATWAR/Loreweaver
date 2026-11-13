@@ -772,11 +772,71 @@ export const scenarios = [
       })()`);
       await page.evaluate('document.querySelector(".card-item").click(); true');
       await page.waitFor('document.querySelector("#card-dialog")?.open');
+      await page.evaluate('document.querySelector("#card-export-format").value = "json-v3"; true');
       await page.click("#card-export");
       await page.waitFor('document.querySelector("#card-status")?.textContent.length >= 0');
       await sleep(150);
       const download = await page.evaluate('window.__downloads?.[0] ?? null');
       assert.equal(download?.type, "application/json");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "edits a full card with greetings, tokens and checks",
+    timeout: 40000,
+    async run(page) {
+      await resetApp(page);
+      await page.click("#new-card-btn");
+      await page.waitFor('document.querySelector("#card-dialog")?.open');
+
+      await page.waitFor('document.querySelector("#card-issues")?.textContent.includes("Give the card a name")');
+      await setValue(page, "#card-name", "Mara Voss");
+      await setValue(page, "#card-description", "A smuggler with a silver tongue and a debt to the harbor guild.");
+      await setValue(page, "#card-first-message", "Keep your voice down.");
+      await addChipKey(page, "#card-tags-input", "npc");
+
+      await page.click("#card-alt-add");
+      await page.evaluate(`(() => {
+        const area = document.querySelector("#card-alt-greetings textarea");
+        area.value = "You again.";
+        area.dispatchEvent(new Event("input", { bubbles: true }));
+        return true;
+      })()`);
+      await page.click("#card-alt-add");
+      await page.waitFor('document.querySelectorAll("#card-alt-greetings .greeting-row").length === 2');
+      await page.evaluate(`(() => {
+        const area = document.querySelectorAll("#card-alt-greetings textarea")[1];
+        area.value = "Late, aren't you?";
+        area.dispatchEvent(new Event("input", { bubbles: true }));
+        document.querySelectorAll("#card-alt-greetings [data-greeting-up]")[1].click();
+        return true;
+      })()`);
+
+      await page.waitFor('Number(document.querySelector("#card-tokens-always").textContent) > 0');
+      assert.equal(await page.evaluate('document.querySelector("#card-issues").textContent.includes("Give the card a name")'), false);
+      assert.equal(await page.evaluate('document.querySelector("#card-alt-greetings textarea").value'), "Late, aren't you?");
+
+      await page.click("#card-save");
+      await page.waitFor('!document.querySelector("#card-dialog")?.open');
+      await page.waitFor('document.querySelectorAll(".card-item").length === 1');
+      assert.match(await page.evaluate('document.querySelector(".card-item-meta").textContent'), /npc/);
+
+      await page.evaluate('document.querySelector(".card-item").click(); true');
+      await page.waitFor('document.querySelector("#card-dialog")?.open');
+      assert.equal(await page.evaluate('document.querySelector("#card-description").value.startsWith("A smuggler")'), true);
+      assert.equal(await page.evaluate('document.querySelectorAll("#card-alt-greetings .greeting-row").length'), 2);
+
+      await setValue(page, "#card-name", "Edited but cancelled");
+      await page.click("#card-cancel");
+      await page.waitFor('document.querySelector("#confirm-dialog")?.open');
+      await page.click("#confirm-cancel");
+      await page.waitFor('!document.querySelector("#confirm-dialog")?.open');
+      assert.equal(await page.evaluate('document.querySelector("#card-dialog").open'), true);
+
+      await page.click("#card-duplicate");
+      await page.waitFor('!document.querySelector("#card-dialog")?.open');
+      await page.waitFor('document.querySelectorAll(".card-item").length === 2');
+      assert.equal(await page.evaluate('[...document.querySelectorAll(".card-item-name")].some((n) => n.textContent.endsWith(" copy"))'), true);
       assert.deepEqual(page.errors, []);
     }
   },

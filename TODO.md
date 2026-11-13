@@ -145,18 +145,29 @@ defect or risk, **S3** improvement.
 
 ## Post-v1
 
-- [ ] `VH` Opt-in cloud sync, only if private and simple (DEF-011).
+- [ ] `M` Editors for world, regex scripts and V3 assets on cards (DEF-123).
+- [ ] `VH` `post-v1` Opt-in cloud sync, only if private and simple (DEF-011).
 - [ ] `M` Collect round-trip failures as fixtures (DEF-053).
 - [ ] `M` Share-sheet import and export on Android (DEF-066).
 - [ ] `H` P6 component (new repository): extract the pure core (DEF-063), headless API (DEF-061),
       embedding guide (DEF-062), descriptor registry (DEF-059), canon-ledger tab (DEF-058), run-level
       budget arbitration (DEF-065).
 
-## Character cards (P5, built v0.8.0)
+## Character cards (P5)
 
-Cards are a first-class record (G-16); the container is an adapter (A-8). Record, PNG and CHARX
-adapters, validation, extraction, linking, the library and the parity section all shipped. See
-`DEFERRALS.md` K and `docs/CARDS.md`.
+Cards are a first-class record (G-16); the container is an adapter (A-8). Record, PNG/CHARX/JSON
+adapters, extraction, linking, the library, the full field set, token report, checks and V2/V3 export have
+shipped (v0.8.0+). Open parity work: library search and filters (DEF-117), diff on re-import (DEF-118),
+templates (DEF-119), a prompt-assembly preview (DEF-120), bulk operations (DEF-121), schema/print/search
+coverage (DEF-122), extension editors (DEF-123) and a full-page workspace (DEF-124).
+
+- [ ] `M` `P5` Card library search, tag filter and sort (DEF-117).
+- [ ] `M` `P5` Card diff and merge on re-import, card revisions (DEF-118).
+- [ ] `M` `P5` Card templates (DEF-119).
+- [ ] `H` `P5` A prompt-assembly preview of card plus book (DEF-120).
+- [ ] `M` `P5` Card bulk operations (DEF-121).
+- [ ] `L` `P5` Cards in the schema page, print export and global search (DEF-122).
+- [ ] `H` `P5` A full-page card workspace (DEF-124).
 
 ## Known gaps
 
