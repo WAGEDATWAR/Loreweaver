@@ -114,7 +114,17 @@ never learns a card quirk.
 | DEF-035 | A focus mode that hides the sidebar | `Ctrl+\\` reuses the collapsed rail | P5 | done |
 | DEF-036 | Hover hint popups for long field explanations | CSS `::after` popups on `data-hint`, hover and focus-visible, no JS | P5 | done |
 | DEF-037 | `aria-keyshortcuts` on shortcut buttons | undo, redo, export, add entry | P5 | done |
-| DEF-038 | A changelog link in the About panel | - | P5 | scheduled |
+| DEF-125 | A UI evaluation: heuristic review, task walk-throughs at four widths, keyboard and screen-reader pass, screenshots | done: `docs/reference/ui-review/REVIEW.md`; the real screen-reader pass stays DEF-043 | P5 | done |
+| DEF-126 | A UI redesign from the evaluation: visual language, information architecture, Tools as pages, component set | acts on DEF-125; layout and style only | P5 | scheduled |
+| DEF-127 | Per-page command palette scoping and recent pages | the palette lists every command on every page | P5 | scheduled |
+| DEF-128 | Phone layout as master-detail: list, entry and details as separate screens (UI-01) | review S1 | P5 | scheduled |
+| DEF-129 | Mid-width layout: details as a drawer and the menu as a rail below about 1200 px (UI-02) | review S1 | P5 | scheduled |
+| DEF-130 | Finish the light theme: details panel, chip inputs and a light screenshot check (UI-04) | review S2 | P5 | scheduled |
+| DEF-131 | A touch density with 44 px targets and a type scale with a 12 px floor (UI-05, UI-06) | review S2 | P5 | scheduled |
+| DEF-132 | A leaner header: file menu, labelled palette button, skip link, shared focus style (UI-07, UI-12) | review S2/S3 | P5 | scheduled |
+| DEF-133 | A Review page combining overview, issues and simulation for a lorebook and a card (UI-08) | review S2 | P5 | scheduled |
+| DEF-134 | Card and lorebook UI parity checklist: destination, workspace, list, tokens, notes, bulk, history (UI-03) | the matrix in the review, section 4; extends DEF-117 to DEF-124 | P5 | scheduled |
+| DEF-038 | A changelog link in the About panel | link to CHANGELOG.md on GitHub in the About dialog | P5 | done |
 
 
 ## N. Fine polish

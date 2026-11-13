@@ -110,5 +110,10 @@ migration of the `lorebook-studio` namespace on load. | locked |
 | U-4 | **The library auto-fits 200-460 px and collapses to a 50 px rail**; width persists. | locked |
 | U-5 | **`prefers-reduced-motion` disables animation.** | locked |
 | U-6 | **Icon-only buttons carry `aria-label` and `title`.** | locked |
+| U-7 | **The brand is the main navigation**, an expandable and collapsible menu (208 px or a 54 px rail; an overlay on phones). | locked |
+| U-8 | **Pages are routed by the location hash** (`#/entries`, `#/library`, `#/data`, `#/settings`), owned by `src/views.js`; the hash is the only view state. Every page has `Alt+1`-`Alt+4` and a palette command. | locked |
+| U-9 | **The entries sidebar holds only entry navigation**; lorebook and card management live on the Library page, and backup, storage and import/export live on the Data page. | locked |
+| U-11 | **Cards and lorebooks are presented with the same care.** The redesign builds both from one page anatomy and component set, and the review's parity matrix is the checklist. | locked |
+| U-10 | **A UI evaluation and redesign precedes v1** (DEF-125, DEF-126); it may change layout and style but not the model, adapters or pure core. | provisional |
 
 

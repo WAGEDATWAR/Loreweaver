@@ -26,6 +26,7 @@ index.html
        -> templates.js (built-in starting points)
        -> cardCodec.js, cardTokens.js, cardValidation.js (pure card logic) -> formats/card.js -> cardPng.js, zip.js
        -> tabGuard.js (cross-tab save guard)
+       -> views.js (pages and hash routing)
        -> storage.js -> storage/idb.js -> format.js -> formats/ (detection + adapters)
        -> ui/{sidebar,editor,overlays}.js (targeted rendering)
 ```
@@ -48,6 +49,14 @@ index.html
 7. Revision restore snapshots the current project, confirms the replacement, restores the selected
    snapshot through the same project parser, and refreshes the editor through normal project
    replacement.
+
+## 2.1 Pages
+
+The window shows one page at a time: Entries (the editor), Library, Data or Settings, chosen from the
+navigation menu, the command palette or `Alt+1`-`Alt+4`. `src/views.js` is the pure registry; the
+location hash is the only view state, so the UI still holds none (A-2). `main.js` reads the hash, shows
+the matching page and re-renders what that page needs (the book list, backup and storage details). See
+`docs/UI.md` 1.
 
 ## 3. Why vanilla
 
@@ -220,7 +229,8 @@ ids (see `DECISIONS.md` I-4).
 | `src/integrity.js` | Project integrity checks and repair |
 | `src/diff.js`, `src/merge.js` | Diff engine and import strategies |
 | `src/tokenizer/*` | BPE encoder, worker, client, vendored ranks |
-| `src/ui/*` | Sidebar, editor and overlay renderers |
+| `src/views.js` | Pure page registry and location-hash routing for the navigation menu |
+| `src/ui/*` | Sidebar, editor, library, card and overlay renderers |
 | `src/formats/*` | Detection, normalization, serialization, adapters |
 | `src/limits.js` | Import size and schema limits |
 | `src/sample.js` | First-run demo project |

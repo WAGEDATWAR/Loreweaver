@@ -4,6 +4,11 @@ import { fileURLToPath } from "node:url";
 import { startStaticServer } from "../scripts/serve.mjs";
 import { launchBrowser, Page } from "./harness.mjs";
 
+async function openPage(page, view) {
+  await page.evaluate(`location.hash = "#/${view}"; true`);
+  await page.waitFor(`!document.querySelector("#page-${view}")?.hidden`);
+}
+
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const fixture = resolve(root, "test", "fixtures", "sillytavern-world-info.json");
 
@@ -61,8 +66,7 @@ const states = [
     await page.waitFor('document.querySelector("#book-actions-dialog")?.open');
   } },
   { name: "token settings dialog", setup: async (page) => {
-    await page.click("#about-btn");
-    await page.waitFor('document.querySelector("#about-dialog")?.open');
+    await openPage(page, "settings");
     await page.click("#about-token-btn");
     await page.waitFor('document.querySelector("#token-settings-dialog")?.open');
     await page.waitFor('document.querySelector("#tokenizer-preset")?.options.length === 2');
@@ -79,8 +83,7 @@ const states = [
     await page.waitFor('document.querySelectorAll(".global-search-item").length > 0');
   } },
   { name: "integrity dialog", setup: async (page) => {
-    await page.click("#about-btn");
-    await page.waitFor('document.querySelector("#about-dialog")?.open');
+    await openPage(page, "data");
     await page.click("#about-integrity-btn");
     await page.waitFor('document.querySelector("#integrity-dialog")?.open');
     await page.waitFor('document.querySelector("#integrity-summary").textContent.length > 0');
@@ -92,8 +95,7 @@ const states = [
     await page.waitFor('document.querySelector("#guide-dialog")?.open');
   } },
   { name: "shortcuts dialog", setup: async (page) => {
-    await page.click("#about-btn");
-    await page.waitFor('document.querySelector("#about-dialog")?.open');
+    await openPage(page, "settings");
     await page.click("#about-shortcuts-btn");
     await page.waitFor('document.querySelector("#shortcuts-dialog")?.open');
   } },
@@ -104,8 +106,7 @@ const states = [
     await page.waitFor('document.querySelector("#sidebar")?.classList.contains("is-drawer")');
   } },
   { name: "schema dialog", setup: async (page) => {
-    await page.click("#about-btn");
-    await page.waitFor('document.querySelector("#about-dialog")?.open');
+    await openPage(page, "settings");
     await page.click("#about-schema-btn");
     await page.waitFor('document.querySelector("#schema-dialog")?.open');
     await page.waitFor('document.querySelector("#schema-body")?.childElementCount > 0');
@@ -154,6 +155,32 @@ const states = [
   { name: "confirm dialog", setup: async (page) => {
     await page.click("#delete-entry-btn");
     await page.waitFor('document.querySelector("#confirm-dialog")?.open');
+  } },
+  { name: "library page", setup: async (page) => {
+    await openPage(page, "library");
+  } },
+  { name: "data page", setup: async (page) => {
+    await openPage(page, "data");
+    await page.waitFor('document.querySelector("#storage-usage-backend")?.textContent !== "\u2014"');
+  } },
+  { name: "settings page", setup: async (page) => {
+    await openPage(page, "settings");
+  } },
+  { name: "light library page", setup: async (page) => {
+    await page.evaluate('document.documentElement.dataset.theme = "light"; true');
+    await openPage(page, "library");
+  } },
+  { name: "collapsed navigation", setup: async (page) => {
+    await page.click("#nav-toggle");
+    await page.waitFor('document.querySelector(".shell")?.dataset.nav === "collapsed"');
+    await sleep(400);
+  } },
+  { name: "mobile navigation", setup: async (page) => {
+    await page.setViewport(390, 844);
+    await sleep(150);
+    await page.click("#nav-toggle");
+    await page.waitFor('document.querySelector(".shell")?.classList.contains("is-nav-open")');
+    await sleep(400);
   } },
   { name: "import diff dialog", setup: async (page) => {
     await page.setFileInput("#import-input", [fixture]);

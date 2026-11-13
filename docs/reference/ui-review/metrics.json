@@ -1,0 +1,3257 @@
+{
+  "1440x900": {
+    "entries": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 60,
+      "small": [
+        "#sample-badge \"Sample\" 56x20",
+        "button.key-chip-remove \"Remove trigger key auror\" 16x16",
+        "button.key-chip-remove \"Remove trigger key the v\" 16x16",
+        "button.key-chip-remove \"Remove trigger key city\" 16x16",
+        "#suggest-keys-btn \"Suggest keys from title \" 165x16",
+        "button.entry-color-option \"No colour\" 20x20",
+        "#peek-btn \"Peek as injected text\" 94x16",
+        "#entry-probability \"100\" 205x16"
+      ],
+      "smallCount": 8,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "span.nav-shortcut \"Alt 1\" 10.5px",
+        "span.nav-shortcut \"Alt 2\" 10.5px",
+        "span.nav-shortcut \"Alt 3\" 10.5px",
+        "span.nav-shortcut \"Alt 4\" 10.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "span.section-label \"Entries\" 10.5px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h1:Loreweaver",
+        "h2:Entry size",
+        "h2:Injection"
+      ],
+      "dialog": null
+    },
+    "entries-nav-collapsed": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 60,
+      "small": [
+        "#sample-badge \"Sample\" 56x20",
+        "button.key-chip-remove \"Remove trigger key auror\" 16x16",
+        "button.key-chip-remove \"Remove trigger key the v\" 16x16",
+        "button.key-chip-remove \"Remove trigger key city\" 16x16",
+        "#suggest-keys-btn \"Suggest keys from title \" 165x16",
+        "button.entry-color-option \"No colour\" 20x20",
+        "#peek-btn \"Peek as injected text\" 94x16",
+        "#entry-probability \"100\" 205x16"
+      ],
+      "smallCount": 8,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "span.section-label \"Entries\" 10.5px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "#entry-count \"3\" 10px",
+        "span.entry-id \"#4063\" 9.5px"
+      ],
+      "truncated": [
+        "span.nav-label \"Entries\"",
+        "span.nav-label \"Library\"",
+        "span.nav-label \"Data\"",
+        "span.nav-label \"Settings\"",
+        "span.nav-label \"Overview\"",
+        "span.nav-label \"Simulate\"",
+        "span.nav-label \"Issues\"",
+        "span.nav-label \"Search all\"",
+        "span.nav-label \"Find and replace\"",
+        "span.nav-label \"About\""
+      ],
+      "offscreen": [],
+      "headings": [
+        "h1:Loreweaver",
+        "h2:Entry size",
+        "h2:Injection"
+      ],
+      "dialog": null
+    },
+    "library": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "#book-count \"1\" 10px",
+        "span.section-label \"Description\" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"0 = off\" 10.5px",
+        "#book-budget-status \"218 enabled tokens\" 10.5px",
+        "span.section-label \"New-entry defaults\" 10.5px",
+        "span.hint \"Applies to entries creat\" 10.5px",
+        "#card-label \"Character cards\" 10.5px",
+        "#card-count \"0\" 10px",
+        "p.card-list-empty \"No cards yet. Add one to\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Library",
+        "h3:Lorebooks",
+        "h3:Active lorebook settings"
+      ],
+      "dialog": null
+    },
+    "data": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 6,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.hint \"Export covers the active\" 10.5px",
+        "p.hint \"Verify the saved project\" 10.5px",
+        "#about-audit \"Nothing imported in this\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Data",
+        "h3:Import and export",
+        "h3:Pre-import backup",
+        "h3:Local storage",
+        "h3:Integrity",
+        "h3:Import log"
+      ],
+      "dialog": null
+    },
+    "settings": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 6,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.hint \"Choose the encoding and \" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Settings",
+        "h3:Appearance",
+        "h3:Tokenizer",
+        "h3:Reference"
+      ],
+      "dialog": null
+    },
+    "dialog-export": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [
+        "#export-data-link \"Data page\" 50x15"
+      ],
+      "smallCount": 1,
+      "tiny": [
+        "p.eyebrow \"Export\" 10px",
+        "h3.export-group-title \"Recommended\" 10.5px",
+        "span.export-option-meta \"Book · primary\" 10px",
+        "span.export-option-meta \"Project\" 10px",
+        "h3.export-group-title \"Other frontends\" 10.5px",
+        "span.export-option-meta \"Book\" 10px",
+        "h3.export-group-title \"Loreweaver files\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Choose an output",
+        "h3:Recommended",
+        "h3:Other frontends",
+        "h3:Loreweaver files"
+      ],
+      "dialog": {
+        "w": 520,
+        "h": 815,
+        "clipped": false
+      }
+    },
+    "dialog-overview": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Overview\" 10px",
+        "span.overview-stat-label \"Entries\" 10px",
+        "span.overview-stat-label \"Enabled\" 10px",
+        "span.overview-stat-label \"Tokens\" 10px",
+        "span.overview-stat-label \"Enabled tokens\" 10px",
+        "span.overview-stat-label \"Unique keys\" 10px",
+        "span.overview-stat-label \"Key coverage\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Lorebook overview"
+      ],
+      "dialog": {
+        "w": 560,
+        "h": 523,
+        "clipped": false
+      }
+    },
+    "dialog-simulation": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 2,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Context simulation\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Preview activation"
+      ],
+      "dialog": {
+        "w": 640,
+        "h": 405,
+        "clipped": false
+      }
+    },
+    "dialog-issues": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Checks\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Lorebook validation"
+      ],
+      "dialog": {
+        "w": 560,
+        "h": 275,
+        "clipped": false
+      }
+    },
+    "dialog-history": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 4,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"History\" 10px",
+        "#history-count \"1 snapshot\" 10.5px",
+        "span.history-item-meta \"Nov 12, 2026, 11:01 PM ·\" 10.5px",
+        "span.history-delta-add \"+4\" 9.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Revision history"
+      ],
+      "dialog": {
+        "w": 580,
+        "h": 333,
+        "clipped": false
+      }
+    },
+    "dialog-template": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 7,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Templates\" 10px",
+        "span.template-option-action \"Use\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Start a new entry"
+      ],
+      "dialog": {
+        "w": 520,
+        "h": 587,
+        "clipped": false
+      }
+    },
+    "dialog-card": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 16,
+      "small": [
+        "summary \"Advanced\" 648x21",
+        "#card-export-format \"PNG card (V3 + V2)\n     \" 143x23"
+      ],
+      "smallCount": 2,
+      "tiny": [
+        "p.eyebrow \"Character card\" 10px",
+        "span.hint \"Images are converted to \" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"V3 only. Used instead of\" 10.5px",
+        "span.hint \"How often the character \" 10.5px",
+        "#card-book-info \"Linking a lorebook embed\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:New character card",
+        "h3:Token cost",
+        "h3:Checks"
+      ],
+      "dialog": {
+        "w": 980,
+        "h": 868,
+        "clipped": false
+      }
+    },
+    "dialog-search": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Global search\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Search all lorebooks"
+      ],
+      "dialog": {
+        "w": 620,
+        "h": 290,
+        "clipped": false
+      }
+    },
+    "dialog-replace": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Bulk replace\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Find and replace"
+      ],
+      "dialog": {
+        "w": 432,
+        "h": 483,
+        "clipped": false
+      }
+    },
+    "dialog-shortcuts": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Shortcuts\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Keyboard shortcuts"
+      ],
+      "dialog": {
+        "w": 520,
+        "h": 824,
+        "clipped": false
+      }
+    },
+    "dialog-schema": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [
+        "summary \"Project7\" 594x21",
+        "summary \"Book8\" 594x21",
+        "summary \"Entry19\" 594x21",
+        "summary \"Card10\" 594x21"
+      ],
+      "smallCount": 4,
+      "tiny": [
+        "p.eyebrow \"Reference\" 10px",
+        "span.count \"7\" 10px",
+        "span.count \"8\" 10px",
+        "span.count \"19\" 10px",
+        "span.count \"10\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Schema reference"
+      ],
+      "dialog": {
+        "w": 640,
+        "h": 292,
+        "clipped": false
+      }
+    },
+    "dialog-tokens": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Tokens\" 10px",
+        "#tokenizer-preset-hint \"cl100k_base\" 10.5px",
+        "span.hint \"Used for context-window \" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Tokenizer and context window"
+      ],
+      "dialog": {
+        "w": 432,
+        "h": 392,
+        "clipped": false
+      }
+    },
+    "dialog-about": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"About\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Loreweaver"
+      ],
+      "dialog": {
+        "w": 560,
+        "h": 350,
+        "clipped": false
+      }
+    },
+    "dialog-guide": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Getting started\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Create and export your first"
+      ],
+      "dialog": {
+        "w": 560,
+        "h": 492,
+        "clipped": false
+      }
+    },
+    "dialog-bookactions": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Lorebook actions\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Manage this lorebook"
+      ],
+      "dialog": {
+        "w": 432,
+        "h": 449,
+        "clipped": false
+      }
+    },
+    "dialog-palette": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 50,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "span.command-option-hint \"Alt+1\" 10.5px",
+        "span.command-option-hint \"Alt+2\" 10.5px",
+        "span.command-option-hint \"Alt+3\" 10.5px",
+        "span.command-option-hint \"Alt+4\" 10.5px",
+        "span.command-option-hint \"Alt+N\" 10.5px",
+        "span.command-option-hint \"Ctrl+D\" 10.5px",
+        "span.command-option-hint \"Alt+P\" 10.5px",
+        "span.command-option-hint \"Ctrl+H\" 10.5px",
+        "span.command-option-hint \"Ctrl+\\\" 10.5px",
+        "span.command-option-hint \"Ctrl+S\" 10.5px",
+        "span.command-option-hint \"Ctrl+Shift+F\" 10.5px",
+        "span.command-option-hint \"Ctrl+O\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Command palette"
+      ],
+      "dialog": {
+        "w": 560,
+        "h": 414,
+        "clipped": false
+      }
+    },
+    "entries-empty-search": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 59,
+      "small": [
+        "#sample-badge \"Sample\" 56x20",
+        "button.key-chip-remove \"Remove trigger key auror\" 16x16",
+        "button.key-chip-remove \"Remove trigger key the v\" 16x16",
+        "button.key-chip-remove \"Remove trigger key city\" 16x16",
+        "#suggest-keys-btn \"Suggest keys from title \" 165x16",
+        "button.entry-color-option \"No colour\" 20x20",
+        "#peek-btn \"Peek as injected text\" 94x16",
+        "#entry-probability \"100\" 205x16"
+      ],
+      "smallCount": 8,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "span.nav-shortcut \"Alt 1\" 10.5px",
+        "span.nav-shortcut \"Alt 2\" 10.5px",
+        "span.nav-shortcut \"Alt 3\" 10.5px",
+        "span.nav-shortcut \"Alt 4\" 10.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "span.section-label \"Entries\" 10.5px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h1:Loreweaver",
+        "h2:Entry size",
+        "h2:Injection"
+      ],
+      "dialog": null
+    },
+    "light-entries": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 60,
+      "small": [
+        "#sample-badge \"Sample\" 56x20",
+        "button.key-chip-remove \"Remove trigger key auror\" 16x16",
+        "button.key-chip-remove \"Remove trigger key the v\" 16x16",
+        "button.key-chip-remove \"Remove trigger key city\" 16x16",
+        "#suggest-keys-btn \"Suggest keys from title \" 165x16",
+        "button.entry-color-option \"No colour\" 20x20",
+        "#peek-btn \"Peek as injected text\" 94x16",
+        "#entry-probability \"100\" 205x16"
+      ],
+      "smallCount": 8,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "span.nav-shortcut \"Alt 1\" 10.5px",
+        "span.nav-shortcut \"Alt 2\" 10.5px",
+        "span.nav-shortcut \"Alt 3\" 10.5px",
+        "span.nav-shortcut \"Alt 4\" 10.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "span.section-label \"Entries\" 10.5px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h1:Loreweaver",
+        "h2:Entry size",
+        "h2:Injection"
+      ],
+      "dialog": null
+    },
+    "light-library": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "#book-count \"1\" 10px",
+        "span.section-label \"Description\" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"0 = off\" 10.5px",
+        "#book-budget-status \"218 enabled tokens\" 10.5px",
+        "span.section-label \"New-entry defaults\" 10.5px",
+        "span.hint \"Applies to entries creat\" 10.5px",
+        "#card-label \"Character cards\" 10.5px",
+        "#card-count \"0\" 10px",
+        "p.card-list-empty \"No cards yet. Add one to\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Library",
+        "h3:Lorebooks",
+        "h3:Active lorebook settings"
+      ],
+      "dialog": null
+    }
+  },
+  "1024x768": {
+    "entries": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 60,
+      "small": [
+        "#sample-badge \"Sample\" 56x20",
+        "button.key-chip-remove \"Remove trigger key auror\" 16x16",
+        "button.key-chip-remove \"Remove trigger key the v\" 16x16",
+        "button.key-chip-remove \"Remove trigger key city\" 16x16",
+        "button.entry-color-option \"No colour\" 20x20",
+        "#peek-btn \"Peek as injected text\" 94x16",
+        "#entry-probability \"100\" 195x16"
+      ],
+      "smallCount": 7,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "span.section-label \"Entries\" 10.5px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "#entry-count \"3\" 10px",
+        "span.entry-id \"#5367\" 9.5px"
+      ],
+      "truncated": [
+        "span.nav-label \"Entries\"",
+        "span.nav-label \"Library\"",
+        "span.nav-label \"Data\"",
+        "span.nav-label \"Settings\"",
+        "span.nav-label \"Overview\"",
+        "span.nav-label \"Simulate\"",
+        "span.nav-label \"Issues\"",
+        "span.nav-label \"Search all\"",
+        "span.nav-label \"Find and replace\"",
+        "span.nav-label \"About\""
+      ],
+      "offscreen": [],
+      "headings": [
+        "h1:Loreweaver",
+        "h2:Entry size",
+        "h2:Injection"
+      ],
+      "dialog": null
+    },
+    "entries-nav-collapsed": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 60,
+      "small": [
+        "#sample-badge \"Sample\" 56x20",
+        "#entry-title \"Aurora Vale\" 18x41",
+        "button.key-chip-remove \"Remove trigger key auror\" 16x16",
+        "button.key-chip-remove \"Remove trigger key the v\" 16x16",
+        "button.key-chip-remove \"Remove trigger key city\" 16x16",
+        "button.entry-color-option \"No colour\" 20x20",
+        "#peek-btn \"Peek as injected text\" 94x16",
+        "#entry-probability \"100\" 195x16"
+      ],
+      "smallCount": 8,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "span.nav-shortcut \"Alt 1\" 10.5px",
+        "span.nav-shortcut \"Alt 2\" 10.5px",
+        "span.nav-shortcut \"Alt 3\" 10.5px",
+        "span.nav-shortcut \"Alt 4\" 10.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "span.section-label \"Entries\" 10.5px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h1:Loreweaver",
+        "h2:Entry size",
+        "h2:Injection"
+      ],
+      "dialog": null
+    },
+    "library": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "#book-count \"1\" 10px",
+        "span.section-label \"Description\" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"0 = off\" 10.5px",
+        "#book-budget-status \"218 enabled tokens\" 10.5px",
+        "span.section-label \"New-entry defaults\" 10.5px",
+        "span.hint \"Applies to entries creat\" 10.5px",
+        "#card-label \"Character cards\" 10.5px",
+        "#card-count \"0\" 10px",
+        "p.card-list-empty \"No cards yet. Add one to\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Library",
+        "h3:Lorebooks",
+        "h3:Active lorebook settings"
+      ],
+      "dialog": null
+    },
+    "data": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 6,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.hint \"Export covers the active\" 10.5px",
+        "p.hint \"Verify the saved project\" 10.5px",
+        "#about-audit \"Nothing imported in this\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Data",
+        "h3:Import and export",
+        "h3:Pre-import backup",
+        "h3:Local storage",
+        "h3:Integrity",
+        "h3:Import log"
+      ],
+      "dialog": null
+    },
+    "settings": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 6,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.hint \"Choose the encoding and \" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Settings",
+        "h3:Appearance",
+        "h3:Tokenizer",
+        "h3:Reference"
+      ],
+      "dialog": null
+    },
+    "dialog-export": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [
+        "#export-data-link \"Data page\" 50x15"
+      ],
+      "smallCount": 1,
+      "tiny": [
+        "p.eyebrow \"Export\" 10px",
+        "h3.export-group-title \"Recommended\" 10.5px",
+        "span.export-option-meta \"Book · primary\" 10px",
+        "span.export-option-meta \"Project\" 10px",
+        "h3.export-group-title \"Other frontends\" 10.5px",
+        "span.export-option-meta \"Book\" 10px",
+        "h3.export-group-title \"Loreweaver files\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Choose an output",
+        "h3:Recommended",
+        "h3:Other frontends",
+        "h3:Loreweaver files"
+      ],
+      "dialog": {
+        "w": 520,
+        "h": 734,
+        "clipped": false
+      }
+    },
+    "dialog-overview": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Overview\" 10px",
+        "span.overview-stat-label \"Entries\" 10px",
+        "span.overview-stat-label \"Enabled\" 10px",
+        "span.overview-stat-label \"Tokens\" 10px",
+        "span.overview-stat-label \"Enabled tokens\" 10px",
+        "span.overview-stat-label \"Unique keys\" 10px",
+        "span.overview-stat-label \"Key coverage\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Lorebook overview"
+      ],
+      "dialog": {
+        "w": 560,
+        "h": 523,
+        "clipped": false
+      }
+    },
+    "dialog-simulation": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 2,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Context simulation\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Preview activation"
+      ],
+      "dialog": {
+        "w": 640,
+        "h": 405,
+        "clipped": false
+      }
+    },
+    "dialog-issues": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Checks\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Lorebook validation"
+      ],
+      "dialog": {
+        "w": 560,
+        "h": 275,
+        "clipped": false
+      }
+    },
+    "dialog-history": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 4,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"History\" 10px",
+        "#history-count \"1 snapshot\" 10.5px",
+        "span.history-item-meta \"Nov 12, 2026, 11:02 PM ·\" 10.5px",
+        "span.history-delta-add \"+4\" 9.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Revision history"
+      ],
+      "dialog": {
+        "w": 580,
+        "h": 333,
+        "clipped": false
+      }
+    },
+    "dialog-template": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 7,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Templates\" 10px",
+        "span.template-option-action \"Use\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Start a new entry"
+      ],
+      "dialog": {
+        "w": 520,
+        "h": 587,
+        "clipped": false
+      }
+    },
+    "dialog-card": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 16,
+      "small": [
+        "summary \"Advanced\" 648x21",
+        "#card-export-format \"PNG card (V3 + V2)\n     \" 143x23"
+      ],
+      "smallCount": 2,
+      "tiny": [
+        "p.eyebrow \"Character card\" 10px",
+        "span.hint \"Images are converted to \" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"V3 only. Used instead of\" 10.5px",
+        "span.hint \"How often the character \" 10.5px",
+        "#card-book-info \"Linking a lorebook embed\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:New character card",
+        "h3:Token cost",
+        "h3:Checks"
+      ],
+      "dialog": {
+        "w": 980,
+        "h": 736,
+        "clipped": false
+      }
+    },
+    "dialog-search": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Global search\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Search all lorebooks"
+      ],
+      "dialog": {
+        "w": 620,
+        "h": 290,
+        "clipped": false
+      }
+    },
+    "dialog-replace": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Bulk replace\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Find and replace"
+      ],
+      "dialog": {
+        "w": 432,
+        "h": 483,
+        "clipped": false
+      }
+    },
+    "dialog-shortcuts": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Shortcuts\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Keyboard shortcuts"
+      ],
+      "dialog": {
+        "w": 520,
+        "h": 734,
+        "clipped": false
+      }
+    },
+    "dialog-schema": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [
+        "summary \"Project7\" 594x21",
+        "summary \"Book8\" 594x21",
+        "summary \"Entry19\" 594x21",
+        "summary \"Card10\" 594x21"
+      ],
+      "smallCount": 4,
+      "tiny": [
+        "p.eyebrow \"Reference\" 10px",
+        "span.count \"7\" 10px",
+        "span.count \"8\" 10px",
+        "span.count \"19\" 10px",
+        "span.count \"10\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Schema reference"
+      ],
+      "dialog": {
+        "w": 640,
+        "h": 292,
+        "clipped": false
+      }
+    },
+    "dialog-tokens": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Tokens\" 10px",
+        "#tokenizer-preset-hint \"cl100k_base\" 10.5px",
+        "span.hint \"Used for context-window \" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Tokenizer and context window"
+      ],
+      "dialog": {
+        "w": 432,
+        "h": 392,
+        "clipped": false
+      }
+    },
+    "dialog-about": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"About\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Loreweaver"
+      ],
+      "dialog": {
+        "w": 560,
+        "h": 350,
+        "clipped": false
+      }
+    },
+    "dialog-guide": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Getting started\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Create and export your first"
+      ],
+      "dialog": {
+        "w": 560,
+        "h": 492,
+        "clipped": false
+      }
+    },
+    "dialog-bookactions": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "p.eyebrow \"Lorebook actions\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Manage this lorebook"
+      ],
+      "dialog": {
+        "w": 432,
+        "h": 449,
+        "clipped": false
+      }
+    },
+    "dialog-palette": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 50,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "span.command-option-hint \"Alt+1\" 10.5px",
+        "span.command-option-hint \"Alt+2\" 10.5px",
+        "span.command-option-hint \"Alt+3\" 10.5px",
+        "span.command-option-hint \"Alt+4\" 10.5px",
+        "span.command-option-hint \"Alt+N\" 10.5px",
+        "span.command-option-hint \"Ctrl+D\" 10.5px",
+        "span.command-option-hint \"Alt+P\" 10.5px",
+        "span.command-option-hint \"Ctrl+H\" 10.5px",
+        "span.command-option-hint \"Ctrl+\\\" 10.5px",
+        "span.command-option-hint \"Ctrl+S\" 10.5px",
+        "span.command-option-hint \"Ctrl+Shift+F\" 10.5px",
+        "span.command-option-hint \"Ctrl+O\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Command palette"
+      ],
+      "dialog": {
+        "w": 560,
+        "h": 414,
+        "clipped": false
+      }
+    },
+    "entries-empty-search": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 59,
+      "small": [
+        "#sample-badge \"Sample\" 56x20",
+        "button.key-chip-remove \"Remove trigger key auror\" 16x16",
+        "button.key-chip-remove \"Remove trigger key the v\" 16x16",
+        "button.key-chip-remove \"Remove trigger key city\" 16x16",
+        "button.entry-color-option \"No colour\" 20x20",
+        "#peek-btn \"Peek as injected text\" 94x16",
+        "#entry-probability \"100\" 195x16"
+      ],
+      "smallCount": 7,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "span.section-label \"Entries\" 10.5px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "#entry-count \"0/3\" 10px",
+        "span.entry-id \"#5367\" 9.5px"
+      ],
+      "truncated": [
+        "span.nav-label \"Entries\"",
+        "span.nav-label \"Library\"",
+        "span.nav-label \"Data\"",
+        "span.nav-label \"Settings\"",
+        "span.nav-label \"Overview\"",
+        "span.nav-label \"Simulate\"",
+        "span.nav-label \"Issues\"",
+        "span.nav-label \"Search all\"",
+        "span.nav-label \"Find and replace\"",
+        "span.nav-label \"About\""
+      ],
+      "offscreen": [],
+      "headings": [
+        "h1:Loreweaver",
+        "h2:Entry size",
+        "h2:Injection"
+      ],
+      "dialog": null
+    },
+    "light-entries": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 60,
+      "small": [
+        "#sample-badge \"Sample\" 56x20",
+        "button.key-chip-remove \"Remove trigger key auror\" 16x16",
+        "button.key-chip-remove \"Remove trigger key the v\" 16x16",
+        "button.key-chip-remove \"Remove trigger key city\" 16x16",
+        "button.entry-color-option \"No colour\" 20x20",
+        "#peek-btn \"Peek as injected text\" 94x16",
+        "#entry-probability \"100\" 195x16"
+      ],
+      "smallCount": 7,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "span.section-label \"Entries\" 10.5px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "#entry-count \"3\" 10px",
+        "span.entry-id \"#5367\" 9.5px"
+      ],
+      "truncated": [
+        "span.nav-label \"Entries\"",
+        "span.nav-label \"Library\"",
+        "span.nav-label \"Data\"",
+        "span.nav-label \"Settings\"",
+        "span.nav-label \"Overview\"",
+        "span.nav-label \"Simulate\"",
+        "span.nav-label \"Issues\"",
+        "span.nav-label \"Search all\"",
+        "span.nav-label \"Find and replace\"",
+        "span.nav-label \"About\""
+      ],
+      "offscreen": [],
+      "headings": [
+        "h1:Loreweaver",
+        "h2:Entry size",
+        "h2:Injection"
+      ],
+      "dialog": null
+    },
+    "light-library": {
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [],
+      "smallCount": 0,
+      "tiny": [
+        "#book-count \"1\" 10px",
+        "span.section-label \"Description\" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"0 = off\" 10.5px",
+        "#book-budget-status \"218 enabled tokens\" 10.5px",
+        "span.section-label \"New-entry defaults\" 10.5px",
+        "span.hint \"Applies to entries creat\" 10.5px",
+        "#card-label \"Character cards\" 10.5px",
+        "#card-count \"0\" 10px",
+        "p.card-list-empty \"No cards yet. Add one to\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Library",
+        "h3:Lorebooks",
+        "h3:Active lorebook settings"
+      ],
+      "dialog": null
+    }
+  },
+  "390x844": {
+    "entries": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 49,
+      "small": [
+        "#nav-toggle \"Loreweaver navigation me\" 36x36",
+        "#book-name \"Aurora Vale\" 75x35",
+        "#sample-badge \"Sample\" 56x20",
+        "#undo-btn \"Undo\" 34x34",
+        "#redo-btn \"Redo\" 34x34",
+        "#history-btn \"Revision history\" 34x34",
+        "#import-btn \"Import lorebook\" 35x34",
+        "#export-btn \"Export lorebook or proje\" 35x34",
+        "a.nav-item \"Entries\n          Alt 1\" 223x36",
+        "a.nav-item \"Library\n          Alt 2\" 223x36",
+        "a.nav-item \"Data\n          Alt 3\" 223x36",
+        "a.nav-item \"Settings\n          Alt 4\" 223x36",
+        "#overview-btn \"Overview\" 223x36",
+        "#simulation-btn \"Simulate\" 223x36",
+        "#validation-btn \"Issues\n          0\" 223x36",
+        "#nav-search-btn \"Search all\" 223x36",
+        "#nav-replace-btn \"Find and replace\" 223x36",
+        "#about-btn \"About\" 223x36",
+        "#sidebar-toggle \"Collapse library sidebar\" 32x32",
+        "#book-select \"Active lorebook\" 316x34",
+        "a.icon-btn \"Manage lorebooks and car\" 34x34",
+        "#entry-search \"\" 322x36",
+        "#regex-toggle \"Treat search as a regula\" 34x34",
+        "button.filter-chip \"Enabled\" 58x26",
+        "button.filter-chip \"Disabled\" 61x26"
+      ],
+      "smallCount": 46,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "span.section-label \"Entries\" 10.5px",
+        "#entry-count \"3\" 10px",
+        "span.entry-id \"#9756\" 9.5px"
+      ],
+      "truncated": [
+        "#book-name \"Aurora Vale\""
+      ],
+      "offscreen": [
+        "a.nav-item \"Entries\n          Alt 1\"",
+        "a.nav-item \"Library\n          Alt 2\"",
+        "a.nav-item \"Data\n          Alt 3\"",
+        "a.nav-item \"Settings\n          Alt 4\"",
+        "#overview-btn \"Overview\"",
+        "#simulation-btn \"Simulate\"",
+        "#validation-btn \"Issues\n          0\"",
+        "#nav-search-btn \"Search all\"",
+        "#nav-replace-btn \"Find and replace\"",
+        "#about-btn \"About\""
+      ],
+      "headings": [
+        "h1:Loreweaver"
+      ],
+      "dialog": null
+    },
+    "entries-nav-open": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 49,
+      "small": [
+        "#nav-toggle \"Loreweaver navigation me\" 36x36",
+        "#book-name \"Aurora Vale\" 75x35",
+        "#sample-badge \"Sample\" 56x20",
+        "#undo-btn \"Undo\" 34x34",
+        "#redo-btn \"Redo\" 34x34",
+        "#history-btn \"Revision history\" 34x34",
+        "#import-btn \"Import lorebook\" 35x34",
+        "#export-btn \"Export lorebook or proje\" 35x34",
+        "a.nav-item \"Entries\n          Alt 1\" 223x36",
+        "a.nav-item \"Library\n          Alt 2\" 223x36",
+        "a.nav-item \"Data\n          Alt 3\" 223x36",
+        "a.nav-item \"Settings\n          Alt 4\" 223x36",
+        "#overview-btn \"Overview\" 223x36",
+        "#simulation-btn \"Simulate\" 223x36",
+        "#validation-btn \"Issues\n          0\" 223x36",
+        "#nav-search-btn \"Search all\" 223x36",
+        "#nav-replace-btn \"Find and replace\" 223x36",
+        "#about-btn \"About\" 223x36",
+        "#sidebar-toggle \"Collapse library sidebar\" 32x32",
+        "#book-select \"Active lorebook\" 316x34",
+        "a.icon-btn \"Manage lorebooks and car\" 34x34",
+        "#entry-search \"\" 322x36",
+        "#regex-toggle \"Treat search as a regula\" 34x34",
+        "button.filter-chip \"Enabled\" 58x26",
+        "button.filter-chip \"Disabled\" 61x26"
+      ],
+      "smallCount": 46,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "span.section-label \"Entries\" 10.5px",
+        "#entry-count \"3\" 10px",
+        "span.entry-id \"#9756\" 9.5px"
+      ],
+      "truncated": [
+        "#book-name \"Aurora Vale\""
+      ],
+      "offscreen": [],
+      "headings": [
+        "h1:Loreweaver"
+      ],
+      "dialog": null
+    },
+    "library": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [
+        "#book-actions-btn \"Lorebook actions\" 90x34",
+        "#new-book-btn \"New lorebook\" 131x34",
+        "#delete-book-btn \"Delete lorebook\" 85x34",
+        "summary \"Description\n            \" 308x30",
+        "#book-tags-input \"\" 292x24",
+        "#book-token-budget \"0\" 310x38",
+        "summary \"New-entry defaults\" 310x37",
+        "#new-card-btn \"New character card\" 34x34"
+      ],
+      "smallCount": 8,
+      "tiny": [
+        "#book-count \"1\" 10px",
+        "span.section-label \"Description\" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"0 = off\" 10.5px",
+        "#book-budget-status \"218 enabled tokens\" 10.5px",
+        "span.section-label \"New-entry defaults\" 10.5px",
+        "span.hint \"Applies to entries creat\" 10.5px",
+        "#card-label \"Character cards\" 10.5px",
+        "#card-count \"0\" 10px",
+        "p.card-list-empty \"No cards yet. Add one to\" 10.5px"
+      ],
+      "truncated": [
+        "#book-description-preview \"A storm-worn coastal cit\""
+      ],
+      "offscreen": [],
+      "headings": [
+        "h2:Library",
+        "h3:Lorebooks",
+        "h3:Active lorebook settings"
+      ],
+      "dialog": null
+    },
+    "data": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 6,
+      "small": [
+        "#data-import-btn \"Import a file…\" 106x34",
+        "#data-export-btn \"Export…\" 77x34",
+        "#data-open-btn \"Open project file\" 121x34",
+        "#data-save-btn \"Save project file\" 116x34",
+        "#restore-backup-btn \"Restore\" 69x34",
+        "#about-integrity-btn \"Check data integrity\" 140x34"
+      ],
+      "smallCount": 6,
+      "tiny": [
+        "p.hint \"Export covers the active\" 10.5px",
+        "p.hint \"Verify the saved project\" 10.5px",
+        "#about-audit \"Nothing imported in this\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Data",
+        "h3:Import and export",
+        "h3:Pre-import backup",
+        "h3:Local storage",
+        "h3:Integrity",
+        "h3:Import log"
+      ],
+      "dialog": null
+    },
+    "settings": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 6,
+      "small": [
+        "#about-theme-btn \"Light theme\" 94x34",
+        "#about-density-btn \"Compact density\" 121x34",
+        "#about-token-btn \"Token settings\" 107x34",
+        "#about-shortcuts-btn \"Keyboard shortcuts\" 136x34",
+        "#about-schema-btn \"Schema reference\" 127x34",
+        "#settings-guide-btn \"Getting started\" 112x34"
+      ],
+      "smallCount": 6,
+      "tiny": [
+        "p.hint \"Choose the encoding and \" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Settings",
+        "h3:Appearance",
+        "h3:Tokenizer",
+        "h3:Reference"
+      ],
+      "dialog": null
+    },
+    "dialog-export": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [
+        "#export-data-link \"Data page\" 50x15",
+        "#export-cancel \"Close\" 57x34"
+      ],
+      "smallCount": 2,
+      "tiny": [
+        "p.eyebrow \"Export\" 10px",
+        "h3.export-group-title \"Recommended\" 10.5px",
+        "h3.export-group-title \"Other frontends\" 10.5px",
+        "h3.export-group-title \"Loreweaver files\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Choose an output",
+        "h3:Recommended",
+        "h3:Other frontends",
+        "h3:Loreweaver files"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 810,
+        "clipped": false
+      }
+    },
+    "dialog-overview": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [
+        "#overview-close \"Close\" 57x34"
+      ],
+      "smallCount": 1,
+      "tiny": [
+        "p.eyebrow \"Overview\" 10px",
+        "span.overview-stat-label \"Entries\" 10px",
+        "span.overview-stat-label \"Enabled\" 10px",
+        "span.overview-stat-label \"Tokens\" 10px",
+        "span.overview-stat-label \"Enabled tokens\" 10px",
+        "span.overview-stat-label \"Unique keys\" 10px",
+        "span.overview-stat-label \"Key coverage\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Lorebook overview"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 606,
+        "clipped": false
+      }
+    },
+    "dialog-simulation": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 2,
+      "small": [
+        "#simulation-run \"Simulate\" 77x34",
+        "#simulation-close \"Close\" 57x34"
+      ],
+      "smallCount": 2,
+      "tiny": [
+        "p.eyebrow \"Context simulation\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Preview activation"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 462,
+        "clipped": false
+      }
+    },
+    "dialog-issues": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [
+        "#validation-close \"Close\" 57x34"
+      ],
+      "smallCount": 1,
+      "tiny": [
+        "p.eyebrow \"Checks\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Lorebook validation"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 288,
+        "clipped": false
+      }
+    },
+    "dialog-history": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 4,
+      "small": [
+        "#history-save-btn \"Save snapshot\" 110x34",
+        "button.btn \"Compare snapshot: Initia\" 77x34",
+        "button.btn \"Restore snapshot: Initia\" 69x34",
+        "#history-close \"Close\" 57x34"
+      ],
+      "smallCount": 4,
+      "tiny": [
+        "p.eyebrow \"History\" 10px",
+        "#history-count \"1 snapshot\" 10.5px",
+        "span.history-item-meta \"Nov 12, 2026, 11:02 PM ·\" 10.5px",
+        "span.history-delta-add \"+4\" 9.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Revision history"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 387,
+        "clipped": false
+      }
+    },
+    "dialog-template": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 7,
+      "small": [
+        "button.btn \"Save the active entry as\" 318x29",
+        "#template-close \"Cancel\" 63x34"
+      ],
+      "smallCount": 2,
+      "tiny": [
+        "p.eyebrow \"Templates\" 10px",
+        "span.template-option-action \"Use\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Start a new entry"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 623,
+        "clipped": false
+      }
+    },
+    "dialog-card": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 16,
+      "small": [
+        "#card-name \"\" 302x38",
+        "#card-nickname \"\" 302x38",
+        "#card-alt-add \"Add greeting\" 302x34",
+        "#card-tags-input \"\" 284x24",
+        "#card-creator \"\" 302x38",
+        "#card-version \"\" 302x38",
+        "summary \"Advanced\" 302x21",
+        "#card-group-add \"Add group greeting\" 302x34",
+        "#card-depth-depth \"4\" 302x38",
+        "#card-depth-role \"System\n                 \" 302x38",
+        "#card-talkativeness \"0.5\" 302x38",
+        "#card-link-book \"No linked lorebookAurora\" 302x38",
+        "#card-export-format \"PNG card (V3 + V2)\n     \" 143x23",
+        "#card-export \"Export\" 63x34",
+        "#card-cancel \"Cancel\" 63x34",
+        "#card-save \"Save card\" 82x34"
+      ],
+      "smallCount": 16,
+      "tiny": [
+        "p.eyebrow \"Character card\" 10px",
+        "span.hint \"Images are converted to \" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"V3 only. Used instead of\" 10.5px",
+        "span.hint \"How often the character \" 10.5px",
+        "#card-book-info \"Linking a lorebook embed\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:New character card",
+        "h3:Token cost",
+        "h3:Checks"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 812,
+        "clipped": false
+      }
+    },
+    "dialog-search": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [
+        "#global-search-input \"\" 318x40",
+        "#global-regex-toggle \"Treat search as a regula\" 34x34",
+        "#global-search-close \"Close\" 57x34"
+      ],
+      "smallCount": 3,
+      "tiny": [
+        "p.eyebrow \"Global search\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Search all lorebooks"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 282,
+        "clipped": false
+      }
+    },
+    "dialog-replace": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [
+        "#replace-find \"\" 318x38",
+        "#replace-with \"\" 318x38",
+        "#replace-cancel \"Cancel\" 63x34",
+        "#replace-preview \"Preview\" 70x34",
+        "#replace-apply \"Replace all\" 89x34"
+      ],
+      "smallCount": 5,
+      "tiny": [
+        "p.eyebrow \"Bulk replace\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Find and replace"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 538,
+        "clipped": false
+      }
+    },
+    "dialog-shortcuts": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [
+        "#shortcuts-close \"Close\" 57x34"
+      ],
+      "smallCount": 1,
+      "tiny": [
+        "p.eyebrow \"Shortcuts\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Keyboard shortcuts"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 810,
+        "clipped": false
+      }
+    },
+    "dialog-schema": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [
+        "summary \"Project7\" 318x21",
+        "summary \"Book8\" 318x21",
+        "summary \"Entry19\" 318x21",
+        "summary \"Card10\" 318x21",
+        "#schema-close \"Close\" 57x34"
+      ],
+      "smallCount": 5,
+      "tiny": [
+        "p.eyebrow \"Reference\" 10px",
+        "span.count \"7\" 10px",
+        "span.count \"8\" 10px",
+        "span.count \"19\" 10px",
+        "span.count \"10\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Schema reference"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 305,
+        "clipped": false
+      }
+    },
+    "dialog-tokens": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [
+        "#tokenizer-preset \"GPT-3.5 Turbo, GPT-4, te\" 318x38",
+        "#context-window-preset \"4K tokens8K tokens16K to\" 318x38",
+        "#token-settings-close \"Done\" 57x34"
+      ],
+      "smallCount": 3,
+      "tiny": [
+        "p.eyebrow \"Tokens\" 10px",
+        "#tokenizer-preset-hint \"cl100k_base\" 10.5px",
+        "span.hint \"Used for context-window \" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Tokenizer and context window"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 384,
+        "clipped": false
+      }
+    },
+    "dialog-about": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [
+        "#about-guide-btn \"Getting started\" 115x34",
+        "a.btn \"Changelog\" 87x34",
+        "#about-close \"Close\" 57x34"
+      ],
+      "smallCount": 3,
+      "tiny": [
+        "p.eyebrow \"About\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Loreweaver"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 416,
+        "clipped": false
+      }
+    },
+    "dialog-guide": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [
+        "#guide-close \"Close\" 57x34"
+      ],
+      "smallCount": 1,
+      "tiny": [
+        "p.eyebrow \"Getting started\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Create and export your first"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 717,
+        "clipped": false
+      }
+    },
+    "dialog-bookactions": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [
+        "#book-merge-target \"\" 221x34",
+        "#book-merge \"Merge\" 63x34",
+        "#book-actions-close \"Close\" 57x34"
+      ],
+      "smallCount": 3,
+      "tiny": [
+        "p.eyebrow \"Lorebook actions\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Manage this lorebook"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 458,
+        "clipped": false
+      }
+    },
+    "dialog-palette": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 50,
+      "small": [
+        "#command-option-0 \"Go to EntriesAlt+1\" 328x38",
+        "#command-option-1 \"Go to LibraryAlt+2\" 328x38",
+        "#command-option-2 \"Go to DataAlt+3\" 328x38",
+        "#command-option-3 \"Go to SettingsAlt+4\" 328x38",
+        "#command-option-4 \"Toggle navigation menu\" 328x38",
+        "#command-option-5 \"New entryAlt+N\" 328x38",
+        "#command-option-6 \"New entry from template\" 328x38",
+        "#command-option-7 \"Duplicate entryCtrl+D\" 328x38",
+        "#command-option-8 \"Copy entry\" 328x38",
+        "#command-option-9 \"Pin entryAlt+P\" 328x38",
+        "#command-option-10 \"Delete entry\" 328x38",
+        "#command-option-11 \"New lorebook\" 328x38",
+        "#command-option-12 \"Lorebook actions\" 328x38",
+        "#command-option-13 \"Select entries by token \" 328x38",
+        "#command-option-14 \"Bulk find and replaceCtr\" 328x38",
+        "#command-option-15 \"New character card\" 328x38",
+        "#command-option-16 \"Toggle light theme\" 328x38",
+        "#command-option-17 \"Keyboard shortcuts\" 328x38",
+        "#command-option-18 \"Schema reference\" 328x38",
+        "#command-option-19 \"Print lorebook\" 328x38",
+        "#command-option-20 \"Toggle focus modeCtrl+\\\" 328x38",
+        "#command-option-21 \"Save projectCtrl+S\" 328x38",
+        "#command-option-22 \"Import lorebook\" 328x38",
+        "#command-option-23 \"Export…\" 328x38",
+        "#command-option-24 \"Export project backup\" 328x38"
+      ],
+      "smallCount": 49,
+      "tiny": [
+        "span.command-option-hint \"Alt+1\" 10.5px",
+        "span.command-option-hint \"Alt+2\" 10.5px",
+        "span.command-option-hint \"Alt+3\" 10.5px",
+        "span.command-option-hint \"Alt+4\" 10.5px",
+        "span.command-option-hint \"Alt+N\" 10.5px",
+        "span.command-option-hint \"Ctrl+D\" 10.5px",
+        "span.command-option-hint \"Alt+P\" 10.5px",
+        "span.command-option-hint \"Ctrl+H\" 10.5px",
+        "span.command-option-hint \"Ctrl+\\\" 10.5px",
+        "span.command-option-hint \"Ctrl+S\" 10.5px",
+        "span.command-option-hint \"Ctrl+Shift+F\" 10.5px",
+        "span.command-option-hint \"Ctrl+O\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Command palette"
+      ],
+      "dialog": {
+        "w": 356,
+        "h": 414,
+        "clipped": false
+      }
+    },
+    "entries-empty-search": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 48,
+      "small": [
+        "#nav-toggle \"Loreweaver navigation me\" 36x36",
+        "#book-name \"Aurora Vale\" 75x35",
+        "#sample-badge \"Sample\" 56x20",
+        "#undo-btn \"Undo\" 34x34",
+        "#redo-btn \"Redo\" 34x34",
+        "#history-btn \"Revision history\" 34x34",
+        "#import-btn \"Import lorebook\" 35x34",
+        "#export-btn \"Export lorebook or proje\" 35x34",
+        "a.nav-item \"Entries\n          Alt 1\" 223x36",
+        "a.nav-item \"Library\n          Alt 2\" 223x36",
+        "a.nav-item \"Data\n          Alt 3\" 223x36",
+        "a.nav-item \"Settings\n          Alt 4\" 223x36",
+        "#overview-btn \"Overview\" 223x36",
+        "#simulation-btn \"Simulate\" 223x36",
+        "#validation-btn \"Issues\n          0\" 223x36",
+        "#nav-search-btn \"Search all\" 223x36",
+        "#nav-replace-btn \"Find and replace\" 223x36",
+        "#about-btn \"About\" 223x36",
+        "#sidebar-toggle \"Collapse library sidebar\" 32x32",
+        "#book-select \"Active lorebook\" 316x34",
+        "a.icon-btn \"Manage lorebooks and car\" 34x34",
+        "#entry-search \"zzzznomatch\" 322x36",
+        "#regex-toggle \"Treat search as a regula\" 34x34",
+        "button.filter-chip \"Enabled\" 58x26",
+        "button.filter-chip \"Disabled\" 61x26"
+      ],
+      "smallCount": 47,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "span.section-label \"Entries\" 10.5px",
+        "#entry-count \"0/3\" 10px",
+        "span.entry-id \"#9756\" 9.5px"
+      ],
+      "truncated": [
+        "#book-name \"Aurora Vale\""
+      ],
+      "offscreen": [
+        "a.nav-item \"Entries\n          Alt 1\"",
+        "a.nav-item \"Library\n          Alt 2\"",
+        "a.nav-item \"Data\n          Alt 3\"",
+        "a.nav-item \"Settings\n          Alt 4\"",
+        "#overview-btn \"Overview\"",
+        "#simulation-btn \"Simulate\"",
+        "#validation-btn \"Issues\n          0\"",
+        "#nav-search-btn \"Search all\"",
+        "#nav-replace-btn \"Find and replace\"",
+        "#about-btn \"About\""
+      ],
+      "headings": [
+        "h1:Loreweaver"
+      ],
+      "dialog": null
+    },
+    "light-entries": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 49,
+      "small": [
+        "#nav-toggle \"Loreweaver navigation me\" 36x36",
+        "#book-name \"Aurora Vale\" 75x35",
+        "#sample-badge \"Sample\" 56x20",
+        "#undo-btn \"Undo\" 34x34",
+        "#redo-btn \"Redo\" 34x34",
+        "#history-btn \"Revision history\" 34x34",
+        "#import-btn \"Import lorebook\" 35x34",
+        "#export-btn \"Export lorebook or proje\" 35x34",
+        "a.nav-item \"Entries\n          Alt 1\" 223x36",
+        "a.nav-item \"Library\n          Alt 2\" 223x36",
+        "a.nav-item \"Data\n          Alt 3\" 223x36",
+        "a.nav-item \"Settings\n          Alt 4\" 223x36",
+        "#overview-btn \"Overview\" 223x36",
+        "#simulation-btn \"Simulate\" 223x36",
+        "#validation-btn \"Issues\n          0\" 223x36",
+        "#nav-search-btn \"Search all\" 223x36",
+        "#nav-replace-btn \"Find and replace\" 223x36",
+        "#about-btn \"About\" 223x36",
+        "#sidebar-toggle \"Collapse library sidebar\" 32x32",
+        "#book-select \"Active lorebook\" 316x34",
+        "a.icon-btn \"Manage lorebooks and car\" 34x34",
+        "#entry-search \"\" 322x36",
+        "#regex-toggle \"Treat search as a regula\" 34x34",
+        "button.filter-chip \"Enabled\" 58x26",
+        "button.filter-chip \"Disabled\" 61x26"
+      ],
+      "smallCount": 46,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "span.section-label \"Entries\" 10.5px",
+        "#entry-count \"3\" 10px",
+        "span.entry-id \"#9756\" 9.5px"
+      ],
+      "truncated": [
+        "#book-name \"Aurora Vale\""
+      ],
+      "offscreen": [
+        "a.nav-item \"Entries\n          Alt 1\"",
+        "a.nav-item \"Library\n          Alt 2\"",
+        "a.nav-item \"Data\n          Alt 3\"",
+        "a.nav-item \"Settings\n          Alt 4\"",
+        "#overview-btn \"Overview\"",
+        "#simulation-btn \"Simulate\"",
+        "#validation-btn \"Issues\n          0\"",
+        "#nav-search-btn \"Search all\"",
+        "#nav-replace-btn \"Find and replace\"",
+        "#about-btn \"About\""
+      ],
+      "headings": [
+        "h1:Loreweaver"
+      ],
+      "dialog": null
+    },
+    "light-library": {
+      "viewport": [
+        390,
+        844
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [
+        "#book-actions-btn \"Lorebook actions\" 90x34",
+        "#new-book-btn \"New lorebook\" 131x34",
+        "#delete-book-btn \"Delete lorebook\" 85x34",
+        "summary \"Description\n            \" 308x30",
+        "#book-tags-input \"\" 292x24",
+        "#book-token-budget \"0\" 310x38",
+        "summary \"New-entry defaults\" 310x37",
+        "#new-card-btn \"New character card\" 34x34"
+      ],
+      "smallCount": 8,
+      "tiny": [
+        "#book-count \"1\" 10px",
+        "span.section-label \"Description\" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"0 = off\" 10.5px",
+        "#book-budget-status \"218 enabled tokens\" 10.5px",
+        "span.section-label \"New-entry defaults\" 10.5px",
+        "span.hint \"Applies to entries creat\" 10.5px",
+        "#card-label \"Character cards\" 10.5px",
+        "#card-count \"0\" 10px",
+        "p.card-list-empty \"No cards yet. Add one to\" 10.5px"
+      ],
+      "truncated": [
+        "#book-description-preview \"A storm-worn coastal cit\""
+      ],
+      "offscreen": [],
+      "headings": [
+        "h2:Library",
+        "h3:Lorebooks",
+        "h3:Active lorebook settings"
+      ],
+      "dialog": null
+    }
+  },
+  "320x760": {
+    "entries": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 49,
+      "small": [
+        "#nav-toggle \"Loreweaver navigation me\" 36x36",
+        "#book-name \"Aurora Vale\" 20x35",
+        "#sample-badge \"Sample\" 56x20",
+        "#undo-btn \"Undo\" 34x34",
+        "#redo-btn \"Redo\" 34x34",
+        "#history-btn \"Revision history\" 34x34",
+        "#import-btn \"Import lorebook\" 35x34",
+        "#export-btn \"Export lorebook or proje\" 35x34",
+        "a.nav-item \"Entries\n          Alt 1\" 223x36",
+        "a.nav-item \"Library\n          Alt 2\" 223x36",
+        "a.nav-item \"Data\n          Alt 3\" 223x36",
+        "a.nav-item \"Settings\n          Alt 4\" 223x36",
+        "#overview-btn \"Overview\" 223x36",
+        "#simulation-btn \"Simulate\" 223x36",
+        "#validation-btn \"Issues\n          0\" 223x36",
+        "#nav-search-btn \"Search all\" 223x36",
+        "#nav-replace-btn \"Find and replace\" 223x36",
+        "#about-btn \"About\" 223x36",
+        "#sidebar-toggle \"Collapse library sidebar\" 32x32",
+        "#book-select \"Active lorebook\" 246x34",
+        "a.icon-btn \"Manage lorebooks and car\" 34x34",
+        "#entry-search \"\" 252x36",
+        "#regex-toggle \"Treat search as a regula\" 34x34",
+        "button.filter-chip \"Enabled\" 58x26",
+        "button.filter-chip \"Disabled\" 61x26"
+      ],
+      "smallCount": 46,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "span.section-label \"Entries\" 10.5px",
+        "#entry-count \"3\" 10px",
+        "span.entry-id \"#6718\" 9.5px"
+      ],
+      "truncated": [
+        "#book-name \"Aurora Vale\""
+      ],
+      "offscreen": [
+        "a.nav-item \"Entries\n          Alt 1\"",
+        "a.nav-item \"Library\n          Alt 2\"",
+        "a.nav-item \"Data\n          Alt 3\"",
+        "a.nav-item \"Settings\n          Alt 4\"",
+        "#overview-btn \"Overview\"",
+        "#simulation-btn \"Simulate\"",
+        "#validation-btn \"Issues\n          0\"",
+        "#nav-search-btn \"Search all\"",
+        "#nav-replace-btn \"Find and replace\"",
+        "#about-btn \"About\""
+      ],
+      "headings": [
+        "h1:Loreweaver"
+      ],
+      "dialog": null
+    },
+    "entries-nav-open": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 49,
+      "small": [
+        "#nav-toggle \"Loreweaver navigation me\" 36x36",
+        "#book-name \"Aurora Vale\" 20x35",
+        "#sample-badge \"Sample\" 56x20",
+        "#undo-btn \"Undo\" 34x34",
+        "#redo-btn \"Redo\" 34x34",
+        "#history-btn \"Revision history\" 34x34",
+        "#import-btn \"Import lorebook\" 35x34",
+        "#export-btn \"Export lorebook or proje\" 35x34",
+        "a.nav-item \"Entries\n          Alt 1\" 223x36",
+        "a.nav-item \"Library\n          Alt 2\" 223x36",
+        "a.nav-item \"Data\n          Alt 3\" 223x36",
+        "a.nav-item \"Settings\n          Alt 4\" 223x36",
+        "#overview-btn \"Overview\" 223x36",
+        "#simulation-btn \"Simulate\" 223x36",
+        "#validation-btn \"Issues\n          0\" 223x36",
+        "#nav-search-btn \"Search all\" 223x36",
+        "#nav-replace-btn \"Find and replace\" 223x36",
+        "#about-btn \"About\" 223x36",
+        "#sidebar-toggle \"Collapse library sidebar\" 32x32",
+        "#book-select \"Active lorebook\" 246x34",
+        "a.icon-btn \"Manage lorebooks and car\" 34x34",
+        "#entry-search \"\" 252x36",
+        "#regex-toggle \"Treat search as a regula\" 34x34",
+        "button.filter-chip \"Enabled\" 58x26",
+        "button.filter-chip \"Disabled\" 61x26"
+      ],
+      "smallCount": 46,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "span.section-label \"Entries\" 10.5px",
+        "#entry-count \"3\" 10px",
+        "span.entry-id \"#6718\" 9.5px"
+      ],
+      "truncated": [
+        "#book-name \"Aurora Vale\""
+      ],
+      "offscreen": [],
+      "headings": [
+        "h1:Loreweaver"
+      ],
+      "dialog": null
+    },
+    "library": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [
+        "#book-actions-btn \"Lorebook actions\" 90x34",
+        "#new-book-btn \"New lorebook\" 131x34",
+        "#delete-book-btn \"Delete lorebook\" 85x34",
+        "summary \"Description\n            \" 238x30",
+        "#book-tags-input \"\" 222x24",
+        "#book-token-budget \"0\" 240x38",
+        "summary \"New-entry defaults\" 240x37",
+        "#new-card-btn \"New character card\" 34x34"
+      ],
+      "smallCount": 8,
+      "tiny": [
+        "#book-count \"1\" 10px",
+        "span.section-label \"Description\" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"0 = off\" 10.5px",
+        "#book-budget-status \"218 enabled tokens\" 10.5px",
+        "span.section-label \"New-entry defaults\" 10.5px",
+        "span.hint \"Applies to entries creat\" 10.5px",
+        "#card-label \"Character cards\" 10.5px",
+        "#card-count \"0\" 10px",
+        "p.card-list-empty \"No cards yet. Add one to\" 10.5px"
+      ],
+      "truncated": [
+        "#book-description-preview \"A storm-worn coastal cit\""
+      ],
+      "offscreen": [],
+      "headings": [
+        "h2:Library",
+        "h3:Lorebooks",
+        "h3:Active lorebook settings"
+      ],
+      "dialog": null
+    },
+    "data": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 6,
+      "small": [
+        "#data-import-btn \"Import a file…\" 106x34",
+        "#data-export-btn \"Export…\" 77x34",
+        "#data-open-btn \"Open project file\" 121x34",
+        "#data-save-btn \"Save project file\" 116x34",
+        "#restore-backup-btn \"Restore\" 69x34",
+        "#about-integrity-btn \"Check data integrity\" 140x34"
+      ],
+      "smallCount": 6,
+      "tiny": [
+        "p.hint \"Export covers the active\" 10.5px",
+        "p.hint \"Verify the saved project\" 10.5px",
+        "#about-audit \"Nothing imported in this\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Data",
+        "h3:Import and export",
+        "h3:Pre-import backup",
+        "h3:Local storage",
+        "h3:Integrity",
+        "h3:Import log"
+      ],
+      "dialog": null
+    },
+    "settings": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 6,
+      "small": [
+        "#about-theme-btn \"Light theme\" 94x34",
+        "#about-density-btn \"Compact density\" 121x34",
+        "#about-token-btn \"Token settings\" 107x34",
+        "#about-shortcuts-btn \"Keyboard shortcuts\" 136x34",
+        "#about-schema-btn \"Schema reference\" 127x34",
+        "#settings-guide-btn \"Getting started\" 112x34"
+      ],
+      "smallCount": 6,
+      "tiny": [
+        "p.hint \"Choose the encoding and \" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Settings",
+        "h3:Appearance",
+        "h3:Tokenizer",
+        "h3:Reference"
+      ],
+      "dialog": null
+    },
+    "dialog-export": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [
+        "#export-data-link \"Data page\" 219x33",
+        "#export-cancel \"Close\" 57x34"
+      ],
+      "smallCount": 2,
+      "tiny": [
+        "p.eyebrow \"Export\" 10px",
+        "h3.export-group-title \"Recommended\" 10.5px",
+        "h3.export-group-title \"Other frontends\" 10.5px",
+        "h3.export-group-title \"Loreweaver files\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Choose an output",
+        "h3:Recommended",
+        "h3:Other frontends",
+        "h3:Loreweaver files"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 726,
+        "clipped": false
+      }
+    },
+    "dialog-overview": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [
+        "#overview-close \"Close\" 57x34"
+      ],
+      "smallCount": 1,
+      "tiny": [
+        "p.eyebrow \"Overview\" 10px",
+        "span.overview-stat-label \"Entries\" 10px",
+        "span.overview-stat-label \"Enabled\" 10px",
+        "span.overview-stat-label \"Tokens\" 10px",
+        "span.overview-stat-label \"Enabled tokens\" 10px",
+        "span.overview-stat-label \"Unique keys\" 10px",
+        "span.overview-stat-label \"Key coverage\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Lorebook overview"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 639,
+        "clipped": false
+      }
+    },
+    "dialog-simulation": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 2,
+      "small": [
+        "#simulation-run \"Simulate\" 77x34",
+        "#simulation-close \"Close\" 57x34"
+      ],
+      "smallCount": 2,
+      "tiny": [
+        "p.eyebrow \"Context simulation\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Preview activation"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 483,
+        "clipped": false
+      }
+    },
+    "dialog-issues": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [
+        "#validation-close \"Close\" 57x34"
+      ],
+      "smallCount": 1,
+      "tiny": [
+        "p.eyebrow \"Checks\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Lorebook validation"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 309,
+        "clipped": false
+      }
+    },
+    "dialog-history": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 4,
+      "small": [
+        "#history-save-btn \"Save snapshot\" 110x34",
+        "button.btn \"Compare snapshot: Initia\" 77x34",
+        "button.btn \"Restore snapshot: Initia\" 69x34",
+        "#history-close \"Close\" 57x34"
+      ],
+      "smallCount": 4,
+      "tiny": [
+        "p.eyebrow \"History\" 10px",
+        "#history-count \"1 snapshot\" 10.5px",
+        "span.history-item-meta \"Nov 12, 2026, 11:02 PM ·\" 10.5px",
+        "span.history-delta-add \"+4\" 9.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Revision history"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 408,
+        "clipped": false
+      }
+    },
+    "dialog-template": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 7,
+      "small": [
+        "button.btn \"Save the active entry as\" 238x21",
+        "#template-close \"Cancel\" 63x34"
+      ],
+      "smallCount": 2,
+      "tiny": [
+        "p.eyebrow \"Templates\" 10px",
+        "span.template-option-action \"Use\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Start a new entry"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 621,
+        "clipped": false
+      }
+    },
+    "dialog-card": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 16,
+      "small": [
+        "#card-name \"\" 232x38",
+        "#card-nickname \"\" 232x38",
+        "#card-alt-add \"Add greeting\" 232x34",
+        "#card-tags-input \"\" 214x24",
+        "#card-creator \"\" 232x38",
+        "#card-version \"\" 232x38",
+        "summary \"Advanced\" 232x21",
+        "#card-group-add \"Add group greeting\" 232x34",
+        "#card-depth-depth \"4\" 232x38",
+        "#card-depth-role \"System\n                 \" 232x38",
+        "#card-talkativeness \"0.5\" 232x38",
+        "#card-link-book \"No linked lorebookAurora\" 232x38",
+        "#card-export-format \"PNG card (V3 + V2)\n     \" 143x23",
+        "#card-export \"Export\" 63x34",
+        "#card-cancel \"Cancel\" 63x34",
+        "#card-save \"Save card\" 82x34"
+      ],
+      "smallCount": 16,
+      "tiny": [
+        "p.eyebrow \"Character card\" 10px",
+        "span.hint \"Images are converted to \" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"V3 only. Used instead of\" 10.5px",
+        "span.hint \"How often the character \" 10.5px",
+        "#card-book-info \"Linking a lorebook embed\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:New character card",
+        "h3:Token cost",
+        "h3:Checks"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 728,
+        "clipped": false
+      }
+    },
+    "dialog-search": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [
+        "#global-search-input \"\" 248x40",
+        "#global-regex-toggle \"Treat search as a regula\" 34x34",
+        "#global-search-close \"Close\" 57x34"
+      ],
+      "smallCount": 3,
+      "tiny": [
+        "p.eyebrow \"Global search\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Search all lorebooks"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 282,
+        "clipped": false
+      }
+    },
+    "dialog-replace": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [
+        "#replace-find \"\" 248x38",
+        "#replace-with \"\" 248x38",
+        "#replace-cancel \"Cancel\" 63x34",
+        "#replace-preview \"Preview\" 70x34",
+        "#replace-apply \"Replace all\" 89x34"
+      ],
+      "smallCount": 5,
+      "tiny": [
+        "p.eyebrow \"Bulk replace\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Find and replace"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 580,
+        "clipped": false
+      }
+    },
+    "dialog-shortcuts": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [
+        "#shortcuts-close \"Close\" 57x34"
+      ],
+      "smallCount": 1,
+      "tiny": [
+        "p.eyebrow \"Shortcuts\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Keyboard shortcuts"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 726,
+        "clipped": false
+      }
+    },
+    "dialog-schema": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [
+        "summary \"Project7\" 248x21",
+        "summary \"Book8\" 248x21",
+        "summary \"Entry19\" 248x21",
+        "summary \"Card10\" 248x21",
+        "#schema-close \"Close\" 57x34"
+      ],
+      "smallCount": 5,
+      "tiny": [
+        "p.eyebrow \"Reference\" 10px",
+        "span.count \"7\" 10px",
+        "span.count \"8\" 10px",
+        "span.count \"19\" 10px",
+        "span.count \"10\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Schema reference"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 325,
+        "clipped": false
+      }
+    },
+    "dialog-tokens": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [
+        "#tokenizer-preset \"GPT-3.5 Turbo, GPT-4, te\" 248x38",
+        "#context-window-preset \"4K tokens8K tokens16K to\" 248x38",
+        "#token-settings-close \"Done\" 57x34"
+      ],
+      "smallCount": 3,
+      "tiny": [
+        "p.eyebrow \"Tokens\" 10px",
+        "#tokenizer-preset-hint \"cl100k_base\" 10.5px",
+        "span.hint \"Used for context-window \" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Tokenizer and context window"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 421,
+        "clipped": false
+      }
+    },
+    "dialog-about": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 3,
+      "small": [
+        "#about-guide-btn \"Getting started\" 115x34",
+        "a.btn \"Changelog\" 87x34",
+        "#about-close \"Close\" 57x34"
+      ],
+      "smallCount": 3,
+      "tiny": [
+        "p.eyebrow \"About\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Loreweaver"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 532,
+        "clipped": false
+      }
+    },
+    "dialog-guide": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 1,
+      "small": [
+        "#guide-close \"Close\" 57x34"
+      ],
+      "smallCount": 1,
+      "tiny": [
+        "p.eyebrow \"Getting started\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Create and export your first"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 726,
+        "clipped": false
+      }
+    },
+    "dialog-bookactions": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 5,
+      "small": [
+        "#book-merge-target \"\" 151x34",
+        "#book-merge \"Merge\" 63x34",
+        "#book-actions-close \"Close\" 57x34"
+      ],
+      "smallCount": 3,
+      "tiny": [
+        "p.eyebrow \"Lorebook actions\" 10px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Manage this lorebook"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 491,
+        "clipped": false
+      }
+    },
+    "dialog-palette": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 50,
+      "small": [
+        "#command-option-0 \"Go to EntriesAlt+1\" 258x38",
+        "#command-option-1 \"Go to LibraryAlt+2\" 258x38",
+        "#command-option-2 \"Go to DataAlt+3\" 258x38",
+        "#command-option-3 \"Go to SettingsAlt+4\" 258x38",
+        "#command-option-4 \"Toggle navigation menu\" 258x38",
+        "#command-option-5 \"New entryAlt+N\" 258x38",
+        "#command-option-6 \"New entry from template\" 258x38",
+        "#command-option-7 \"Duplicate entryCtrl+D\" 258x38",
+        "#command-option-8 \"Copy entry\" 258x38",
+        "#command-option-9 \"Pin entryAlt+P\" 258x38",
+        "#command-option-10 \"Delete entry\" 258x38",
+        "#command-option-11 \"New lorebook\" 258x38",
+        "#command-option-12 \"Lorebook actions\" 258x38",
+        "#command-option-13 \"Select entries by token \" 258x38",
+        "#command-option-14 \"Bulk find and replaceCtr\" 258x38",
+        "#command-option-15 \"New character card\" 258x38",
+        "#command-option-16 \"Toggle light theme\" 258x38",
+        "#command-option-17 \"Keyboard shortcuts\" 258x38",
+        "#command-option-18 \"Schema reference\" 258x38",
+        "#command-option-19 \"Print lorebook\" 258x38",
+        "#command-option-20 \"Toggle focus modeCtrl+\\\" 258x38",
+        "#command-option-21 \"Save projectCtrl+S\" 258x38",
+        "#command-option-22 \"Import lorebook\" 258x38",
+        "#command-option-23 \"Export…\" 258x38",
+        "#command-option-24 \"Export project backup\" 258x38"
+      ],
+      "smallCount": 49,
+      "tiny": [
+        "span.command-option-hint \"Alt+1\" 10.5px",
+        "span.command-option-hint \"Alt+2\" 10.5px",
+        "span.command-option-hint \"Alt+3\" 10.5px",
+        "span.command-option-hint \"Alt+4\" 10.5px",
+        "span.command-option-hint \"Alt+N\" 10.5px",
+        "span.command-option-hint \"Ctrl+D\" 10.5px",
+        "span.command-option-hint \"Alt+P\" 10.5px",
+        "span.command-option-hint \"Ctrl+H\" 10.5px",
+        "span.command-option-hint \"Ctrl+\\\" 10.5px",
+        "span.command-option-hint \"Ctrl+S\" 10.5px",
+        "span.command-option-hint \"Ctrl+Shift+F\" 10.5px",
+        "span.command-option-hint \"Ctrl+O\" 10.5px"
+      ],
+      "truncated": [],
+      "offscreen": [],
+      "headings": [
+        "h2:Command palette"
+      ],
+      "dialog": {
+        "w": 286,
+        "h": 414,
+        "clipped": false
+      }
+    },
+    "entries-empty-search": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 48,
+      "small": [
+        "#nav-toggle \"Loreweaver navigation me\" 36x36",
+        "#book-name \"Aurora Vale\" 20x35",
+        "#sample-badge \"Sample\" 56x20",
+        "#undo-btn \"Undo\" 34x34",
+        "#redo-btn \"Redo\" 34x34",
+        "#history-btn \"Revision history\" 34x34",
+        "#import-btn \"Import lorebook\" 35x34",
+        "#export-btn \"Export lorebook or proje\" 35x34",
+        "a.nav-item \"Entries\n          Alt 1\" 223x36",
+        "a.nav-item \"Library\n          Alt 2\" 223x36",
+        "a.nav-item \"Data\n          Alt 3\" 223x36",
+        "a.nav-item \"Settings\n          Alt 4\" 223x36",
+        "#overview-btn \"Overview\" 223x36",
+        "#simulation-btn \"Simulate\" 223x36",
+        "#validation-btn \"Issues\n          0\" 223x36",
+        "#nav-search-btn \"Search all\" 223x36",
+        "#nav-replace-btn \"Find and replace\" 223x36",
+        "#about-btn \"About\" 223x36",
+        "#sidebar-toggle \"Collapse library sidebar\" 32x32",
+        "#book-select \"Active lorebook\" 246x34",
+        "a.icon-btn \"Manage lorebooks and car\" 34x34",
+        "#entry-search \"zzzznomatch\" 252x36",
+        "#regex-toggle \"Treat search as a regula\" 34x34",
+        "button.filter-chip \"Enabled\" 58x26",
+        "button.filter-chip \"Disabled\" 61x26"
+      ],
+      "smallCount": 47,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "span.section-label \"Entries\" 10.5px",
+        "#entry-count \"0/3\" 10px",
+        "span.entry-id \"#6718\" 9.5px"
+      ],
+      "truncated": [
+        "#book-name \"Aurora Vale\""
+      ],
+      "offscreen": [
+        "a.nav-item \"Entries\n          Alt 1\"",
+        "a.nav-item \"Library\n          Alt 2\"",
+        "a.nav-item \"Data\n          Alt 3\"",
+        "a.nav-item \"Settings\n          Alt 4\"",
+        "#overview-btn \"Overview\"",
+        "#simulation-btn \"Simulate\"",
+        "#validation-btn \"Issues\n          0\"",
+        "#nav-search-btn \"Search all\"",
+        "#nav-replace-btn \"Find and replace\"",
+        "#about-btn \"About\""
+      ],
+      "headings": [
+        "h1:Loreweaver"
+      ],
+      "dialog": null
+    },
+    "light-entries": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 49,
+      "small": [
+        "#nav-toggle \"Loreweaver navigation me\" 36x36",
+        "#book-name \"Aurora Vale\" 20x35",
+        "#sample-badge \"Sample\" 56x20",
+        "#undo-btn \"Undo\" 34x34",
+        "#redo-btn \"Redo\" 34x34",
+        "#history-btn \"Revision history\" 34x34",
+        "#import-btn \"Import lorebook\" 35x34",
+        "#export-btn \"Export lorebook or proje\" 35x34",
+        "a.nav-item \"Entries\n          Alt 1\" 223x36",
+        "a.nav-item \"Library\n          Alt 2\" 223x36",
+        "a.nav-item \"Data\n          Alt 3\" 223x36",
+        "a.nav-item \"Settings\n          Alt 4\" 223x36",
+        "#overview-btn \"Overview\" 223x36",
+        "#simulation-btn \"Simulate\" 223x36",
+        "#validation-btn \"Issues\n          0\" 223x36",
+        "#nav-search-btn \"Search all\" 223x36",
+        "#nav-replace-btn \"Find and replace\" 223x36",
+        "#about-btn \"About\" 223x36",
+        "#sidebar-toggle \"Collapse library sidebar\" 32x32",
+        "#book-select \"Active lorebook\" 246x34",
+        "a.icon-btn \"Manage lorebooks and car\" 34x34",
+        "#entry-search \"\" 252x36",
+        "#regex-toggle \"Treat search as a regula\" 34x34",
+        "button.filter-chip \"Enabled\" 58x26",
+        "button.filter-chip \"Disabled\" 61x26"
+      ],
+      "smallCount": 46,
+      "tiny": [
+        "#sample-badge \"Sample\" 9.5px",
+        "#nav-tools-label \"Tools\" 10.5px",
+        "#validation-count \"0\" 10px",
+        "#book-label \"Lorebook\" 10.5px",
+        "button.filter-chip \"Enabled\" 10.5px",
+        "button.filter-chip \"Disabled\" 10.5px",
+        "button.filter-chip \"Always on\" 10.5px",
+        "button.filter-chip \"Missing keys\" 10.5px",
+        "#recent-label \"Recent\" 10.5px",
+        "span.section-label \"Entries\" 10.5px",
+        "#entry-count \"3\" 10px",
+        "span.entry-id \"#6718\" 9.5px"
+      ],
+      "truncated": [
+        "#book-name \"Aurora Vale\""
+      ],
+      "offscreen": [
+        "a.nav-item \"Entries\n          Alt 1\"",
+        "a.nav-item \"Library\n          Alt 2\"",
+        "a.nav-item \"Data\n          Alt 3\"",
+        "a.nav-item \"Settings\n          Alt 4\"",
+        "#overview-btn \"Overview\"",
+        "#simulation-btn \"Simulate\"",
+        "#validation-btn \"Issues\n          0\"",
+        "#nav-search-btn \"Search all\"",
+        "#nav-replace-btn \"Find and replace\"",
+        "#about-btn \"About\""
+      ],
+      "headings": [
+        "h1:Loreweaver"
+      ],
+      "dialog": null
+    },
+    "light-library": {
+      "viewport": [
+        320,
+        760
+      ],
+      "overflowX": 0,
+      "targets": 9,
+      "small": [
+        "#book-actions-btn \"Lorebook actions\" 90x34",
+        "#new-book-btn \"New lorebook\" 131x34",
+        "#delete-book-btn \"Delete lorebook\" 85x34",
+        "summary \"Description\n            \" 238x30",
+        "#book-tags-input \"\" 222x24",
+        "#book-token-budget \"0\" 240x38",
+        "summary \"New-entry defaults\" 240x37",
+        "#new-card-btn \"New character card\" 34x34"
+      ],
+      "smallCount": 8,
+      "tiny": [
+        "#book-count \"1\" 10px",
+        "span.section-label \"Description\" 10.5px",
+        "span.hint \"optional\" 10.5px",
+        "span.hint \"0 = off\" 10.5px",
+        "#book-budget-status \"218 enabled tokens\" 10.5px",
+        "span.section-label \"New-entry defaults\" 10.5px",
+        "span.hint \"Applies to entries creat\" 10.5px",
+        "#card-label \"Character cards\" 10.5px",
+        "#card-count \"0\" 10px",
+        "p.card-list-empty \"No cards yet. Add one to\" 10.5px"
+      ],
+      "truncated": [
+        "#book-description-preview \"A storm-worn coastal cit\""
+      ],
+      "offscreen": [],
+      "headings": [
+        "h2:Library",
+        "h3:Lorebooks",
+        "h3:Active lorebook settings"
+      ],
+      "dialog": null
+    }
+  }
+}

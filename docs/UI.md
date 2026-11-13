@@ -8,21 +8,52 @@
 
 ---
 
-## 1. Layout
+## 1. Layout and navigation
 
 ```text
-+------------------------------------------------------------------+
-| brand | lorebook name | save state                  Import Export |
-+----------------+-------------------------------------------------+
-| lorebook switcher | entry name            Enabled   Delete      |
-| search            | trigger keys | secondary keys               |
-| entry list        | content + live statistics                    |
-|                   | injection settings + option chips            |
-| new entry         |                                             |
-+----------------+-------------------------------------------------+
++--------------------------------------------------------------------------+
+| [mark Loreweaver v] | lorebook name | save state          Open Save Import Export |
++-----------+---------------------+-----------------------------+----------+
+| Entries   | Entries (sidebar)   | entry name        Enabled   | Details  |
+| Library   | lorebook picker     | trigger keys | secondary    |          |
+| Data      | search + filters    | content + live statistics   |          |
+| Settings  | entry list (fills)  | author notes                |          |
+| Tools     | bulk bar            |                             |          |
+|  Overview | New entry           |                             |          |
+|  Simulate |                     |                             |          |
+|  Issues   |                     |                             |          |
+|  Search   |                     |                             |          |
+|  Replace  |                     |                             |          |
+| About     |                     |                             |          |
++-----------+---------------------+-----------------------------+----------+
 ```
 
-The sidebar is the library. The main pane is the document. There are no nested settings pages.
+**The brand is the main navigation.** The logo and name at the left of the header is a button that
+expands and collapses the navigation menu, the same way the entries sidebar collapses. Expanded it is a
+208 px menu with labels and shortcuts; collapsed it is a 54 px icon rail with tooltips. The choice
+persists. At 780 px and below the menu is an overlay opened from the same button and closed on selection
+or `Escape`.
+
+**The app is a set of pages.** The menu switches between:
+
+| Page | Hash | Shortcut | Holds |
+| --- | --- | --- | --- |
+| Entries | `#/entries` | `Alt+1` | the entries sidebar, entry editor and details panel (default) |
+| Library | `#/library` | `Alt+2` | the lorebook list, active lorebook settings and entry defaults, character cards |
+| Data | `#/data` | `Alt+3` | import, export, project files, pre-import backup, storage and persistence, integrity, import log |
+| Settings | `#/settings` | `Alt+4` | theme, density, tokenizer, shortcuts, schema reference, guide |
+
+The **Tools** group in the menu opens the Overview, Simulate, Issues, Search all and Find and replace
+dialogs; **About** opens the About dialog. Every page and tool is also a command-palette entry
+(`Go to Library`, and so on).
+
+The location hash is the only source of truth for the current page (`src/views.js`), so the Back
+button, reloads and links work and the UI holds no view state of its own. The window title names the
+page when it is not Entries.
+
+The **Entries sidebar** holds only what is needed to find and open an entry: a compact lorebook picker
+(with a link to the Library), search, filters, a collapsed Recent list, the sort control, the entry list
+(which takes all remaining height), the bulk bar and the New entry actions.
 
 ## 2. Design tokens
 
@@ -68,12 +99,12 @@ the About panel and the command palette and persists locally. Both themes are he
 - Destructive actions require confirmation; ordinary actions do not.
 - Import confirmation is a diff review with format, counts, warnings, a strategy control and the
   resulting book and entry changes. It creates a pre-import backup before applying.
-- The export dialog offers a full project backup plus single-book native, SillyTavern, Chub and
-  character-book targets, and reports local storage usage.
+- The export dialog is only about choosing an output. Targets are grouped (Recommended, Other frontends,
+  Loreweaver files, Character card). Backup, restore and storage diagnostics live on the Data page.
 - Above 120 entries the sidebar windows the list: only visible rows plus an 8-row overscan render,
   spacers hold the scroll height, and the active card stays focused.
-- Book descriptions live in a collapsible lorebook-information section with a one-line preview, beside
-  the overview and validation controls.
+- Book descriptions, tags, the token budget and new-entry defaults live in the Library page's active
+  lorebook settings; the overview and validation controls are Tools in the navigation menu.
 - The validation control summarizes issues; its dialog groups issues by type, lets category counts
   filter the list, and jumps to the affected entry.
 - The lorebook actions dialog duplicates, splits or merges the active book; merging remaps ids.
@@ -95,10 +126,12 @@ the About panel and the command palette and persists locally. Both themes are he
 
 ## 7. Responsive behavior
 
-- Above 780 px: auto-fitted 200-460 px library plus fluid editor; never overflow horizontally.
-- 780 px and below: stacked library above the editor with internally scrolling content and a compact
-  header.
-- Collapsing the library uses a 50 px rail at every width.
+- Above 780 px: navigation menu (208 px, or a 54 px rail), auto-fitted 200-460 px entries sidebar and a
+  fluid editor; never overflow horizontally.
+- 780 px and below: the navigation menu is an overlay, the sidebar is the library drawer, and the header is
+  compact.
+- Collapsing the entries sidebar uses a 50 px rail at every width.
+- 600 px and below: the header drops Open and Save (they stay on the Data page and in the palette).
 - 1000 px and below: two-column settings.
 - 900 px and below: compact topbar, brand text hidden.
 - 600 px and below: single-column fields, icon-only import/export.
@@ -106,13 +139,36 @@ the About panel and the command palette and persists locally. Both themes are he
 
 ## 8. Known gaps
 
-- A mobile library drawer is deferred (DEF-030).
+- The Tools (Overview, Simulate, Issues, History) are still dialogs; promoting them to pages belongs to
+  the UI redesign (DEF-126).
+- The card editor is still a dialog (DEF-124).
 - A light theme ships opt-in (DEF-031); both themes pass `npm run contrast` (DEF-112).
 - There is no density option or remembered text-area height (DEF-032, DEF-033).
 - Virtualized rows hide tag chips and the matched-field note; the full card returns when the list is
   narrow or below the windowing threshold.
 
-## 9. Definition of done
+## 9. UI evaluation and redesign (planned, P5)
+
+The navigation and page split fixed the worst clutter, but the interface has grown feature by feature
+and has never had a deliberate evaluation. Before v1 it gets one (DEF-125) and a redesign that acts on it
+(DEF-126):
+
+1. **Evaluate** with evidence (done, see `docs/reference/ui-review/REVIEW.md`): a heuristic review of every page and dialog against the design tokens, a
+   task-based walk-through of the five core jobs (write a book, import and fix a SillyTavern book, build a
+   card, check a book before export, move a project between browsers) at 1440, 1024, 390 and 320 px, a
+   keyboard-only and screen-reader pass (DEF-043), and screenshots of each state kept under
+   `docs/reference/ui-review/`. Findings are ranked and each becomes a ledger row or a fix.
+2. **Redesign** what the evaluation proves: the visual language (type scale, density, colour roles, icon
+   set), the page information architecture, Tools promoted to pages, a card workspace, empty and loading
+   states (DEF-002, DEF-104), and a consistent component set so a new surface is assembled, not invented.
+3. **Hold the redesign to the gates**: axe zero violations, `npm run contrast`, the e2e suite, and a
+   scenario per page.
+
+Lorebooks and character cards get the same care and presentation: every finding is asked of both, and
+the review holds a parity matrix. The pass may change layout and styling freely; it may not change the data model, the adapter contract or
+the pure core.
+
+## 10. Definition of done
 
 A surface change ships with an axe pass at 1440, 390 and 320 px, a focus-target check, keyboard access,
 and a browser scenario. A new dialog is added to `e2e/a11y.mjs` in the same change.

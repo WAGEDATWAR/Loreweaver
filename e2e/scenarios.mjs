@@ -17,6 +17,11 @@ async function resetApp(page) {
   await dismissOnboarding(page);
 }
 
+async function openPage(page, view) {
+  await page.evaluate(`location.hash = "#/${view}"; true`);
+  await page.waitFor(`!document.querySelector("#page-${view}")?.hidden`);
+}
+
 async function appState(page) {
   return page.evaluate(`(() => ({
     book: document.querySelector("#book-name")?.value ?? "",
@@ -531,6 +536,109 @@ export const scenarios = [
     }
   },
   {
+    name: "navigates between pages with the menu, hash and shortcuts",
+    timeout: 40000,
+    async run(page) {
+      await resetApp(page);
+      assert.equal(await page.evaluate('document.querySelector("#sidebar").hidden'), false);
+      assert.equal(await page.evaluate('document.querySelector(".nav-item[data-view=entries]").getAttribute("aria-current")'), "page");
+
+      await page.click('.nav-item[data-view="library"]');
+      await page.waitFor('!document.querySelector("#page-library")?.hidden');
+      assert.equal(await page.evaluate('document.querySelector("#sidebar").hidden'), true);
+      assert.equal(await page.evaluate('location.hash'), "#/library");
+      assert.equal(await page.evaluate('document.querySelector(".nav-item[data-view=library]").getAttribute("aria-current")'), "page");
+      assert.equal(await page.evaluate('document.querySelectorAll("#book-list .book-item").length'), 1);
+      assert.match(await page.evaluate("document.title"), /^Library/);
+
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "3", altKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('!document.querySelector("#page-data")?.hidden');
+      await page.waitFor('document.querySelector("#storage-usage-backend")?.textContent !== "\u2014"');
+
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "4", altKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('!document.querySelector("#page-settings")?.hidden');
+
+      await page.evaluate('history.back(); true');
+      await page.waitFor('!document.querySelector("#page-data")?.hidden');
+
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "1", altKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('document.querySelector("#sidebar")?.hidden === false');
+      assert.equal(await page.evaluate('document.querySelector("#page-data").hidden'), true);
+
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('document.querySelector("#command-dialog")?.open');
+      assert.equal(await page.evaluate('document.querySelector("#command-dialog").textContent.includes("Go to Library")'), true);
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "collapses and expands the navigation menu and remembers it",
+    async run(page) {
+      await resetApp(page);
+      await page.setViewport(1440, 900);
+      await sleep(100);
+      assert.equal(await page.evaluate('document.querySelector(".shell").dataset.nav'), "expanded");
+      assert.equal(await page.evaluate('document.querySelector("#nav-toggle").getAttribute("aria-expanded")'), "true");
+
+      await page.click("#nav-toggle");
+      await page.waitFor('document.querySelector(".shell").dataset.nav === "collapsed"');
+      assert.equal(await page.evaluate('document.querySelector("#nav-toggle").getAttribute("aria-expanded")'), "false");
+      await page.waitFor('document.querySelector("#app-nav").getBoundingClientRect().width < 80');
+
+      await page.reload();
+      await page.waitFor('document.querySelector(".shell")?.dataset.nav === "collapsed"');
+      await page.click("#nav-toggle");
+      await page.waitFor('document.querySelector(".shell").dataset.nav === "expanded"');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "shows the entry list without scrolling the sidebar",
+    async run(page) {
+      await resetApp(page);
+      await page.setViewport(1440, 900);
+      await sleep(150);
+      const box = await page.evaluate(`(() => {
+        const list = document.querySelector("#entry-list").getBoundingClientRect();
+        return { top: list.top, height: list.height, viewport: window.innerHeight };
+      })()`);
+      assert.ok(box.top < box.viewport * 0.6, `entry list starts too low (${box.top}px)`);
+      assert.ok(box.height >= 140, `entry list is too short (${box.height}px)`);
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "manages lorebooks and cards from the library page",
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "library");
+      await page.click("#new-book-btn");
+      await page.waitFor('document.querySelectorAll("#book-list .book-item").length === 2');
+      await page.evaluate('document.querySelectorAll("#book-list .book-item")[0].click(); true');
+      await page.waitFor('document.querySelector("#book-list .book-item.is-active")?.textContent.includes("Aurora Vale")');
+      await page.click("#new-card-btn");
+      await page.waitFor('document.querySelector("#card-dialog")?.open');
+      await page.click("#card-cancel");
+      await page.waitFor('!document.querySelector("#card-dialog")?.open');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "opens backup and storage details from the data page",
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "data");
+      await page.waitFor('document.querySelector("#storage-usage-backend")?.textContent === "IndexedDB"');
+      assert.equal(await page.evaluate('document.querySelector("#backup-status").textContent.length > 0'), true);
+      await page.click("#data-export-btn");
+      await page.waitFor('document.querySelector("#export-dialog")?.open');
+      assert.equal(await page.evaluate('document.querySelector("#export-dialog #storage-usage-backend")'), null);
+      await page.click("#export-data-link");
+      await page.waitFor('!document.querySelector("#export-dialog")?.open');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "registers a service worker and caches the shell",
     timeout: 30000,
     async run(page) {
@@ -570,11 +678,10 @@ export const scenarios = [
     name: "toggles compact density and keeps textarea heights",
     async run(page) {
       await resetApp(page);
-      await page.click("#about-btn");
-      await page.waitFor('document.querySelector("#about-dialog")?.open');
+      await openPage(page, "settings");
       await page.click("#about-density-btn");
       await page.waitFor('document.documentElement.dataset.density === "compact"');
-      await page.click("#about-close");
+      await openPage(page, "entries");
 
       await page.evaluate(`(() => {
         const textarea = document.querySelector("#entry-content");
@@ -595,8 +702,7 @@ export const scenarios = [
     name: "toggles a persistent light theme",
     async run(page) {
       await resetApp(page);
-      await page.click("#about-btn");
-      await page.waitFor('document.querySelector("#about-dialog")?.open');
+      await openPage(page, "settings");
       await page.click("#about-theme-btn");
       await page.waitFor('document.documentElement.dataset.theme === "light"');
       const pressed = await page.evaluate('document.querySelector("#about-theme-btn").getAttribute("aria-pressed")');
@@ -704,13 +810,10 @@ export const scenarios = [
       await page.waitFor('!document.querySelector("#diff-dialog")?.open');
       await sleep(300);
 
-      await page.click("#about-btn");
-      await page.waitFor('document.querySelector("#about-dialog")?.open');
+      await openPage(page, "data");
       await page.waitFor('document.querySelector("#about-audit")?.textContent.includes("sillytavern-world-info.json")');
       const log = await page.evaluate('document.querySelector("#about-audit").textContent');
       assert.match(log, /SillyTavern/);
-      assert.match(log, /SillyTavern/);
-      await page.click("#about-close");
       assert.deepEqual(page.errors, []);
     }
   },
@@ -1002,8 +1105,9 @@ export const scenarios = [
       await page.waitFor('document.querySelector("#export-options [data-export-format]")');
 
       const order = await page.evaluate('[...document.querySelectorAll("#export-options [data-export-format]")].map((node) => node.dataset.exportFormat)');
-      assert.equal(order[0], "project");
-      assert.equal(order[1], "sillytavern");
+      assert.equal(order[0], "sillytavern");
+      assert.ok(order.includes("project"));
+      assert.equal(await page.evaluate('document.querySelector("#export-options .export-group-title").textContent'), "Recommended");
       const meta = await page.evaluate('document.querySelector("#export-options [data-export-format=\\"sillytavern\\"] .export-option-meta").textContent');
       assert.match(meta, /primary/);
 
@@ -1550,8 +1654,7 @@ export const scenarios = [
     name: "switches tokenizer and context window presets",
     async run(page) {
       await resetApp(page);
-      await page.evaluate('document.querySelector("#about-btn").click(); true');
-      await page.waitFor('document.querySelector("#about-dialog")?.open');
+      await openPage(page, "settings");
       await page.click("#about-token-btn");
       await page.waitFor('document.querySelector("#token-settings-dialog")?.open');
       await page.waitFor('document.querySelector("#tokenizer-preset")?.options.length === 2');
@@ -1612,8 +1715,7 @@ export const scenarios = [
     name: "checks project data integrity",
     async run(page) {
       await resetApp(page);
-      await page.evaluate('document.querySelector("#about-btn").click(); true');
-      await page.waitFor('document.querySelector("#about-dialog")?.open');
+      await openPage(page, "data");
       await page.click("#about-integrity-btn");
       await page.waitFor('document.querySelector("#integrity-dialog")?.open');
       await page.waitFor('document.querySelector("#integrity-summary").textContent.includes("No integrity issues")');

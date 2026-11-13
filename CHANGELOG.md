@@ -16,6 +16,21 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- A UI evaluation (DEF-125): `npm run ui:review` captures 24 states at four widths with layout metrics,
+  `npm run ui:keyboard` walks focus and dialogs, and `docs/reference/ui-review/REVIEW.md` ranks 15
+  findings and holds a lorebook and card parity matrix. New ledger rows DEF-128 to DEF-134; decision U-11.
+
+- A navigation menu and pages. The logo and name in the header now open an expandable and collapsible
+  menu (a 54 px rail when collapsed, an overlay on phones) that switches between Entries, Library, Data and
+  Settings, with the Overview, Simulate, Issues, Search and Replace tools and About below. Pages are
+  routed by the location hash and have `Alt+1`-`Alt+4` shortcuts and `Go to` palette commands.
+- A Library page (lorebook list, active lorebook settings, entry defaults, character cards), a Data
+  page (import, export, project files, backup and restore, storage and persistence, integrity, import
+  log) and a Settings page (theme, density, tokenizer, shortcuts, schema reference, guide).
+- The export dialog groups targets (Recommended, Other frontends, Loreweaver files, Character card); the
+  About dialog links to the changelog (DEF-038).
+- A UI evaluation and redesign on the roadmap before v1 (DEF-125, DEF-126, DEF-127; decision U-10).
+
 - Character card parity with lorebooks: a full editor (description, nickname, alternate and group-only
   greetings, tags, depth prompt, talkativeness), a live token report split into always-sent, examples
   and opening, a card checks panel, duplicate, a discard-changes guard, image conversion to PNG, and
@@ -93,6 +108,13 @@ Mobile preview builds, bulk authoring tools and the completed scale phase.
 ## [0.7.4] - 2026-10-22
 
 ### Fixed
+
+- The command palette interleaved entry commands with the page commands, a stray marker sat above the
+  Recent list, and the card dialog's token panel overlapped its form on phones.
+
+- The entry list was buried at the bottom of a scrolling sidebar and only 16 px tall at 1440x900; the
+  sidebar now holds only entry navigation and the list takes the remaining height.
+- `.btn-danger` text failed contrast in the light theme.
 
 - Character cards: the V2/V3 `description` field was missing (it sat unseen in the unknown-fields bucket),
   a card's `data.extensions` (world, depth prompt, talkativeness, regex scripts) was dropped on import,

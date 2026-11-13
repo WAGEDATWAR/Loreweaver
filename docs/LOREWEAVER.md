@@ -84,7 +84,8 @@ Each phase in `TODO.md` has a gate in `PLAN.md`. A regression blocks the next ph
 - **P3 - Context intelligence.** Real tokenizer, budget, collision and coverage detection, simulation,
   regex keys.
 - **P4 - Scale and durability.** IndexedDB, project files, longer retention, virtualization, export diff.
-- **P5 - Release.** Character cards, onboarding, themes, guide, a11y audit, browser suite, deployment.
+- **P5 - Release.** Character cards, onboarding, themes, guide, a11y audit, browser suite, deployment, and
+  a UI evaluation and redesign (DEF-125, DEF-126) before the v1 tag.
 - **P6 - Component (post-v1, separate repo).** Extract the pure core and a headless surface so a consumer
   can embed the editor (G-14, G-15). It tracks v1; it does not gate it.
 
@@ -96,6 +97,8 @@ Each phase in `TODO.md` has a gate in `PLAN.md`. A regression blocks the next ph
 - A new user creates and exports a first lorebook without external documentation.
 - A card imports, round-trips through PNG and CHARX, and exports with its book.
 - Every gate is green on `main`; `npm run a11y` reports zero serious violations.
+- The interface has had a documented evaluation and a redesign that acts on it, with every page and
+  dialog held to the same component set.
 - The pure modules still import no DOM, storage or `main.js` at v1, so extraction stays a lift.
 
 ## 9. Measurement

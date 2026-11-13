@@ -4,7 +4,7 @@ Loreweaver is a local-first editor for lorebooks used in LLM roleplay frontends.
 
 ## Create your first lorebook
 
-1. **Name your lorebook.** The title field at the top of the window names the active lorebook. Use the sidebar dropdown to switch between lorebooks or add a new one with the `+` button.
+1. **Name your lorebook.** The title field at the top of the window names the active lorebook. Use the sidebar dropdown to switch between lorebooks; add, duplicate or delete them on the Library page (Alt+2).
 2. **Add entries.** Choose **New entry** or **From template**, then fill in the title and content. Content is the text injected when the entry activates.
 3. **Add trigger keys.** Type keys as chips: press `Enter` or `,` to add one, paste a comma- or newline-separated list, or write a regex key as `/pattern/i`. Always-on entries skip key matching entirely.
 4. **Organize and search.** Add tags to entries and lorebooks, then filter the list by tag or by status (enabled, disabled, always-on, missing keys). Search highlights matches and shows which fields matched.

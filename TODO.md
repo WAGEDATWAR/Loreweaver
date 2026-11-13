@@ -58,8 +58,10 @@ Planned in `docs/LOREWEAVER.md` 7. Each gate is measured; a regression blocks th
 Ordered by value per effort; every open ledger row, nothing outside the current phase. Done items live in
 `DEFERRALS.md` and Recently landed.
 
+- [x] UI evaluation done (DEF-125): `docs/reference/ui-review/REVIEW.md`.
+- [ ] `VH` `P5` UI redesign from the evaluation, in the order of its section 6 (DEF-126, DEF-128 to
+      DEF-134). Lorebooks and cards get the same care and presentation throughout.
 - [ ] `L` `P5` Hide field hints while a field has content (DEF-095).
-- [ ] `L` `P5` A changelog link in the About panel (DEF-038).
 - [ ] `L` `P5` Richer empty and search states, and loading/error states for async actions (DEF-002, DEF-104).
 - [ ] `M` `P5` JSON/YAML plain export for scripting (DEF-017).
 - [ ] `M` `P5` An optional UI-state block in project files (DEF-105).
@@ -102,19 +104,35 @@ defect or risk, **S3** improvement.
 - [ ] **S3** Import limits are scattered (25 MB in `limits.js`, a hard-coded "25 MB" toast and an 8 MB
       avatar limit in `main.js`, 32 MB in `cardPng.js`); centralise in `limits.js`.
 
+### UI evaluation and redesign (P5, before the v1 tag)
+
+- [x] Evaluate (DEF-125): 24 states at four widths, a keyboard pass, a ranked review and a lorebook and
+      card parity matrix in `docs/reference/ui-review/REVIEW.md`. A real screen-reader pass is still open
+      (DEF-043).
+- [ ] `H` Foundation: type scale with a 12 px floor, touch density, one focus style, finish the light
+      theme (DEF-130, DEF-131, DEF-132).
+- [ ] `H` Responsive model: phone master-detail and mid-width drawers (DEF-128, DEF-129).
+- [ ] `H` Card and lorebook parity in the interface: a card workspace built from the shared page anatomy,
+      list, tokens, notes, bulk and history (DEF-134, DEF-117 to DEF-124).
+- [ ] `M` A Review page for books and cards (DEF-133).
+- [ ] `VH` Redesign (DEF-126): type scale, density, colour roles, icon set; a consistent component set;
+      Tools (Overview, Simulate, Issues, History) as pages; a card workspace (DEF-124); empty, loading and
+      error states (DEF-002, DEF-104).
+- [ ] `L` Command palette scoped to the current page, with recent pages (DEF-127).
+
 ### UI and UX
-- [ ] **S1** The entry list, the core navigation, is buried: at 1440x900 it starts at y=919 and is 16px
+- [x] **S1** The entry list, the core navigation, is buried: at 1440x900 it starts at y=919 and is 16px
       tall, below the lorebook info, defaults, Overview/Simulate/Issues, cards, recent list, search and
       footer. A user must scroll the sidebar to find entries. Give the entry list the flexible height,
       collapse lorebook info/cards/recent into collapsible groups, and move Overview/Simulate/Issues to the
       header or a tool rail.
-- [ ] **S2** The sidebar carries too many jobs (book picker, book meta, entry defaults, tools, cards,
+- [x] **S2** The sidebar carries too many jobs (book picker, book meta, entry defaults, tools, cards,
       recent, search, filters, entries, create actions). Split into Library (books/cards) and Entries.
-- [ ] **S2** The Export dialog mixes export formats, backup restore and storage diagnostics; storage and
+- [x] **S2** The Export dialog mixes export formats, backup restore and storage diagnostics; storage and
       backup belong in a Data/Settings dialog. "Loreweaver book" vs "Interchange lorebook" vs "Character
       book" needs plain-language naming or grouping (primary / compatibility / advanced). Card export lives
       elsewhere; surface it.
-- [ ] **S2** The About dialog doubles as a settings panel (theme, density, audit log, shortcuts, guide).
+- [x] **S2** The About dialog doubles as a settings panel (theme, density, audit log, shortcuts, guide).
       Create a real Settings dialog and keep About for version and links.
 - [ ] **S3** The collapsed "New-entry defaults" disclosure shows a bare triangle and an orphan label.
 - [ ] **S3** The header has many icon-only buttons (palette, undo, redo, history); add visible labels or

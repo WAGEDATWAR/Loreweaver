@@ -24,7 +24,9 @@
     "lint": "node scripts/lint.mjs",
     "format": "node scripts/format.mjs",
     "format:write": "node scripts/format.mjs --write",
-    "release:check": "node scripts/release-check.mjs"
+    "release:check": "node scripts/release-check.mjs",
+    "ui:review": "node --no-warnings scripts/ui-review.mjs",
+    "ui:keyboard": "node --no-warnings scripts/ui-keyboard.mjs"
   },
   "devDependencies": {
     "@capacitor/android": "^6.2.3",
@@ -34,7 +36,3 @@
     "gpt-tokenizer": "^4.1.0"
   }
 }
-
-
-
-

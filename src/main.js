@@ -142,6 +142,8 @@ import { buildCardTokenReport } from "./cardTokens.js";
 import { validateCardRecord } from "./cardValidation.js";
 import { clamp } from "./utils.js";
 import { createTabGuard } from "./tabGuard.js";
+import { VIEWS, getView, parseViewHash, viewForShortcut, viewHref } from "./views.js";
+import { renderBookList } from "./ui/books.js";
 import { selectEntriesByTokenSize } from "./bulk.js";
 import { applyReplace, parseReplaceQuery, planReplace } from "./replace.js";
 import { VALIDATION_LABELS, validateBook } from "./validation.js";
@@ -149,6 +151,7 @@ import { VALIDATION_LABELS, validateBook } from "./validation.js";
 const refs = {
   workspace: document.querySelector(".workspace"),
   sidebar: document.querySelector("#sidebar"),
+  editorMain: document.querySelector("main.editor"),
   sidebarContent: document.querySelector("#sidebar-content"),
   sidebarToggle: document.querySelector("#sidebar-toggle"),
   sidebarResizer: document.querySelector("#sidebar-resizer"),
@@ -216,6 +219,21 @@ const refs = {
   storageBanner: document.querySelector("#storage-banner"),
   storageBannerMessage: document.querySelector("#storage-banner-message"),
   storageExportBtn: document.querySelector("#storage-export-btn"),
+  shell: document.querySelector(".shell"),
+  appNav: document.querySelector("#app-nav"),
+  navToggle: document.querySelector("#nav-toggle"),
+  navItems: [...document.querySelectorAll(".nav-item[data-view]")],
+  pages: [...document.querySelectorAll(".page")],
+  bookList: document.querySelector("#book-list"),
+  bookCount: document.querySelector("#book-count"),
+  dataImportBtn: document.querySelector("#data-import-btn"),
+  dataExportBtn: document.querySelector("#data-export-btn"),
+  dataOpenBtn: document.querySelector("#data-open-btn"),
+  dataSaveBtn: document.querySelector("#data-save-btn"),
+  navSearchBtn: document.querySelector("#nav-search-btn"),
+  navReplaceBtn: document.querySelector("#nav-replace-btn"),
+  settingsGuideBtn: document.querySelector("#settings-guide-btn"),
+  exportDataLink: document.querySelector("#export-data-link"),
   tabBanner: document.querySelector("#tab-banner"),
   tabBannerTitle: document.querySelector("#tab-banner-title"),
   tabBannerMessage: document.querySelector("#tab-banner-message"),
@@ -780,6 +798,117 @@ function syncSidebarWidthToViewport() {
   applySidebarWidth(sidebarWidthMode === "auto" ? measureSidebarContentWidth() : readSidebarWidth() ?? sidebarWidth);
 }
 
+const NAV_STATE_KEY = storageKey("nav-expanded:v1");
+const MOBILE_NAV_QUERY = window.matchMedia("(max-width: 780px)");
+let currentView = "entries";
+
+function readNavExpanded() {
+  try {
+    const stored = localStorage.getItem(NAV_STATE_KEY);
+
+    if (stored === "1" || stored === "0") {
+      return stored === "1";
+    }
+  } catch {
+    return window.innerWidth >= 1200;
+  }
+
+  return window.innerWidth >= 1200;
+}
+
+function setNavExpanded(expanded, persist = true) {
+  refs.shell.dataset.nav = expanded ? "expanded" : "collapsed";
+  refs.navToggle.setAttribute("aria-expanded", String(expanded));
+
+  if (persist) {
+    try {
+      localStorage.setItem(NAV_STATE_KEY, expanded ? "1" : "0");
+    } catch {
+      return;
+    }
+  }
+}
+
+function setMobileNavOpen(open) {
+  refs.shell.classList.toggle("is-nav-open", open);
+  refs.navToggle.setAttribute("aria-expanded", String(open));
+}
+
+function toggleNav() {
+  if (MOBILE_NAV_QUERY.matches) {
+    setMobileNavOpen(!refs.shell.classList.contains("is-nav-open"));
+    return;
+  }
+
+  setNavExpanded(refs.shell.dataset.nav !== "expanded");
+}
+
+function showView(id, { focusHeading = false } = {}) {
+  currentView = getView(id).id;
+  refs.workspace.dataset.view = currentView;
+  const onEntries = currentView === "entries";
+  refs.sidebar.hidden = !onEntries;
+  refs.editorMain.hidden = !onEntries;
+
+  for (const page of refs.pages) {
+    page.hidden = page.id !== `page-${currentView}`;
+  }
+
+  for (const item of refs.navItems) {
+    if (item.dataset.view === currentView) {
+      item.setAttribute("aria-current", "page");
+    } else {
+      item.removeAttribute("aria-current");
+    }
+  }
+
+  if (MOBILE_NAV_QUERY.matches) {
+    setMobileNavOpen(false);
+  }
+
+  if (currentView === "library") {
+    renderBookList(refs);
+    renderCardList(refs);
+  } else if (currentView === "data") {
+    refreshBackupStatus();
+    refreshStorageUsage();
+    refs.aboutAuditLog.textContent = formatAudit(readAuditLog());
+  } else if (currentView === "settings") {
+    syncThemeButton();
+    syncDensityButton();
+  }
+
+  updateDocumentTitle();
+
+  if (focusHeading && !onEntries) {
+    document.querySelector(`#${currentView}-title`)?.focus({ preventScroll: true });
+  }
+}
+
+function goToView(id) {
+  const target = viewHref(id);
+
+  if (window.location.hash !== target) {
+    window.location.hash = target;
+  }
+
+  showView(id, { focusHeading: true });
+}
+
+function ensureEntriesView() {
+  if (currentView !== "entries") {
+    goToView("entries");
+  }
+}
+
+window.addEventListener("hashchange", () => {
+  const next = parseViewHash(window.location.hash);
+
+  if (next !== currentView) {
+    showView(next, { focusHeading: true });
+  }
+});
+
 function setSidebarCollapsed(collapsed, persist = true) {
   refs.sidebar.classList.toggle("is-collapsed", collapsed);
   refs.workspace.classList.toggle("is-sidebar-collapsed", collapsed);
@@ -1306,6 +1435,7 @@ function openGlobalSearchDialog() {
 
 function handleGlobalSearchJump(bookId, entryId) {
   refs.globalSearchDialog.close();
+  ensureEntriesView();
   setActiveBook(bookId);
   clearSearch();
   setActiveEntry(entryId);
@@ -1460,6 +1590,13 @@ function commandToggleFilter(name) {
 function buildCommands() {
   const entry = getActiveEntry();
   const commands = [
+    ...VIEWS.map((view) => ({
+      title: `Go to ${view.label}`,
+      hint: view.shortcut,
+      keywords: ["page", "navigate", "open", view.id],
+      run: () => goToView(view.id)
+    })),
+    { title: "Toggle navigation menu", keywords: ["menu", "sidebar", "collapse", "layout"], run: toggleNav },
     { title: "New entry", hint: "Alt+N", keywords: ["add", "create"], run: handleAddEntry },
     { title: "New entry from template", keywords: ["add", "create", "starter"], run: openTemplateDialog },
     { title: "New lorebook", keywords: ["add", "create", "book"], run: () => {
@@ -1512,7 +1649,7 @@ function buildCommands() {
   ];
 
   if (entry) {
-    commands.splice(2, 0,
+    commands.splice(commands.findIndex((command) => command.title === "New entry from template") + 1, 0,
       { title: "Duplicate entry", hint: "Ctrl+D", keywords: ["copy"], run: handleDuplicateEntry },
       { title: "Copy entry", keywords: ["clipboard", "copy"], run: handleCopyEntry },
       {
@@ -1660,7 +1797,9 @@ async function saveProjectFile({ saveAs = false } = {}) {
 
 function updateDocumentTitle() {
   const book = getActiveBook();
-  document.title = `${book?.name.trim() || "Untitled Lorebook"} — Loreweaver ${appVersion()}`;
+  const view = getView(currentView);
+  const where = currentView === "entries" ? "" : `${view.label} · `;
+  document.title = `${where}${book?.name.trim() || "Untitled Lorebook"} — Loreweaver ${appVersion()}`;
 }
 
 function updateHistoryButtons() {
@@ -1687,6 +1826,7 @@ function renderAll() {
   refs.bookTagChips?.setKeys(book?.tags ?? []);
   renderSidebar(refs);
   renderCardList(refs);
+  renderBookList(refs);
   renderRecentList(refs);
   renderEditor(refs);
   updateHistoryButtons();
@@ -2274,57 +2414,75 @@ function createExportOption({ id, title, description, meta }) {
   return button;
 }
 
+const EXPORT_GROUPS = [
+  { label: "Recommended", ids: ["sillytavern", "project"] },
+  { label: "Other frontends", ids: ["chub", "risu", "characterbook", "content-format"] },
+  { label: "Loreweaver files", ids: ["native"] }
+];
+
+function createExportGroup(label, options) {
+  const group = document.createElement("div");
+  const heading = document.createElement("h3");
+
+  group.className = "export-group";
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", label);
+  heading.className = "export-group-title";
+  heading.textContent = label;
+  group.append(heading, ...options);
+  return group;
+}
+
 function renderExportOptions() {
   const card = getActiveCard();
-  const options = [
-    createExportOption({
+  const byId = new Map([
+    ["project", createExportOption({
       id: "project",
       title: "Project backup",
       description: "Every lorebook, card and setting in one restorable file.",
       meta: "Project"
-    }),
-    ...EXPORT_FORMATS.map((format) => createExportOption({
+    })],
+    ...EXPORT_FORMATS.map((format) => [format.id, createExportOption({
       id: format.id,
       title: format.label,
       description: format.description,
       meta: format.primary ? "Book \u00b7 primary" : "Book"
-    }))
-  ];
+    })])
+  ]);
+  const groups = [];
+  const used = new Set();
+
+  for (const group of EXPORT_GROUPS) {
+    const options = group.ids.filter((id) => byId.has(id)).map((id) => {
+      used.add(id);
+      return byId.get(id);
+    });
+
+    if (options.length) {
+      groups.push(createExportGroup(group.label, options));
+    }
+  }
+
+  const leftover = [...byId.entries()].filter(([id]) => !used.has(id)).map(([, option]) => option);
+
+  if (leftover.length) {
+    groups.push(createExportGroup("More formats", leftover));
+  }
 
   if (card) {
     const label = card.name.trim() || "Untitled card";
-    options.push(createExportOption({
-      id: "card-png",
-      title: `Card PNG \u00b7 ${label}`,
-      description: card.bookId
-        ? "The card PNG with its linked lorebook embedded."
-        : "The card PNG without a linked lorebook.",
-      meta: "Card"
-    }));
-
-    options.push(createExportOption({
-      id: "card-charx",
-      title: `Card CHARX \u00b7 ${label}`,
-      description: "The card as a CHARX zip with its image and linked lorebook.",
-      meta: "Card"
-    }));
-
-    options.push(createExportOption({
-      id: "card-json-v3",
-      title: `Card JSON (V3) \u00b7 ${label}`,
-      description: "The V3 card as plain JSON, for scripting or frontends that import JSON.",
-      meta: "Card"
-    }));
-
-    options.push(createExportOption({
-      id: "card-json-v2",
-      title: `Card JSON (V2) \u00b7 ${label}`,
-      description: "The older V2 card format, for frontends that do not read V3.",
-      meta: "Card"
-    }));
+    const cardOptions = [
+      ["card-png", `PNG card \u00b7 ${label}`, card.bookId
+        ? "A PNG with V3 and V2 data and the linked lorebook embedded. Opens in any frontend."
+        : "A PNG with V3 and V2 data. Link a lorebook to embed it."],
+      ["card-charx", `CHARX \u00b7 ${label}`, "A zip with the card, its image and the linked lorebook."],
+      ["card-json-v3", `JSON, V3 \u00b7 ${label}`, "Plain V3 JSON, for scripting or frontends that import JSON."],
+      ["card-json-v2", `JSON, V2 \u00b7 ${label}`, "The older V2 format, for frontends that do not read V3."]
+    ].map(([id, title, description]) => createExportOption({ id, title, description, meta: "Card" }));
+    groups.push(createExportGroup("Character card", cardOptions));
   }
 
-  refs.exportOptions.replaceChildren(...options);
+  refs.exportOptions.replaceChildren(...groups);
 }
 
 function formatBackupDate(timestamp) {
@@ -2869,6 +3027,7 @@ function dropPlaceFor(event, card) {
 }
 
 function handleAddEntry() {
+  ensureEntriesView();
   clearSearch();
   addEntry();
   renderAll();
@@ -2968,6 +3127,7 @@ async function handleSaveAsTemplate() {
 }
 
 function openTemplateDialog() {
+  ensureEntriesView();
   renderTemplateDialog();
   refs.templateDialog.showModal();
 }
@@ -3052,6 +3212,7 @@ async function handleCopyEntry() {
 }
 
 function handleDuplicateEntry() {
+  ensureEntriesView();
   const copy = duplicateEntry();
 
   if (!copy) {
@@ -5016,6 +5177,53 @@ refs.aboutBtn.addEventListener("click", () => {
   openAboutDialog();
 });
 
+refs.navToggle.addEventListener("click", toggleNav);
+
+refs.appNav.addEventListener("click", (event) => {
+  const link = event.target.closest("a.nav-item[data-view]");
+
+  if (link) {
+    event.preventDefault();
+    goToView(link.dataset.view);
+    return;
+  }
+
+  if (MOBILE_NAV_QUERY.matches && event.target.closest("button.nav-item")) {
+    setMobileNavOpen(false);
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && refs.shell.classList.contains("is-nav-open") && !document.querySelector("dialog[open]")) {
+    setMobileNavOpen(false);
+    refs.navToggle.focus();
+  }
+});
+
+refs.bookList.addEventListener("click", (event) => {
+  const item = event.target.closest("[data-book-id]");
+
+  if (!item) {
+    return;
+  }
+
+  setActiveBook(item.dataset.bookId);
+  setTagFilters([]);
+  persistTagFilters([]);
+  clearSearch();
+  renderAll();
+  scheduleSave();
+});
+
+refs.dataImportBtn.addEventListener("click", () => refs.importInput.click());
+refs.dataExportBtn.addEventListener("click", openExportDialog);
+refs.dataOpenBtn.addEventListener("click", () => openProjectFile());
+refs.dataSaveBtn.addEventListener("click", () => saveProjectFile());
+refs.navSearchBtn.addEventListener("click", openGlobalSearchDialog);
+refs.navReplaceBtn.addEventListener("click", openReplaceDialog);
+refs.settingsGuideBtn.addEventListener("click", openGuideDialog);
+refs.exportDataLink.addEventListener("click", () => refs.exportDialog.close());
+
 refs.aboutGuideBtn.addEventListener("click", () => {
   refs.aboutDialog.close();
   openGuideDialog();
@@ -5310,6 +5518,12 @@ document.addEventListener("keydown", async (event) => {
   const modifier = event.ctrlKey || event.metaKey;
   const key = event.key.toLowerCase();
 
+  if (event.altKey && !modifier && !event.shiftKey && viewForShortcut(event.key)) {
+    event.preventDefault();
+    goToView(viewForShortcut(event.key));
+    return;
+  }
+
   if (modifier && !event.altKey && key === "k") {
     event.preventDefault();
     openCommandPalette(buildCommands());
@@ -5413,6 +5627,7 @@ document.addEventListener("keydown", async (event) => {
 
   if (event.key === "/" && !modifier && !event.altKey && !isTypingTarget(event.target)) {
     event.preventDefault();
+    ensureEntriesView();
     refs.entrySearch.focus();
     refs.entrySearch.select();
   }
@@ -5569,11 +5784,15 @@ if (initialSave.ok) {
 
 tabGuard.announce();
 requestPersistence();
+setNavExpanded(readNavExpanded(), false);
+showView(parseViewHash(window.location.hash));
 
 refs.saveFileBtn.hidden = false;
+refs.dataSaveBtn.hidden = false;
 
 if (supportsFileSystemAccess()) {
   refs.openFileBtn.hidden = false;
+  refs.dataOpenBtn.hidden = false;
 } else {
   refs.saveFileBtn.title = "Download the project as a file";
   refs.saveFileBtn.setAttribute("aria-label", "Download project file");
@@ -5602,6 +5821,7 @@ function recordAndSaveAudit(record) {
 
 
 const KEYBOARD_SHORTCUTS = [
+  ...VIEWS.map((view) => ({ keys: view.shortcut, label: `Go to ${view.label}` })),
   { keys: "Ctrl+K", label: "Command palette" },
   { keys: "Alt+N", label: "New entry" },
   { keys: "Ctrl+D", label: "Duplicate entry" },
