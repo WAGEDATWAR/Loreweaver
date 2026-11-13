@@ -242,6 +242,7 @@ const refs = {
   schemaClose: document.querySelector("#schema-close"),
   aboutSchemaBtn: document.querySelector("#about-schema-btn"),
   printRoot: document.querySelector("#print-root"),
+  drawerToggle: document.querySelector("#drawer-toggle"),
   aboutTokenBtn: document.querySelector("#about-token-btn"),
   aboutIntegrityBtn: document.querySelector("#about-integrity-btn"),
   tokenSettingsDialog: document.querySelector("#token-settings-dialog"),
@@ -2712,6 +2713,7 @@ function activateEntryCard(id, { toggle = false, range = false } = {}) {
   renderSidebar(refs);
   renderEditor(refs);
   focusEntryCard(id);
+  closeDrawerAfterSelection();
 
   if (changed) {
     scheduleSave();
@@ -3709,6 +3711,16 @@ refs.newBookBtn.addEventListener("click", () => {
 refs.deleteBookBtn.addEventListener("click", () => {
   handleDeleteBook();
 });
+
+refs.drawerToggle.addEventListener("click", () => {
+  toggleDrawer();
+});
+
+function closeDrawerAfterSelection() {
+  if (drawerOpen) {
+    setDrawerOpen(false);
+  }
+}
 
 refs.newCardBtn.addEventListener("click", () => {
   openCardDialog();
@@ -5182,6 +5194,25 @@ function watchTextareaHeights() {
       }
     });
   }
+}
+
+let drawerOpen = false;
+
+function setDrawerOpen(open) {
+  drawerOpen = open;
+  refs.sidebar.classList.toggle("is-drawer", open);
+  refs.workspace.classList.toggle("drawer-open", open);
+  refs.drawerToggle.setAttribute("aria-expanded", String(open));
+  refs.drawerToggle.setAttribute("aria-label", open ? "Close library drawer" : "Open library drawer");
+  refs.drawerToggle.title = open ? "Close library" : "Library";
+
+  if (!open) {
+    refs.entryList?.focus({ preventScroll: true });
+  }
+}
+
+function toggleDrawer() {
+  setDrawerOpen(!drawerOpen);
 }
 applyTheme(readTheme());
 applyDensity(readDensity());

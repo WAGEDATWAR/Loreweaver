@@ -488,6 +488,24 @@ export const scenarios = [
     }
   },
   {
+    name: "opens the library as a mobile drawer",
+    async run(page) {
+      await resetApp(page);
+      await page.setViewport(390, 844);
+      await sleep(150);
+
+      await page.click("#drawer-toggle");
+      await page.waitFor('document.querySelector("#sidebar")?.classList.contains("is-drawer")');
+      assert.equal(await page.evaluate('document.querySelector("#drawer-toggle").getAttribute("aria-expanded")'), "true");
+
+      await page.evaluate('document.querySelectorAll(".entry-card")[1].click(); true');
+      await page.waitFor('!document.querySelector("#sidebar")?.classList.contains("is-drawer")');
+      assert.equal(await page.evaluate('document.querySelector("#entry-title").value.length > 0'), true);
+      await page.setViewport(1440, 900);
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "toggles compact density and keeps textarea heights",
     async run(page) {
       await resetApp(page);

@@ -39,6 +39,11 @@
       </div>
 
       <div class="topbar-actions">
+        <button id="drawer-toggle" class="icon-btn drawer-toggle" type="button" aria-label="Open library drawer" aria-expanded="false" title="Library">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>
+          </svg>
+        </button>
         <button id="command-btn" class="icon-btn command-btn" type="button" aria-label="Command palette" title="Command palette (Ctrl+K)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M9 6.5 7.5 6.5A2.5 2.5 0 1 0 10 9V7.5"/><path d="M9 17.5 7.5 17.5A2.5 2.5 0 1 1 10 15v1.5"/>
@@ -158,7 +163,7 @@
             <section class="book-section" aria-labelledby="book-label">
               <div class="section-label" id="book-label">Lorebook</div>
               <div class="book-controls">
-                <select id="book-select" class="book-select" aria-labelledby="book-label"></select>
+                <select id="book-select" class="book-select" aria-label="Active lorebook" aria-labelledby="book-label"></select>
                 <button id="book-actions-btn" class="icon-btn" type="button" title="Lorebook actions" aria-label="Lorebook actions">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/>
@@ -196,7 +201,11 @@
                 </div>
               </div>
               <div class="field">
-                <label for="book-token-budget">Token budget <span class="hint">0 = off</span></label>
+                <label for="book-token-budget">Token budget
+                  <span class="hint" data-hint="Warns when the enabled entries of this lorebook together exceed this many tokens, using the selected tokenizer. Leave 0 to disable the warning.">
+                    0 = off
+                  </span>
+                </label>
                 <input id="book-token-budget" class="book-budget-input" type="number" min="0" max="10000000" step="100" value="0" inputmode="numeric">
                 <span id="book-budget-status" class="book-budget-status" aria-live="polite">Enabled: ~0 tokens</span>
               </div>
@@ -403,7 +412,11 @@
               <section class="editor-section">
                 <div class="field-grid">
                   <div class="field">
-                    <label for="entry-keys-input">Trigger keys <span class="hint">Enter or comma to add</span></label>
+                    <label for="entry-keys-input">Trigger keys
+                      <span class="hint" data-hint="Type a key and press Enter or comma to add it as a chip. Paste a comma- or newline-separated list to add many at once. Wrap a key in slashes, like /pattern/i, to make it a regular expression.">
+                        Enter or comma to add
+                      </span>
+                    </label>
                     <div id="entry-keys" class="key-chips">
                       <input id="entry-keys-input" class="key-chips-input" type="text" placeholder="sword, blade, weapon" autocomplete="off" spellcheck="false">
                     </div>
@@ -507,7 +520,11 @@
                   </div>
 
                   <div class="field">
-                    <label for="entry-token-limit">Token limit <span class="hint">0 = off</span></label>
+                    <label for="entry-token-limit">Token limit
+                      <span class="hint" data-hint="Flags this single entry in the issue list when its content exceeds this many tokens. 0 disables the check.">
+                        0 = off
+                      </span>
+                    </label>
                     <input id="entry-token-limit" type="number" inputmode="numeric" min="0" step="10">
                   </div>
 

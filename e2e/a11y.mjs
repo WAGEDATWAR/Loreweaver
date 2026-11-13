@@ -97,6 +97,12 @@ const states = [
     await page.click("#about-shortcuts-btn");
     await page.waitFor('document.querySelector("#shortcuts-dialog")?.open');
   } },
+  { name: "mobile drawer", setup: async (page) => {
+    await page.setViewport(390, 844);
+    await sleep(150);
+    await page.click("#drawer-toggle");
+    await page.waitFor('document.querySelector("#sidebar")?.classList.contains("is-drawer")');
+  } },
   { name: "schema dialog", setup: async (page) => {
     await page.click("#about-btn");
     await page.waitFor('document.querySelector("#about-dialog")?.open');
