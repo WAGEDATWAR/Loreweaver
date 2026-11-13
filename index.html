@@ -118,6 +118,22 @@
       </div>
     </div>
 
+    <div id="tab-banner" class="storage-banner" role="alert" hidden>
+      <div class="storage-banner-text">
+        <strong id="tab-banner-title">Open in another tab</strong>
+        <span id="tab-banner-message"></span>
+      </div>
+      <div class="storage-banner-actions">
+        <button id="tab-reload-btn" class="btn btn-primary" type="button" hidden>Load latest</button>
+        <button id="tab-keep-btn" class="btn" type="button" hidden>Keep this tab's version</button>
+        <button id="tab-dismiss-btn" class="icon-btn" type="button" aria-label="Dismiss tab warning" title="Dismiss">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path d="m6 6 12 12"/><path d="m18 6-12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
     <div id="backup-reminder" class="storage-banner is-info" role="status" hidden>
       <div class="storage-banner-text">
         <strong>Time for a backup</strong>
@@ -583,6 +599,7 @@
           <dt>Backend</dt><dd id="storage-usage-backend">&mdash;</dd>
           <dt>Project</dt><dd id="storage-usage-project">&mdash;</dd>
           <dt>Snapshots</dt><dd id="storage-usage-revisions">&mdash;</dd>
+          <dt>Persistence</dt><dd id="storage-usage-persisted">&mdash;</dd>
         </dl>
       </section>
       <div class="dialog-actions">

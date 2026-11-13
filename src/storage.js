@@ -597,6 +597,36 @@ export async function getProjectBackupInfo() {
   };
 }
 
+export async function requestPersistence() {
+  const storage = typeof navigator === "undefined" ? null : navigator.storage;
+
+  if (!storage?.persist) {
+    return { supported: false, persisted: false };
+  }
+
+  try {
+    if (storage.persisted && await storage.persisted()) {
+      return { supported: true, persisted: true };
+    }
+
+    return { supported: true, persisted: Boolean(await storage.persist()) };
+  } catch {
+    return { supported: true, persisted: false };
+  }
+}
+
+async function readPersisted() {
+  try {
+    if (typeof navigator !== "undefined" && navigator.storage?.persisted) {
+      return Boolean(await navigator.storage.persisted());
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 export async function getStorageUsage() {
   const target = getBackend();
   let projectBytes = 0;
@@ -647,7 +677,8 @@ export async function getStorageUsage() {
     revisionCount: revisions.length,
     revisionBytes,
     usage,
-    quota
+    quota,
+    persisted: await readPersisted()
   };
 }
 

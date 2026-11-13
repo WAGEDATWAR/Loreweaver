@@ -87,6 +87,9 @@ Mobile preview builds, bulk authoring tools and the completed scale phase.
 
 ### Fixed
 
+- Two tabs on one project no longer overwrite each other: a cross-tab guard pauses saving in a stale
+  tab and offers Load latest or Keep this version. The app also requests persistent storage and shows
+  the result in the storage panel.
 - Service worker: network-first with a cache fallback (no more stale or mixed-version modules after a
   deploy), and `npm run bundle` stamps a content-hash cache name and precaches every shipped file so the
   first offline visit works and old caches are dropped.

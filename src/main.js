@@ -83,6 +83,7 @@ import {
   getRevisions,
   getStorageUsage,
   initStorage,
+  requestPersistence,
   loadHistory,
   loadProject,
   loadProjectBackup,
@@ -128,6 +129,7 @@ import { confirmAction, toast } from "./ui/overlays.js";
 import { getVisibleEntryIds, renderSidebar } from "./ui/sidebar.js";
 import { fillCardForm, readCardForm, renderCardList, renderRecentList } from "./ui/cards.js";
 import { clamp } from "./utils.js";
+import { createTabGuard } from "./tabGuard.js";
 import { selectEntriesByTokenSize } from "./bulk.js";
 import { applyReplace, parseReplaceQuery, planReplace } from "./replace.js";
 import { VALIDATION_LABELS, validateBook } from "./validation.js";
@@ -177,6 +179,13 @@ const refs = {
   storageBanner: document.querySelector("#storage-banner"),
   storageBannerMessage: document.querySelector("#storage-banner-message"),
   storageExportBtn: document.querySelector("#storage-export-btn"),
+  tabBanner: document.querySelector("#tab-banner"),
+  tabBannerTitle: document.querySelector("#tab-banner-title"),
+  tabBannerMessage: document.querySelector("#tab-banner-message"),
+  tabReloadBtn: document.querySelector("#tab-reload-btn"),
+  tabKeepBtn: document.querySelector("#tab-keep-btn"),
+  tabDismissBtn: document.querySelector("#tab-dismiss-btn"),
+  storageUsagePersisted: document.querySelector("#storage-usage-persisted"),
   storageRetryBtn: document.querySelector("#storage-retry-btn"),
   storageDismissBtn: document.querySelector("#storage-dismiss-btn"),
   undoBtn: document.querySelector("#undo-btn"),
@@ -454,6 +463,23 @@ refs.requestTokens = (text) => tokenizer.request(text);
 let saveTimer = 0;
 let historySaveTimer = 0;
 let saveFailed = false;
+let staleFromPeer = false;
+let skipUnloadWarning = false;
+
+const tabGuard = createTabGuard({
+  name: storageKey("tabs:v1"),
+  channelFactory: typeof BroadcastChannel === "function" ? (name) => new BroadcastChannel(name) : null,
+  onPeerPresent: () => showTabBanner("open"),
+  onPeerSaved: () => {
+    if (!staleFromPeer) {
+      staleFromPeer = true;
+      window.clearTimeout(saveTimer);
+      setSaveState("paused");
+    }
+
+    showTabBanner("stale");
+  }
+});
 let unsavedChanges = false;
 let projectFileHandle = null;
 let simulationTimer = 0;
@@ -756,7 +782,7 @@ function finishSidebarResize() {
 function setSaveState(mode) {
   refs.saveState.dataset.state = mode;
   const label = refs.saveState.querySelector(".save-label");
-  label.textContent = mode === "saving" ? "Saving" : mode === "error" ? "Unsaved" : "Saved";
+  label.textContent = mode === "saving" ? "Saving" : mode === "error" ? "Unsaved" : mode === "paused" ? "Paused" : "Saved";
 }
 
 function showStorageBanner(result) {
@@ -768,6 +794,28 @@ function showStorageBanner(result) {
     ? "Browser storage is full, so your latest changes are only in memory. Export a project backup now, then remove old revisions or free up space and retry."
     : "Your latest changes could not be saved to this browser. Export a project backup to protect your work, then retry.";
   refs.storageBanner.hidden = false;
+}
+
+function showTabBanner(kind) {
+  if (!refs.tabBanner) {
+    return;
+  }
+
+  const stale = kind === "stale";
+
+  refs.tabBannerTitle.textContent = stale ? "Changed in another tab" : "Open in another tab";
+  refs.tabBannerMessage.textContent = stale
+    ? "Another tab saved this project, so saving is paused here to avoid overwriting its work. Load the latest version, or keep this tab's version and replace the other."
+    : "Loreweaver is open in more than one tab. Edits in one tab can overwrite the other, so keep editing in a single tab.";
+  refs.tabReloadBtn.hidden = !stale;
+  refs.tabKeepBtn.hidden = !stale;
+  refs.tabBanner.hidden = false;
+}
+
+function hideTabBanner() {
+  if (refs.tabBanner) {
+    refs.tabBanner.hidden = true;
+  }
 }
 
 function hideStorageBanner() {
@@ -942,6 +990,9 @@ async function refreshStorageUsage() {
   refs.storageUsageBackend.textContent = usage.backend === "indexeddb" ? "IndexedDB" : "localStorage";
   refs.storageUsageProject.textContent = formatBytes(usage.projectBytes);
   refs.storageUsageRevisions.textContent = `${usage.revisionCount} · ${formatBytes(usage.revisionBytes)}`;
+  refs.storageUsagePersisted.textContent = usage.persisted === null
+    ? "Not supported"
+    : usage.persisted ? "Protected from eviction" : "Best effort (the browser may clear it under pressure)";
 
   if (Number.isFinite(usage.usage) && Number.isFinite(usage.quota) && usage.quota > 0) {
     const percent = Math.round((usage.usage / usage.quota) * 100);
@@ -2120,6 +2171,12 @@ function scrollEntryCardIntoView(id) {
 
 async function flushSave() {
   window.clearTimeout(saveTimer);
+
+  if (staleFromPeer) {
+    setSaveState("paused");
+    return false;
+  }
+
   const result = await saveProjectDetailed(getState());
   setSaveState(result.ok ? "saved" : "error");
 
@@ -2136,6 +2193,7 @@ async function flushSave() {
     saveFailed = false;
     unsavedChanges = false;
     hideStorageBanner();
+    tabGuard.notifySaved();
     await maybeSaveRevision();
   }
 
@@ -4904,6 +4962,22 @@ refs.storageRetryBtn.addEventListener("click", async () => {
   }
 });
 
+refs.tabReloadBtn.addEventListener("click", () => {
+  skipUnloadWarning = true;
+  window.location.reload();
+});
+
+refs.tabKeepBtn.addEventListener("click", async () => {
+  staleFromPeer = false;
+  hideTabBanner();
+  scheduleSave();
+  toast("This tab's version will replace the other tab's", "success");
+});
+
+refs.tabDismissBtn.addEventListener("click", () => {
+  hideTabBanner();
+});
+
 refs.storageDismissBtn.addEventListener("click", () => {
   hideStorageBanner();
 });
@@ -5136,8 +5210,9 @@ document.addEventListener("keydown", async (event) => {
 
 window.addEventListener("beforeunload", (event) => {
   recordSessionChanges();
+  tabGuard.close();
 
-  if (unsavedChanges || saveFailed) {
+  if (!skipUnloadWarning && (unsavedChanges || saveFailed || staleFromPeer)) {
     event.preventDefault();
     event.returnValue = "";
   }
@@ -5281,6 +5356,9 @@ if (initialSave.ok) {
   setSaveState("error");
   showStorageBanner(initialSave);
 }
+
+tabGuard.announce();
+requestPersistence();
 
 refs.saveFileBtn.hidden = false;
 

@@ -69,10 +69,19 @@ renumbers duplicates, drops dangling references and removes orphaned payloads wh
 - A failed revision write removes its own partial payload before returning.
 - The data-integrity dialog is reachable from About and from the command palette.
 
-## 7. Known gaps
+## 7. Multiple tabs and durability
+
+- **One writer tab.** `src/tabGuard.js` talks over a `BroadcastChannel` named for the storage namespace. A
+  tab that finds another open shows an advisory banner. When another tab saves, this tab pauses its own
+  saves (state `paused`) and offers **Load latest** (reload from storage) or **Keep this tab's version**
+  (resume and overwrite). Nothing is overwritten silently. Without `BroadcastChannel` the guard is a no-op.
+- **Eviction.** On start the app calls `navigator.storage.persist()`; the storage panel reports whether
+  the data is protected or best effort. A denial is not an error; backups remain the safety net.
+
+## 8. Known gaps
 
 - Undo is session-only (DEF-006).
-- Revisions, backups and projects share one browser quota; there is no eviction policy beyond the
-  revision cap.
+- Revisions, backups and projects share one browser quota; the browser may refuse persistence, and the
+  only mitigation is the exported backup.
 - Project files need Chrome's File System Access API; elsewhere Import/Export is the path (DEF-018).
 - Encrypted projects and cloud sync are deferred (DEF-010, DEF-011).

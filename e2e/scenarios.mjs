@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { sleep } from "./harness.mjs";
+import { Page, sleep } from "./harness.mjs";
 
 async function dismissOnboarding(page) {
   await sleep(120);
@@ -485,6 +485,49 @@ export const scenarios = [
       await page.click('[data-template-id^="template_"]');
       await page.waitFor('document.querySelector("#entry-title")?.value === "Signal Tower"');
       assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "guards against saving over another tab",
+    timeout: 40000,
+    async run(page, context) {
+      await resetApp(page);
+      await sleep(400);
+
+      const second = await Page.openNew(context.port, context.baseUrl);
+
+      try {
+        await second.waitFor('document.querySelector("#book-name")?.value');
+        await page.waitFor('!document.querySelector("#tab-banner")?.hidden');
+        assert.equal(await page.evaluate('document.querySelector("#tab-banner-title").textContent'), "Open in another tab");
+        assert.equal(await page.evaluate('document.querySelector("#tab-keep-btn").hidden'), true);
+
+        await second.evaluate(`(() => {
+          const input = document.querySelector("#entry-title");
+          input.value = "Edited in tab two";
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+          return true;
+        })()`);
+        await second.waitFor('document.querySelector("#save-state")?.dataset.state === "saved"');
+
+        await page.waitFor('document.querySelector("#tab-banner-title")?.textContent === "Changed in another tab"');
+        assert.equal(await page.evaluate('document.querySelector("#tab-keep-btn").hidden'), false);
+
+        await page.evaluate(`(() => {
+          const input = document.querySelector("#entry-title");
+          input.value = "Edited in tab one";
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+          return true;
+        })()`);
+        await page.waitFor('document.querySelector("#save-state")?.dataset.state === "paused"', { timeout: 15000 });
+
+        await page.click("#tab-keep-btn");
+        await page.waitFor('document.querySelector("#save-state")?.dataset.state === "saved"');
+        assert.equal(await page.evaluate('document.querySelector("#tab-banner").hidden'), true);
+        assert.deepEqual(page.errors, []);
+      } finally {
+        await second.closeTarget();
+      }
     }
   },
   {

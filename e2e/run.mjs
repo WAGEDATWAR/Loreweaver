@@ -48,6 +48,7 @@ async function main() {
 
     const context = {
       baseUrl,
+      port: browser.port,
       root,
       fixture: (name) => resolve(root, "test", "fixtures", name)
     };

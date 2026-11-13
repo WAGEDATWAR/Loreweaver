@@ -244,6 +244,25 @@ export class Page {
     return page;
   }
 
+  static async openNew(port, url) {
+    const target = await fetch(`http://127.0.0.1:${port}/json/new?${encodeURIComponent(url)}`, { method: "PUT" }).then((response) => response.json());
+    const client = await CdpClient.connect(target.webSocketDebuggerUrl);
+    const page = new Page(client);
+    page.targetId = target.id;
+    page.port = port;
+    await page.enable();
+    page.lastUrl = url;
+    return page;
+  }
+
+  async closeTarget() {
+    this.client.close();
+
+    if (this.targetId) {
+      await fetch(`http://127.0.0.1:${this.port}/json/close/${this.targetId}`).catch(() => {});
+    }
+  }
+
   async enable() {
     await this.client.send("Page.enable");
     await this.client.send("Runtime.enable");

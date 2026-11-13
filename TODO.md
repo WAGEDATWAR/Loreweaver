@@ -90,10 +90,10 @@ phase can close; none is tracked there yet. Severity: **S1** data loss or broken
 defect or risk, **S3** improvement.
 
 ### Data safety and robustness
-- [ ] **S1** No multi-tab protection: two tabs on one project overwrite each other's saves (no
+- [x] **S1** No multi-tab protection: two tabs on one project overwrite each other's saves (no
       `BroadcastChannel`, Web Lock or `storage` listener). Detect another live tab, warn, and go read-only
       or reload on its save.
-- [ ] **S1** `navigator.storage.persist()` is never requested; for a local-first app the browser may
+- [x] **S1** `navigator.storage.persist()` is never requested; for a local-first app the browser may
       evict IndexedDB under storage pressure. Request it and surface the result in the storage panel.
 - [ ] **S2** User regexes (trigger keys, regex search, bulk replace) run on the main thread; a
       catastrophic pattern such as `/(a+)+$/` can freeze the tab. Add a match budget or run in the worker.
