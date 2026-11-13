@@ -1,5 +1,6 @@
-import { cp, mkdir, rm, stat } from "node:fs/promises";
-import { resolve } from "node:path";
+import { createHash } from "node:crypto";
+import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -17,7 +18,7 @@ async function exists(path) {
 
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
-await (import("node:fs/promises")).then((fs) => fs.writeFile(resolve(out, ".nojekyll"), ""));
+await writeFile(resolve(out, ".nojekyll"), "");
 
 let copied = 0;
 
@@ -32,4 +33,38 @@ for (const entry of entries) {
   copied += 1;
 }
 
-console.log(`web bundle: ${copied} entries written to www/`);
+async function walk(dir) {
+  const found = [];
+
+  for (const item of await readdir(dir, { withFileTypes: true })) {
+    const full = resolve(dir, item.name);
+
+    if (item.isDirectory()) {
+      found.push(...await walk(full));
+    } else {
+      found.push(full);
+    }
+  }
+
+  return found;
+}
+
+const shipped = (await walk(out))
+  .map((file) => relative(out, file).split("\\").join("/"))
+  .filter((file) => file !== ".nojekyll" && file !== "sw.js" && !file.endsWith("SOURCE.md"))
+  .sort();
+const hash = createHash("sha256");
+
+for (const file of shipped) {
+  hash.update(file);
+  hash.update(await readFile(resolve(out, file)));
+}
+
+const version = hash.digest("hex").slice(0, 12);
+const swPath = resolve(out, "sw.js");
+let sw = await readFile(swPath, "utf8");
+sw = sw.replace(/const VERSION = "[^"]*";/, `const VERSION = "${version}";`);
+sw = sw.replace(/const PRECACHE = \[[\s\S]*?\n\];/, `const PRECACHE = ${JSON.stringify(["./", ...shipped], null, 2)};`);
+await writeFile(swPath, sw);
+
+console.log(`web bundle: ${copied} entries written to www/ (service worker cache ${version}, ${shipped.length} files precached)`);

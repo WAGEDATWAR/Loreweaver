@@ -85,6 +85,12 @@ Mobile preview builds, bulk authoring tools and the completed scale phase.
 
 ## [0.7.4] - 2026-10-22
 
+### Fixed
+
+- Service worker: network-first with a cache fallback (no more stale or mixed-version modules after a
+  deploy), and `npm run bundle` stamps a content-hash cache name and precaches every shipped file so the
+  first offline visit works and old caches are dropped.
+
 ### Added
 
 - Configurable tokenizer presets (cl100k_base and o200k_base) with a token settings dialog, plus context window presets used for context-window usage in the overview and simulation.

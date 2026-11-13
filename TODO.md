@@ -16,7 +16,8 @@ reported under Recently landed with its revision.
 Loreweaver is a local-first lorebook editor. The canonical schema, the adapter layer, local recovery and
 the real tokenizer are built and gated, and the app boots, imports, edits and exports.
 
-**Next:** P5 release. Character cards come first, then the surface and distribution work.
+**Next:** P5 release. The authoring, interop, card and surface work has landed; what remains is polish,
+merge and encryption depth, accessibility, and distribution (icons, signed APK, beta).
 
 **The plan is standalone first.** v1 is the standalone tool. A reusable component is a **new repository
 extracted after v1** (G-14); the post-v1 phase P6 owns it and no consumer ask moves a v1 gate. The pure
@@ -42,7 +43,7 @@ Planned in `docs/LOREWEAVER.md` 7. Each gate is measured; a regression blocks th
       it overruns budget.
 - [x] **P4 - Scale and durability.** IndexedDB retention, project files, export diff, token cache, bulk
       find/replace. Gate: a 2,000-entry book stays responsive and an accidental import is recoverable.
-- [ ] **P5 - Release.** Character cards, onboarding, themes, guide, icon set, beta, deployment. Gate: a
+- [~] **P5 - Release.** Character cards, onboarding, themes, guide, icon set, beta, deployment. Gate: a
       new user creates and exports a first lorebook unaided, and a card round-trips. (DEF-002, DEF-010,
       DEF-017, DEF-038, DEF-040, DEF-043, DEF-051, DEF-052, DEF-057, DEF-060, DEF-064, DEF-067,
       DEF-095, DEF-104, DEF-105, DEF-110)
@@ -54,23 +55,102 @@ Planned in `docs/LOREWEAVER.md` 7. Each gate is measured; a regression blocks th
 
 ## Next Up
 
-Ordered by value per effort. Nothing here is outside the current phase.
+Ordered by value per effort; every open ledger row, nothing outside the current phase. Done items live in
+`DEFERRALS.md` and Recently landed.
 
-- [ ] `M` `P5` Editable advanced SillyTavern and Chub fields (DEF-015).
-- [ ] `M` `P5` RisuAI-native export (DEF-014).
-- [ ] `L` `P5` Drag-and-drop file import onto the window (DEF-019).
-- [ ] `L` `P5` An import audit log of format, warnings and skipped fields (DEF-111).
-- [ ] `M` `P5` A schema reference page generated from the canonical model (DEF-106).
-- [ ] `L` `P5` Print/PDF export for offline review passes (DEF-107).
-- [ ] `M` `P5` Configurable new-entry defaults (DEF-108).
-- [ ] `M` `P5` Per-entry colour labels (DEF-113).
+- [ ] `L` `P5` Hide field hints while a field has content (DEF-095).
+- [ ] `L` `P5` A changelog link in the About panel (DEF-038).
+- [ ] `L` `P5` Richer empty and search states, and loading/error states for async actions (DEF-002, DEF-104).
+- [ ] `M` `P5` JSON/YAML plain export for scripting (DEF-017).
+- [ ] `M` `P5` An optional UI-state block in project files (DEF-105).
 - [ ] `M` `P5` Markdown preview, only if frontends read it consistently (DEF-110).
-- [ ] `L` `P5` Density options, resizable text areas, focus mode, hover hints (DEF-032, DEF-033, DEF-035, DEF-036).
-- [ ] `M` `P5` A keyboard shortcuts reference dialog (DEF-034).
 - [ ] `M` `P5` An app icon set and social preview assets (DEF-051).
-- [ ] `M` `P5` A small beta with real SillyTavern and Chub users (DEF-052).
+- [ ] `M` `P5` Three-way merge over a common ancestor (DEF-057).
+- [ ] `M` `P5` Multi-book attach with per-book weights (DEF-064).
+- [ ] `M` `P5` Encrypted local projects (DEF-010).
+- [ ] `M` `P5` A manual screen-reader pass on top of axe (DEF-043).
 - [ ] `M` `P5` A signed release APK and keystore (DEF-067).
 - [ ] `M` `P5` Decide the Windows build story (DEF-060).
+- [ ] `M` `P5` A small beta with real SillyTavern and Chub users (DEF-052).
+- [ ] `VH` `P5` TypeScript or JSDoc types if schema complexity grows (DEF-040).
+
+## Housekeeping (found at the Claude Code handoff, 2026-11-12)
+
+- [ ] `L` CHANGELOG: the light-theme/contrast line is listed twice under Unreleased; dedupe and cut 0.9.0.
+- [ ] `L` CI: add `npm run deferral-scan` and `npm run release:check` steps (RELEASING.md lists both).
+- [ ] `L` Delete stale scratch files in the repo root (`dbg-a*.mjs`, `a11y-out.txt`; gitignored, out of date).
+- [ ] `M` `src/main.js` is ~5,500 lines and `index.html` ~1,200: split by surface into `src/ui/` modules
+      without breaking one-writer (a layering decision first, in DECISIONS.md).
+- [x] Service worker: stale cache-first and a fixed cache name; fixed (network-first, hashed cache, full precache).
+
+## Review findings (deep review, 2026-11-12)
+
+Raw findings from the Claude Code handoff review. Each needs a `DEFERRALS.md` row (or a fix) before its
+phase can close; none is tracked there yet. Severity: **S1** data loss or broken core flow, **S2** real
+defect or risk, **S3** improvement.
+
+### Data safety and robustness
+- [ ] **S1** No multi-tab protection: two tabs on one project overwrite each other's saves (no
+      `BroadcastChannel`, Web Lock or `storage` listener). Detect another live tab, warn, and go read-only
+      or reload on its save.
+- [ ] **S1** `navigator.storage.persist()` is never requested; for a local-first app the browser may
+      evict IndexedDB under storage pressure. Request it and surface the result in the storage panel.
+- [ ] **S2** User regexes (trigger keys, regex search, bulk replace) run on the main thread; a
+      catastrophic pattern such as `/(a+)+$/` can freeze the tab. Add a match budget or run in the worker.
+- [ ] **S2** `zip.js` inflates with no output cap (zip bomb via CHARX or `zTXt`); the 32 MB limit applies
+      to the input only. Cap the inflated size and entry count.
+- [ ] **S3** Import limits are scattered (25 MB in `limits.js`, a hard-coded "25 MB" toast and an 8 MB
+      avatar limit in `main.js`, 32 MB in `cardPng.js`); centralise in `limits.js`.
+
+### UI and UX
+- [ ] **S1** The entry list, the core navigation, is buried: at 1440x900 it starts at y=919 and is 16px
+      tall, below the lorebook info, defaults, Overview/Simulate/Issues, cards, recent list, search and
+      footer. A user must scroll the sidebar to find entries. Give the entry list the flexible height,
+      collapse lorebook info/cards/recent into collapsible groups, and move Overview/Simulate/Issues to the
+      header or a tool rail.
+- [ ] **S2** The sidebar carries too many jobs (book picker, book meta, entry defaults, tools, cards,
+      recent, search, filters, entries, create actions). Split into Library (books/cards) and Entries.
+- [ ] **S2** The Export dialog mixes export formats, backup restore and storage diagnostics; storage and
+      backup belong in a Data/Settings dialog. "Loreweaver book" vs "Interchange lorebook" vs "Character
+      book" needs plain-language naming or grouping (primary / compatibility / advanced). Card export lives
+      elsewhere; surface it.
+- [ ] **S2** The About dialog doubles as a settings panel (theme, density, audit log, shortcuts, guide).
+      Create a real Settings dialog and keep About for version and links.
+- [ ] **S3** The collapsed "New-entry defaults" disclosure shows a bare triangle and an orphan label.
+- [ ] **S3** The header has many icon-only buttons (palette, undo, redo, history); add visible labels or
+      tooltips with shortcuts, and consider an overflow menu at narrow widths.
+- [ ] **S3** The empty right details rail takes 50px when collapsed; default it hidden below 1280px.
+
+### Code structure
+- [ ] **S2** `src/main.js` is 5,462 lines with ~190 functions and ~270 `querySelector` calls; one
+      121-line `handleImport`, a 100-line `renderSimulationResults`. Split by surface (import/export,
+      cards, simulation, dialogs, shortcuts, drawer) into `src/ui/` or `src/controllers/`, with the
+      `refs` map moved out. A DECISIONS.md entry first.
+- [ ] **S2** `main.js` owns ~25 module-level mutable variables (timers, drag state, `editingCardId`,
+      `tokenSettings`, `validationFilters`) against A-2 ("the UI never holds state"); move session UI state
+      into a small `uiState` store.
+- [ ] **S3** `integrity.js` imports `formats/helpers.js` although A-1 lets pure modules import only
+      `utils.js`; move the helper to the pure core or amend A-1.
+- [ ] **S3** `docs/ARCHITECTURE.md` still says cards are "Planned (P5)" and its module diagram omits
+      about 35 modules (cards, content-format, tokenizer, windowing, templates, history...). Refresh it.
+- [ ] **S3** `src/content-format/` is shared with Synthesis by copying; add a sync check (hash or
+      version) so the two copies cannot drift.
+- [ ] **S3** `styles.css` is 4,872 lines in one file; split by area (tokens, layout, dialogs, editor).
+
+### Test and gate gaps
+- [ ] **S3** E2E gates exist but there is no scenario for multi-tab, storage eviction, a zip bomb or a
+      catastrophic regex; add them with the fixes above.
+- [ ] **S3** The service worker has a scenario for registration but none for update flow (new version
+      replaces the old cache) or offline reload; add both.
+
+## Post-v1
+
+- [ ] `VH` Opt-in cloud sync, only if private and simple (DEF-011).
+- [ ] `M` Collect round-trip failures as fixtures (DEF-053).
+- [ ] `M` Share-sheet import and export on Android (DEF-066).
+- [ ] `H` P6 component (new repository): extract the pure core (DEF-063), headless API (DEF-061),
+      embedding guide (DEF-062), descriptor registry (DEF-059), canon-ledger tab (DEF-058), run-level
+      budget arbitration (DEF-065).
 
 ## Character cards (P5, built v0.8.0)
 
@@ -78,79 +158,8 @@ Cards are a first-class record (G-16); the container is an adapter (A-8). Record
 adapters, validation, extraction, linking, the library and the parity section all shipped. See
 `DEFERRALS.md` K and `docs/CARDS.md`.
 
-
-## Editor and authoring
-- [ ] `M` `P5` Configurable new-entry defaults: always on, selective, case, whole words (DEF-108).
-- [ ] `L` `P5` Hide field hints while a field has content (DEF-095).
-
-## Interoperability
-
-- [ ] `M` `P5` JSON/YAML plain export for scripting (DEF-017).
-- [ ] `L` `P5` Drag-and-drop file import onto the window (DEF-019).
-- [ ] `L` `P5` An import audit log of format, warnings and skipped fields (DEF-111).
-- [ ] `M` `P5` Editable advanced SillyTavern and Chub fields (DEF-015).
-- [ ] `M` `P5` RisuAI-native export (DEF-014).
-- [ ] `M` `P5` A schema reference page generated from the canonical model (DEF-106).
-- [ ] `L` `P5` Print/PDF export for offline review passes (DEF-107).
-
-## Organization and search
-
-- [ ] `L` `P5` User-pinned entries per book (DEF-092).
-- [ ] `L` `P5` A recent-entries list (DEF-093).
-- [ ] `M` `P5` A regex search mode in the entry list (DEF-094).
-
-## Data and persistence
-
-- [ ] `M` `P5` Encrypted local projects (DEF-010).
-- [ ] `M` `P5` An optional UI-state block in project files (DEF-105).
-- [ ] `VH` `post-v1` Opt-in cloud sync, only if private and simple (DEF-011).
-
-## UI, UX and accessibility
-
-
-
-- [ ] `L` `P5` Density options for compact lists (DEF-032).
-- [ ] `L` `P5` Resizable text areas with remembered heights (DEF-033).
-- [ ] `L` `P5` A keyboard shortcuts reference dialog (DEF-034).
-- [ ] `L` `P5` A focus mode that hides the sidebar (DEF-035).
-- [ ] `L` `P5` Hover hint popups for long field explanations (DEF-036).
-- [ ] `L` `P5` `aria-keyshortcuts` on shortcut buttons (DEF-037).
-- [ ] `L` `P5` A changelog link in the About panel (DEF-038).
-
-## QoL and polish
-
-- [ ] `L` `P5` Multi-select validation issue-type filters (DEF-096).
-- [ ] `L` `P5` Hide the Repair button when the integrity check is clean (DEF-097).
-- [ ] `L` `P5` Toast timing and duplicate-failure suppression (DEF-098).
-
-## Engineering and QA
-
-- [ ] `VH` `P5` TypeScript or JSDoc types if schema complexity grows (DEF-040).
-- [ ] `M` `P5` A manual screen-reader pass on top of axe (DEF-043).
-- [ ] `M` `P5` Three-way merge over a common ancestor (DEF-057).
-- [ ] `M` `P5` Decide the Windows build story (DEF-060).
-- [ ] `M` `P5` Multi-book attach with per-book weights (DEF-064).
-- [ ] `M` `P5` A signed release APK and keystore (DEF-067).
-
-## Product and release
-
-- [ ] `M` `P5` An app icon set and social preview assets (DEF-051).
-- [ ] `M` `P5` A small beta with real SillyTavern and Chub users (DEF-052).
-- [ ] `M` `post-v1` Collect round-trip failures as fixtures (DEF-053).
-
-## Component (post-v1, new repository)
-
-- [ ] `H` `post-v1` Extract the pure core into a new component repository (DEF-063).
-- [ ] `M` `post-v1` A supported headless API surface (DEF-061).
-- [ ] `L` `post-v1` An embedding and vendoring guide with the licence note (DEF-062).
-- [ ] `H` `post-v1` A descriptor registry generating forms, validation and JSON Schema (DEF-059).
-- [ ] `H` `post-v1` A canon-ledger facts tab and conflict report (DEF-058).
-- [ ] `M` `post-v1` Run-level budget arbitration across attached books (DEF-065).
-- [ ] `M` `post-v1` Share-sheet import and export on Android (DEF-066).
-
 ## Known gaps
 
-- RisuAI-native export is unsupported (DEF-014).
 - No share-sheet wiring on Android yet; preview builds use the picker and downloads (DEF-066).
 - Preview APKs are debug-signed only; a keystore and signed release build are owed (DEF-067).
 

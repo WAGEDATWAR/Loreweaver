@@ -1,7 +1,9 @@
-/* Loreweaver service worker: cache-first for the app shell, network-first for nothing else.
-   The app has no build step and no remote calls, so every same-origin GET of a shell asset can be
-   served from cache after the first visit. Version bumps invalidate the old cache. */
-const CACHE = "loreweaver-v1";
+/* Loreweaver service worker: network-first for the app shell with a cache fallback.
+   Online loads always get fresh files, so a deploy never serves stale or mixed-version modules;
+   offline loads fall back to the cache. `npm run bundle` stamps VERSION with a content hash and
+   PRECACHE with every shipped file, so a new build gets a new cache and the old one is deleted. */
+const VERSION = "dev";
+const CACHE = `loreweaver-${VERSION}`;
 const PRECACHE = [
   "./",
   "index.html",
@@ -40,17 +42,15 @@ self.addEventListener("fetch", (event) => {
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const network = fetch(request).then((response) => {
+    fetch(request)
+      .then((response) => {
         if (response && response.ok && response.type === "basic") {
           const copy = response.clone();
           caches.open(CACHE).then((cache) => cache.put(request, copy));
         }
 
         return response;
-      }).catch(() => cached);
-
-      return cached || network;
-    })
+      })
+      .catch(() => caches.match(request, { ignoreSearch: true }).then((cached) => cached || caches.match("index.html")))
   );
 });
