@@ -488,6 +488,24 @@ export const scenarios = [
     }
   },
   {
+    name: "registers a service worker and caches the shell",
+    timeout: 30000,
+    async run(page) {
+      await resetApp(page);
+      await sleep(700);
+      await page.waitFor('Boolean(navigator.serviceWorker.controller)');
+      const cache = await page.evaluate(`(async () => {
+        const keys = await caches.keys();
+        const entries = keys.length ? await (await caches.open(keys[0])).keys() : [];
+        return { keys: keys.length, entries: entries.length };
+      })()`);
+      assert.ok(cache.entries >= 5, `expected the shell precached, saw ${cache.entries} entries`);
+      await page.reload();
+      await page.waitFor('document.querySelector("#book-name")?.value');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "opens the library as a mobile drawer",
     async run(page) {
       await resetApp(page);

@@ -43,9 +43,9 @@ Planned in `docs/LOREWEAVER.md` 7. Each gate is measured; a regression blocks th
 - [x] **P4 - Scale and durability.** IndexedDB retention, project files, export diff, token cache, bulk
       find/replace. Gate: a 2,000-entry book stays responsive and an accidental import is recoverable.
 - [ ] **P5 - Release.** Character cards, onboarding, themes, guide, icon set, beta, deployment. Gate: a
-      new user creates and exports a first lorebook unaided, and a card round-trips. (DEF-002 to
-      DEF-014, DEF-019, DEF-030 to DEF-038, DEF-040 to DEF-043, DEF-051 to DEF-052, DEF-057, DEF-060,
-      DEF-064, DEF-067, DEF-084 to DEF-116)
+      new user creates and exports a first lorebook unaided, and a card round-trips. (DEF-002, DEF-010,
+      DEF-017, DEF-038, DEF-040, DEF-043, DEF-051, DEF-052, DEF-057, DEF-060, DEF-064, DEF-067,
+      DEF-095, DEF-104, DEF-105, DEF-110)
 - [ ] **v1.** Standalone.
 - [ ] **P6 - Component (post-v1, new repository, DEF-063).** Extract the pure core and a headless
       surface so a consumer can embed the editor. Gate: the extracted component passes the same unit and
@@ -65,13 +65,11 @@ Ordered by value per effort. Nothing here is outside the current phase.
 - [ ] `M` `P5` Configurable new-entry defaults (DEF-108).
 - [ ] `M` `P5` Per-entry colour labels (DEF-113).
 - [ ] `M` `P5` Markdown preview, only if frontends read it consistently (DEF-110).
-- [ ] `M` `P5` A mobile library drawer (DEF-030).
 - [ ] `L` `P5` Density options, resizable text areas, focus mode, hover hints (DEF-032, DEF-033, DEF-035, DEF-036).
 - [ ] `M` `P5` A keyboard shortcuts reference dialog (DEF-034).
 - [ ] `M` `P5` An app icon set and social preview assets (DEF-051).
 - [ ] `M` `P5` A small beta with real SillyTavern and Chub users (DEF-052).
 - [ ] `M` `P5` A signed release APK and keystore (DEF-067).
-- [ ] `M` `P5` Deployment automation and the PWA (DEF-041, DEF-042).
 - [ ] `M` `P5` Decide the Windows build story (DEF-060).
 
 ## Character cards (P5, built v0.8.0)
@@ -109,7 +107,6 @@ adapters, validation, extraction, linking, the library and the parity section al
 
 ## UI, UX and accessibility
 
-- [ ] `M` `P5` A mobile library drawer (DEF-030).
 
 
 - [ ] `L` `P5` Density options for compact lists (DEF-032).
@@ -129,8 +126,6 @@ adapters, validation, extraction, linking, the library and the parity section al
 ## Engineering and QA
 
 - [ ] `VH` `P5` TypeScript or JSDoc types if schema complexity grows (DEF-040).
-- [ ] `M` `P5` Offline support as a PWA (DEF-041).
-- [ ] `L` `P5` Deployment automation to a static host (DEF-042).
 - [ ] `M` `P5` A manual screen-reader pass on top of axe (DEF-043).
 - [ ] `M` `P5` Three-way merge over a common ancestor (DEF-057).
 - [ ] `M` `P5` Decide the Windows build story (DEF-060).
@@ -161,6 +156,9 @@ adapters, validation, extraction, linking, the library and the parity section al
 
 ## Recently landed
 
+- PWA support (manifest, maskable icons, cache-first service worker) and a GitHub Pages deploy workflow
+  that runs the gates on `v*` tags (v0.8.0+).
+- The mobile library drawer, hover hint popups, compact density and resizable text areas (v0.8.0+).
 - A light theme with a persisted toggle and `npm run contrast`, a two-theme WCAG AA gate in CI (v0.8.0+).
 - Organization pass: user-pinned entries (`Alt+P`), a recent-entries list, a regex search mode on both
   search inputs, and custom templates that persist on the project (v0.8.0+).
@@ -175,6 +173,7 @@ adapters, validation, extraction, linking, the library and the parity section al
 - The product rename to Loreweaver, with a namespace migration and legacy-file import (v0.7.4+).
 - Book duplicate, split and merge with id and source-UID remapping.
 - The documentation set reshaped to the topic-owner standard.
+
 
 
 

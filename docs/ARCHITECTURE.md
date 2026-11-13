@@ -188,6 +188,7 @@ ids (see `DECISIONS.md` I-4).
 | `src/formats/*` | Detection, normalization, serialization, adapters |
 | `src/limits.js` | Import size and schema limits |
 | `src/sample.js` | First-run demo project |
+| `sw.js`, `manifest.webmanifest`, `icons/` | PWA shell: cache-first offline support, installed-app metadata |
 
 ## 8. Extension points
 
@@ -196,3 +197,5 @@ ids (see `DECISIONS.md` I-4).
 - A view is a dialog in `index.html`, a handler in `main.js`, and pure logic in a module.
 - Row windowing is decided by `windowing.js`; `ui/sidebar.js` renders only the window, so the store is
   untouched and the pure window math is unit-tested (`test/windowing.test.js`).
+- Deployment ships the `www/` bundle (`.github/workflows/deploy.yml`); `scripts/bundle.mjs` is the one
+  place that decides what a release contains.

@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const out = resolve(root, "www");
-const entries = ["index.html", "src", "favicon.svg", "favicon.ico"];
+const entries = ["index.html", "src", "favicon.svg", "favicon.ico", "manifest.webmanifest", "sw.js", "icons"];
 
 async function exists(path) {
   try {
@@ -17,6 +17,7 @@ async function exists(path) {
 
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
+await (import("node:fs/promises")).then((fs) => fs.writeFile(resolve(out, ".nojekyll"), ""));
 
 let copied = 0;
 

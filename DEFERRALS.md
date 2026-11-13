@@ -144,8 +144,8 @@ Small, low-risk surface fixes carried from the old backlog.
 | # | Item | Notes | Owner | Status |
 |---|---|---|---|---|
 | DEF-040 | TypeScript or JSDoc types if schema complexity grows | - | P5 | scheduled |
-| DEF-041 | Offline support as a PWA | - | P5 | scheduled |
-| DEF-042 | Deployment automation to a static host | - | P5 | scheduled |
+| DEF-041 | Offline support as a PWA | manifest, maskable icons and a cache-first `sw.js` precaching the shell | P5 | done |
+| DEF-042 | Deployment automation to a static host | `.github/workflows/deploy.yml`: gates then the bundle to GitHub Pages on `v*` tags | P5 | done |
 | DEF-043 | A manual screen-reader pass on top of axe | U-3 | P5 | scheduled |
 | DEF-044 | Browser coverage for export downloads and shortcuts | download filename/type and the undo, search, replace and palette shortcuts | P4 | done |
 | DEF-054 | Benchmark a 500,000-character single book | `npm run benchmark` content-size profile | P4 | done |
@@ -187,6 +187,7 @@ may delay a v1 phase.
 | DEF-062 | An embedding and vendoring guide with the licence note | asks A-1/C-3 | post-v1 | scheduled |
 | DEF-063 | Extract the pure core into a new component repository | asks A-1 to A-6; the v1 tag is the precondition | post-v1 | scheduled |
 | DEF-065 | Run-level budget arbitration across attached books | ask B-9; the run budget is the outer bound | post-v1 | scheduled |
+
 
 
 

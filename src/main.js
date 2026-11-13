@@ -5456,3 +5456,7 @@ function printActiveBook() {
   renderPrintView();
   window.print();
 }
+
+if ("serviceWorker" in navigator && globalThis.location?.protocol?.startsWith("http")) {
+  navigator.serviceWorker.register("./sw.js").catch(() => {});
+}

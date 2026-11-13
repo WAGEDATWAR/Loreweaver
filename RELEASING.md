@@ -31,6 +31,8 @@ Loreweaver uses a simple pre-1.0 semantic versioning convention.
 6. Push `main`.
 7. Create an annotated tag: `git tag -a v<version> -m "v<version> - <summary>"`.
 8. Push the tag: `git push origin v<version>`.
+9. Pushing the tag triggers `.github/workflows/deploy.yml`, which re-runs the gates and deploys the
+   `www/` bundle to GitHub Pages. Cut a milestone APK the same way (`docs/MOBILE-PREVIEW.md`).
 
 ## Verification scripts
 

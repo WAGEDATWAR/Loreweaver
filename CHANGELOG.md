@@ -41,6 +41,10 @@ All notable changes to Loreweaver are documented here. The format is based on [K
   duplicate, `Ctrl+Enter` simulation, a Copy entry command, `aria-keyshortcuts`, and reset-filters and
   clear-search actions in the empty list state (DEF-005, DEF-007 to DEF-009, DEF-037, DEF-096 to DEF-103,
   DEF-109, DEF-114 to DEF-116).
+- The mobile library drawer and CSS hover/focus hint popups for long field explanations (DEF-030, DEF-036).
+- PWA support: a web manifest with maskable icons and a cache-first service worker that precaches the
+  shell, so the app installs and opens offline (DEF-041). Deployment automation: `deploy.yml` runs the
+  gates on `v*` tags and publishes the `www/` bundle to GitHub Pages (DEF-042).
 
 ## [0.8.0] - 2026-11-08
 
@@ -239,6 +243,7 @@ Mobile preview builds, bulk authoring tools and the completed scale phase.
 - Canonical project, book, and entry schema.
 - Native project import/export, single-book export, and pre-import backups.
 - Search, autosave, sample project, and the dark application shell.
+
 
 
 
