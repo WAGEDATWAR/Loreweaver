@@ -443,7 +443,7 @@ test("native export stays lossless and warning-free", async () => {
 test("publishes export capabilities for every book format", async () => {
   assert.deepEqual(
     EXPORT_FORMATS.map((format) => format.id),
-    ["sillytavern", "native", "content-format", "chub", "characterbook"]
+    ["sillytavern", "native", "content-format", "chub", "characterbook", "risu"]
   );
   assert.equal(EXPORT_FORMATS[0].primary, true);
   assert.equal(EXPORT_FORMATS.filter((format) => format.primary).length, 1);
@@ -459,4 +459,22 @@ test("rejects unrelated JSON with a clear message", async () => {
 
   assert.equal(result.ok, false);
   assert.match(result.error, /isn't a supported lorebook/);
+});
+
+test("exports a RisuAI lorebook with array entries", async () => {
+  const project = createProject({
+    books: [{
+      name: "Risu Book",
+      entries: [{ title: "Mara", keys: ["mara"], content: "Harbormaster.", tags: ["npc"], notes: "secret" }]
+    }]
+  });
+  const exported = serializeLorebook("risu", project.books[0]);
+
+  assert.equal(exported.ok, true);
+  assert.match(exported.filename, /risuai-lorebook\.json$/);
+  assert.ok(Array.isArray(exported.data.entries));
+  assert.equal(exported.data.entries[0].key[0], "mara");
+  assert.equal(exported.data.entries[0].comment, "Mara");
+  assert.ok(exported.warnings.some((warning) => /tags/.test(warning)));
+  assert.ok(exported.warnings.some((warning) => /author note/i.test(warning)));
 });

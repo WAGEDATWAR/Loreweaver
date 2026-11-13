@@ -566,6 +566,31 @@ export const scenarios = [
     }
   },
   {
+    name: "edits advanced imported fields in place",
+    async run(page, context) {
+      await resetApp(page);
+      await importFile(page, context.fixture("sillytavern-world-info.json"));
+      await page.click("#diff-accept");
+      await page.waitFor('[...document.querySelectorAll("#book-select option")].some((option) => option.textContent === "Harbor Secrets")');
+      await page.waitFor('document.querySelector("#advanced-fields")?.hidden === false');
+      await page.evaluate('document.querySelector("#advanced-fields").open = true; true');
+
+      const depth = await page.evaluate('document.querySelector(\'[data-advanced-key="depth"]\')?.value');
+      assert.equal(depth, "8");
+
+      await setValue(page, '[data-advanced-key="depth"]', "12");
+      await page.waitFor('document.querySelector("#save-state")?.dataset.state === "saved"');
+
+      await page.reload();
+      await page.waitFor('document.querySelector("#book-name")?.value === "Harbor Secrets"');
+      await page.waitFor('document.querySelector("#advanced-fields")?.hidden === false');
+      await page.evaluate('document.querySelector("#advanced-fields").open = true; true');
+      const reloaded = await page.evaluate('document.querySelector(\'[data-advanced-key="depth"]\')?.value');
+      assert.equal(reloaded, "12");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "imports by drag and drop and logs the audit",
     async run(page, context) {
       await resetApp(page);

@@ -14,6 +14,9 @@ export const POSITIONS = [
 
 const POSITION_VALUES = new Set(POSITIONS.map((position) => position.value));
 
+export const ENTRY_COLOR_VALUES = ["", "blue", "green", "amber", "red", "purple", "teal"];
+const ENTRY_COLORS = new Set(ENTRY_COLOR_VALUES);
+
 function normalizeExtensions(value) {
   return value && typeof value === "object" && !Array.isArray(value) ? value : {};
 }
@@ -67,6 +70,7 @@ export function createEntry(patch = {}) {
     probability: Number.isFinite(patch.probability) ? clamp(Math.round(patch.probability), 0, 100) : 100,
     tokenLimit: Number.isFinite(patch.tokenLimit) ? clamp(Math.round(patch.tokenLimit), 0, 1_000_000) : 0,
     charLimit: Number.isFinite(patch.charLimit) ? clamp(Math.round(patch.charLimit), 0, 1_000_000) : 0,
+    color: ENTRY_COLORS.has(patch.color) ? patch.color : "",
     createdAt: Number.isFinite(patch.createdAt) ? patch.createdAt : now,
     updatedAt: Number.isFinite(patch.updatedAt) ? patch.updatedAt : now,
     extensions: normalizeExtensions(patch.extensions)

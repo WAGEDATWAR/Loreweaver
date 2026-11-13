@@ -4562,3 +4562,100 @@ button.book-action:disabled {
   color: var(--text-soft);
   font-size: 12.5px;
 }
+
+.entry-defaults {
+  margin-top: 10px;
+}
+
+.entry-defaults summary {
+  cursor: pointer;
+  color: var(--text-soft);
+}
+
+.entry-defaults .chip-row {
+  margin-top: 8px;
+}
+
+.entry-defaults .hint {
+  display: block;
+  margin-top: 6px;
+}
+
+.status-dot.color-blue { background: #6fa8ff; }
+.status-dot.color-green { background: #63d69a; }
+.status-dot.color-amber { background: #e6b95c; }
+.status-dot.color-red { background: #ff8795; }
+.status-dot.color-purple { background: #b98aff; }
+.status-dot.color-teal { background: #5fc9d6; }
+
+.entry-color-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.entry-color-option {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.entry-color-option:hover {
+  border-color: var(--border-strong);
+}
+
+.entry-color-option.is-active {
+  border-color: var(--text);
+}
+
+.advanced-fields {
+  margin-top: 10px;
+}
+
+.advanced-fields summary {
+  cursor: pointer;
+  color: var(--text-soft);
+}
+
+.advanced-fields-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.advanced-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.advanced-field > span {
+  color: var(--text-soft);
+  font-size: 11.5px;
+}
+
+.advanced-field input[type="number"],
+.advanced-field input[type="text"],
+.advanced-field select {
+  width: 140px;
+  height: 30px;
+  padding: 0 8px;
+  color: var(--text);
+  font-size: 12px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+}
+
+.advanced-field input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+}

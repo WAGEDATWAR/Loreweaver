@@ -677,7 +677,12 @@ export function addEntry(patch = {}) {
 
   captureHistory("add-entry", false);
   const highestOrder = book.entries.reduce((highest, entry) => Math.max(highest, entry.order), 0);
-  const entry = createEntry({ ...patch, order: highestOrder + 10 });
+  const defaults = state.ui?.entryDefaults ?? {};
+  const merged = { ...defaults, ...patch };
+  const entry = createEntry({
+    ...merged,
+    order: highestOrder + 10
+  });
   book.entries.push(entry);
   book.updatedAt = Date.now();
   state.activeEntryId = entry.id;
@@ -1146,4 +1151,28 @@ export function setSearchRegex(active) {
 
 export function getSearchRegex() {
   return state?.ui?.searchRegex === true;
+}
+
+export function getEntryDefaults() {
+  const defaults = state?.ui?.entryDefaults ?? {};
+
+  return {
+    constant: defaults.constant === true,
+    selective: defaults.selective === true,
+    caseSensitive: defaults.caseSensitive === true,
+    matchWholeWords: defaults.matchWholeWords === true
+  };
+}
+
+export function setEntryDefaults(patch = {}) {
+  if (!state) {
+    return getEntryDefaults();
+  }
+
+  captureHistory("set-entry-defaults", false);
+  state.ui.entryDefaults = {
+    ...getEntryDefaults(),
+    ...patch
+  };
+  return getEntryDefaults();
 }

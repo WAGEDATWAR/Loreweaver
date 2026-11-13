@@ -50,6 +50,8 @@ import {
   setEntriesOrder,
   setEntryFilters,
   resetFilters,
+  getEntryDefaults,
+  setEntryDefaults,
   getSearchRegex,
   setSearchRegex,
   setSearchQuery,
@@ -97,8 +99,9 @@ import { MAX_IMPORT_BYTES } from "./limits.js";
 import { parseHistory, serializeHistory } from "./history.js";
 import { IMPORT_STRATEGIES, mergeProject } from "./merge.js";
 import { createSampleProject } from "./sample.js";
-import { createCard, createProject, normalizeTagList } from "./schema.js";
+import { createCard, createProject, normalizeTagList, ENTRY_COLOR_VALUES } from "./schema.js";
 import { formatAudit, recordAudit } from "./auditLog.js";
+import { writeAdvancedField } from "./advanced.js";
 import { searchProject } from "./search.js";
 import { suggestKeys } from "./suggestKeys.js";
 import { storageKey } from "./storage/namespace.js";
@@ -139,6 +142,10 @@ const refs = {
   bookTagsInput: document.querySelector("#book-tags-input"),
   bookTokenBudget: document.querySelector("#book-token-budget"),
   bookBudgetStatus: document.querySelector("#book-budget-status"),
+  defaultConstant: document.querySelector("#default-constant"),
+  defaultSelective: document.querySelector("#default-selective"),
+  defaultCaseSensitive: document.querySelector("#default-case-sensitive"),
+  defaultWholeWords: document.querySelector("#default-whole-words"),
   cardList: document.querySelector("#card-list"),
   recentList: document.querySelector("#recent-list"),
   recentSection: document.querySelector(".recent-section"),
@@ -363,6 +370,9 @@ const refs = {
   entryTagsContainer: document.querySelector("#entry-tags"),
   entryTagsInput: document.querySelector("#entry-tags-input"),
   entryContent: document.querySelector("#entry-content"),
+  entryColorRow: document.querySelector(".entry-color-row"),
+  advancedFields: document.querySelector("#advanced-fields"),
+  advancedFieldsBody: document.querySelector("#advanced-fields-body"),
   entryNotes: document.querySelector("#entry-notes"),
   entryStatChars: document.querySelector("#entry-stat-chars"),
   entryStatWords: document.querySelector("#entry-stat-words"),
@@ -1513,6 +1523,11 @@ function updateBookDescriptionPreview(description) {
 
 function renderAll() {
   const book = getActiveBook();
+  const defaults = getEntryDefaults();
+  refs.defaultConstant.checked = defaults.constant;
+  refs.defaultSelective.checked = defaults.selective;
+  refs.defaultCaseSensitive.checked = defaults.caseSensitive;
+  refs.defaultWholeWords.checked = defaults.matchWholeWords;
   refs.bookName.value = book?.name ?? "";
   refs.bookDescription.value = book?.description ?? "";
   updateBookDescriptionPreview(book?.description ?? "");
@@ -3785,6 +3800,20 @@ refs.bookTokenBudget.addEventListener("blur", () => {
   refs.bookTokenBudget.value = String(getActiveBook()?.tokenBudget ?? 0);
 });
 
+const defaultBindings = [
+  [refs.defaultConstant, "constant"],
+  [refs.defaultSelective, "selective"],
+  [refs.defaultCaseSensitive, "caseSensitive"],
+  [refs.defaultWholeWords, "matchWholeWords"]
+];
+
+for (const [checkbox, field] of defaultBindings) {
+  checkbox.addEventListener("change", () => {
+    setEntryDefaults({ [field]: checkbox.checked });
+    scheduleSave();
+  });
+}
+
 refs.entrySearch.addEventListener("input", (event) => {
   setSearchQuery(event.target.value);
   renderSidebar(refs);
@@ -4223,6 +4252,89 @@ refs.entryNotes.addEventListener("input", (event) => {
   updateActiveEntry({ notes: event.target.value });
   scheduleSave();
 });
+
+function renderEntryColorOptions() {
+  if (!refs.entryColorRow || refs.entryColorRow.childElementCount) {
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  const labels = new Map([
+    ["", "No colour"],
+    ["blue", "Blue"],
+    ["green", "Green"],
+    ["amber", "Amber"],
+    ["red", "Red"],
+    ["purple", "Purple"],
+    ["teal", "Teal"]
+  ]);
+
+  for (const value of ENTRY_COLOR_VALUES) {
+    const option = document.createElement("button");
+    option.type = "button";
+    option.className = `entry-color-option${value ? ` color-${value}` : ""}`;
+    option.dataset.color = value;
+    option.title = labels.get(value);
+    option.setAttribute("aria-label", labels.get(value));
+    option.setAttribute("aria-pressed", "false");
+    fragment.append(option);
+  }
+
+  refs.entryColorRow.append(fragment);
+}
+
+renderEntryColorOptions();
+
+refs.entryColorRow?.addEventListener("click", (event) => {
+  const option = event.target.closest("[data-color]");
+
+  if (!option) {
+    return;
+  }
+
+  updateActiveEntry({ color: option.dataset.color });
+  renderEditor(refs);
+  renderSidebar(refs);
+  scheduleSave();
+});
+
+refs.advancedFieldsBody?.addEventListener("change", handleAdvancedFieldChange);
+refs.advancedFieldsBody?.addEventListener("input", (event) => {
+  // Number and text fields commit on input; the save debounce absorbs the churn.
+  if (event.target.closest("[data-advanced-key]")?.dataset.advancedType === "number") {
+    handleAdvancedFieldChange(event);
+  }
+});
+
+function handleAdvancedFieldChange(event) {
+  const input = event.target.closest("[data-advanced-key]");
+
+  if (!input) {
+    return;
+  }
+
+  const entry = getActiveEntry();
+
+  if (!entry) {
+    return;
+  }
+
+  const key = input.dataset.advancedKey;
+  let value;
+
+  if (input.dataset.advancedType === "boolean") {
+    value = input.checked;
+  } else if (input.dataset.advancedType === "number") {
+    value = input.value === "" ? "" : Math.round(Number(input.value));
+    value = Number.isFinite(value) ? value : "";
+  } else {
+    value = input.value;
+  }
+
+  const updated = writeAdvancedField(entry, key, value);
+  updateActiveEntry({ extensions: updated.extensions });
+  scheduleSave();
+}
 
 function openPeekDialog() {
   const entry = getActiveEntry();

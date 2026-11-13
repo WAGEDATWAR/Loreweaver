@@ -200,6 +200,16 @@
                 <input id="book-token-budget" class="book-budget-input" type="number" min="0" max="10000000" step="100" value="0" inputmode="numeric">
                 <span id="book-budget-status" class="book-budget-status" aria-live="polite">Enabled: ~0 tokens</span>
               </div>
+              <details id="entry-defaults" class="entry-defaults">
+                <summary><span class="section-label">New-entry defaults</span></summary>
+                <div class="chip-row">
+                  <label class="chip"><input id="default-constant" type="checkbox">Always on</label>
+                  <label class="chip"><input id="default-selective" type="checkbox">Selective</label>
+                  <label class="chip"><input id="default-case-sensitive" type="checkbox">Case sensitive</label>
+                  <label class="chip"><input id="default-whole-words" type="checkbox">Match whole words</label>
+                </div>
+                <span class="hint">Applies to entries created after the change.</span>
+              </details>
               <div class="book-meta-actions">
                 <button id="overview-btn" class="meta-btn overview-btn" type="button" aria-label="Lorebook overview" title="Lorebook overview">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -427,6 +437,9 @@
                   <span class="section-badge">Not injected</span>
                 </div>
                 <textarea id="entry-notes" class="notes-area" placeholder="Outline ideas, canon checks, or reminders for yourself. These notes are never included in lorebook exports." spellcheck="true"></textarea>
+                <div class="entry-color-row" role="group" aria-label="Entry colour label">
+                  <button type="button" class="entry-color-option" data-color="" title="No colour" aria-label="No colour"></button>
+                </div>
               </section>
             </div>
           </div>
@@ -510,6 +523,11 @@
                   <label class="chip"><input id="entry-case-sensitive" type="checkbox">Case sensitive</label>
                   <label class="chip"><input id="entry-whole-words" type="checkbox">Match whole words</label>
                 </div>
+
+                <details id="advanced-fields" class="advanced-fields" hidden>
+                  <summary><span class="section-label">Advanced fields</span><span class="hint">from the imported format</span></summary>
+                  <div id="advanced-fields-body" class="advanced-fields-body"></div>
+                </details>
               </section>
             </div>
           </aside>

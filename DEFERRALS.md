@@ -26,10 +26,10 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 | DEF-007 | Entry links (`[[Title]]`) with broken-link validation | `entryLinks.js`, folded into validation | P5 | done |
 | DEF-008 | Suggested trigger keys from title and content | `suggestKeys.js` with a Suggest keys button | P5 | done |
 | DEF-009 | Bulk tag assignment for selected entries | bulk tag dialog, add and remove | P5 | done |
-| DEF-108 | A configurable default for new-entry flags (always on, selective, case sensitive, whole words) | per-project defaults | P5 | scheduled |
+| DEF-108 | A configurable default for new-entry flags (always on, selective, case sensitive, whole words) | defaults disclosure in Lorebook info; applies to later entries | P5 | done |
 | DEF-109 | An inject-peek preview of an entry's rendered text | peek dialog with token cost | P5 | done |
 | DEF-110 | Markdown preview for content | only if the target frontends read it consistently | P5 | scheduled |
-| DEF-113 | Per-entry colour labels for visual grouping | distinct from tags | P5 | scheduled |
+| DEF-113 | Per-entry colour labels for visual grouping | six colour dots on cards and a picker under notes | P5 | done |
 
 
 ## I. Interop
@@ -38,8 +38,8 @@ fails on a malformed or ownerless row; `npm run deferral-scan` reports prose def
 |---|---|---|---|---|
 | DEF-012 | Character card containers (PNG/CHARX) and embedded books | delivered by the K series | P5 | done |
 | DEF-013 | Chub wrapper variants beyond `lorebook_v3` | wrapped `data` block fixture imports with wrapper fields preserved | P4 | done |
-| DEF-014 | RisuAI-native export | - | P5 | scheduled |
-| DEF-015 | Editable advanced SillyTavern and Chub fields | - | P5 | scheduled |
+| DEF-014 | RisuAI-native export | export-only adapter with array entries (`formats/risu.js`) | P5 | done |
+| DEF-015 | Editable advanced SillyTavern and Chub fields | Advanced section reads/writes `extensions.sourceFields`, role numeric mapping preserved (`advanced.js`) | P5 | done |
 | DEF-016 | Lossy-field warning coverage across serializers | tags and notes warn on every interchange export (`buildLossyWarnings`); native stays silent | P4 | done |
 | DEF-017 | JSON/YAML plain export for scripting | - | P5 | scheduled |
 | DEF-019 | Drag-and-drop file import onto the window | drop overlay over the whole window, first file imports | P5 | done |
@@ -187,6 +187,7 @@ may delay a v1 phase.
 | DEF-062 | An embedding and vendoring guide with the licence note | asks A-1/C-3 | post-v1 | scheduled |
 | DEF-063 | Extract the pure core into a new component repository | asks A-1 to A-6; the v1 tag is the precondition | post-v1 | scheduled |
 | DEF-065 | Run-level budget arbitration across attached books | ask B-9; the run budget is the outer bound | post-v1 | scheduled |
+
 
 
 

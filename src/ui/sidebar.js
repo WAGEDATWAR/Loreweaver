@@ -206,7 +206,7 @@ function createEntryCard(entry, options) {
   id.title = `Entry ID: ${entry.id}`;
 
   const dot = document.createElement("span");
-  dot.className = "status-dot";
+  dot.className = `status-dot${entry.color ? ` color-${entry.color}` : ""}`;
   dot.setAttribute("aria-hidden", "true");
 
   const title = document.createElement("span");

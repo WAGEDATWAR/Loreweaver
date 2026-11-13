@@ -5,11 +5,12 @@ import { characterBookAdapter } from "./characterBook.js";
 import { chubAdapter } from "./chub.js";
 import { isRecord } from "./helpers.js";
 import { nativeAdapter } from "./native.js";
+import { risuAdapter } from "./risu.js";
 import { sillyTavernAdapter } from "./sillytavern.js";
 
 // The shared interchange adapter leads: a file another frontend wrote (or we wrote for it) reads
 // without any frontend-specific guessing. Native Loreweaver files come next.
-const adapters = [nativeAdapter, contentFormatAdapter, chubAdapter, sillyTavernAdapter, characterBookAdapter];
+const adapters = [nativeAdapter, contentFormatAdapter, chubAdapter, sillyTavernAdapter, characterBookAdapter, risuAdapter];
 
 export const CARD_ADAPTER = cardAdapter;
 
