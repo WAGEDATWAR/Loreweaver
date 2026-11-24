@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="./src/styles.css">
 </head>
 <body>
+  <a class="skip-link" href="#content" id="skip-link">Skip to content</a>
   <div class="app">
     <header class="topbar">
       <h1 class="sr-only">Loreweaver</h1>
@@ -58,12 +59,13 @@
             <path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>
           </svg>
         </button>
-        <button id="command-btn" class="icon-btn command-btn" type="button" aria-label="Command palette" title="Command palette (Ctrl+K)">
+        <button id="command-btn" class="icon-btn command-btn" type="button" aria-label="Command palette, Ctrl K" title="Command palette (Ctrl+K)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M9 6.5 7.5 6.5A2.5 2.5 0 1 0 10 9V7.5"/><path d="M9 17.5 7.5 17.5A2.5 2.5 0 1 1 10 15v1.5"/>
             <path d="M15 6.5 16.5 6.5A2.5 2.5 0 1 1 14 9V7.5"/><path d="M15 17.5 16.5 17.5A2.5 2.5 0 1 0 14 15v1.5"/>
             <path d="M9 9h6v6H9z"/>
           </svg>
+          <span class="command-label">Ctrl K</span>
         </button>
         <div class="history-controls" role="group" aria-label="History">
           <button id="undo-btn" class="icon-btn" type="button" aria-label="Undo" aria-keyshortcuts="Control+Z" title="Undo (Ctrl+Z)" disabled>
@@ -173,6 +175,7 @@
       </div>
     </div>
 
+    <span id="content" tabindex="-1"></span>
     <div class="shell" data-nav="expanded">
       <nav id="app-nav" class="app-nav" aria-label="Editor" hidden>
         <a id="nav-back" class="nav-item nav-back" href="#/library" title="Back to the library (Alt 1)">

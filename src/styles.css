@@ -266,7 +266,7 @@ textarea::placeholder {
   align-items: center;
   gap: 6px;
   color: var(--faint);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
   transition: color 160ms ease;
@@ -309,7 +309,7 @@ textarea::placeholder {
   overflow: hidden;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -318,7 +318,7 @@ textarea::placeholder {
   flex-shrink: 0;
   padding: 2px 7px;
   color: var(--warning);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -350,7 +350,7 @@ textarea::placeholder {
 .onboarding-points code {
   padding: 1px 4px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   background: var(--surface-sunken);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -515,7 +515,7 @@ button {
   padding: 1px 5px;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 12px;
   font-weight: 500;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
@@ -705,7 +705,7 @@ body.is-resizing-sidebar {
 .section-label {
   display: block;
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -750,7 +750,7 @@ body.is-resizing-sidebar {
   height: 30px;
   padding: 0 8px;
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   background: var(--surface-sunken);
   border: 1px solid var(--border);
@@ -835,7 +835,7 @@ body.is-resizing-sidebar {
   min-width: 0;
   overflow: hidden;
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
   text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -948,7 +948,7 @@ body.is-resizing-sidebar {
   padding: 1px 5px;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 5px;
@@ -965,7 +965,7 @@ body.is-resizing-sidebar {
 .filter-chip {
   padding: 4px 9px;
   color: var(--muted);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 600;
   background: var(--surface-sunken);
   border: 1px solid var(--border);
@@ -1010,7 +1010,7 @@ body.is-resizing-sidebar {
 .validation-count {
   min-width: 10px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -1027,7 +1027,7 @@ body.is-resizing-sidebar {
   height: 26px;
   padding: 0 24px 0 8px;
   color: var(--muted);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 550;
   background-color: transparent;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%237c8799' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
@@ -1064,7 +1064,7 @@ body.is-resizing-sidebar {
   padding: 1px 6px;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   text-align: center;
   background: var(--surface-raised);
   border: 1px solid var(--border);
@@ -1207,7 +1207,7 @@ body.is-resizing-sidebar {
   overflow: hidden;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   line-height: 1.4;
   text-overflow: ellipsis;
@@ -1252,7 +1252,7 @@ body.is-resizing-sidebar {
   flex-shrink: 0;
   padding: 1px 5px;
   color: var(--accent);
-  font-size: 8.5px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1265,7 +1265,7 @@ body.is-resizing-sidebar {
   overflow: hidden;
   padding-left: 13px;
   color: var(--faint);
-  font-size: 11.5px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1280,7 +1280,7 @@ body.is-resizing-sidebar {
   flex-shrink: 0;
   padding: 1px 5px;
   color: var(--warning);
-  font-size: 8.5px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1299,7 +1299,7 @@ body.is-resizing-sidebar {
 .entry-tag {
   padding: 1px 6px;
   color: var(--faint);
-  font-size: 9.5px;
+  font-size: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -1309,7 +1309,7 @@ body.is-resizing-sidebar {
   padding-left: 13px;
   overflow: hidden;
   color: var(--accent);
-  font-size: 10px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1350,7 +1350,7 @@ body.is-resizing-sidebar {
   min-width: 0;
   overflow: hidden;
   color: var(--text-soft);
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1377,7 +1377,7 @@ body.is-resizing-sidebar {
 
 .bulk-order-label {
   color: var(--faint);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -1393,7 +1393,7 @@ body.is-resizing-sidebar {
   height: 28px;
   padding: 0 6px;
   color: var(--text);
-  font-size: 11.5px;
+  font-size: 12px;
   text-align: center;
   background: var(--surface-sunken);
   border: 1px solid var(--border);
@@ -1507,7 +1507,7 @@ body.is-resizing-sidebar {
 .details-label {
   margin: 0 0 12px;
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1543,7 +1543,7 @@ body.is-resizing-sidebar {
 .stat-name {
   overflow: hidden;
   color: var(--faint);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-overflow: ellipsis;
@@ -1564,7 +1564,7 @@ body.is-resizing-sidebar {
 
 .details-panel .chip {
   padding: 6px 10px;
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
 .editor-inner {
@@ -1593,7 +1593,7 @@ body.is-resizing-sidebar {
   display: block;
   margin-bottom: 6px;
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1731,7 +1731,7 @@ body.is-resizing-sidebar {
 
 .hint {
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 400;
 }
 
@@ -1904,7 +1904,7 @@ body.is-resizing-sidebar {
 
 .book-budget-status {
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .book-budget-status.is-over {
@@ -2011,7 +2011,7 @@ button.book-action:disabled {
 
 .book-action-desc {
   color: var(--faint);
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.45;
 }
 
@@ -2077,7 +2077,7 @@ button.book-action:disabled {
 .section-head h2 {
   margin: 0;
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -2086,7 +2086,7 @@ button.book-action:disabled {
 .stats {
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -2120,7 +2120,7 @@ button.book-action:disabled {
 .section-badge {
   padding: 3px 6px;
   color: var(--faint);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -2270,7 +2270,7 @@ button.book-action:disabled {
   min-width: 34px;
   color: var(--text-soft);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   text-align: right;
 }
 
@@ -2452,7 +2452,7 @@ button.book-action:disabled {
   flex-shrink: 0;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .command-empty {
@@ -2509,7 +2509,7 @@ button.book-action:disabled {
 .guide-steps code {
   padding: 1px 4px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   background: var(--surface-sunken);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -2549,7 +2549,7 @@ button.book-action:disabled {
 
 .simulation-summary {
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
 .simulation-results {
@@ -2564,7 +2564,7 @@ button.book-action:disabled {
 .simulation-section h3 {
   margin: 0 0 8px;
   color: var(--faint);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -2601,7 +2601,7 @@ button.book-action:disabled {
   padding: 2px 6px;
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12px;
   text-align: center;
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
@@ -2632,7 +2632,7 @@ button.book-action:disabled {
 
 .simulation-item-meta {
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .simulation-graph {
@@ -2656,7 +2656,7 @@ button.book-action:disabled {
 .simulation-graph-rank {
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   text-align: right;
 }
 
@@ -2668,7 +2668,7 @@ button.book-action:disabled {
   padding: 2px 7px;
   overflow: hidden;
   color: var(--text);
-  font-size: 10.5px;
+  font-size: 12px;
   white-space: nowrap;
   text-overflow: ellipsis;
   background: linear-gradient(90deg, var(--accent-soft), rgba(143, 168, 255, 0.04));
@@ -2691,7 +2691,7 @@ button.book-action:disabled {
   gap: 14px;
   margin-bottom: 6px;
   color: var(--faint);
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .simulation-graph-legend span {
@@ -2721,7 +2721,7 @@ button.book-action:disabled {
   overflow: auto;
   color: var(--text-soft);
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.5;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -2772,7 +2772,7 @@ button.book-action:disabled {
 .simulation-skip-reason {
   flex-shrink: 0;
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .dialog h2 {
@@ -2800,7 +2800,7 @@ button.book-action:disabled {
 .dialog-heading .eyebrow {
   margin-bottom: 5px;
   color: var(--accent);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -2854,7 +2854,7 @@ button.book-action:disabled {
 
 .export-option-desc {
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.4;
 }
 
@@ -2862,7 +2862,7 @@ button.book-action:disabled {
   flex-shrink: 0;
   padding: 3px 6px;
   color: var(--faint);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border: 1px solid var(--border);
@@ -2889,14 +2889,14 @@ button.book-action:disabled {
 }
 
 .backup-heading p {
-  font-size: 11.5px;
+  font-size: 12px;
   white-space: pre-line;
 }
 
 .backup-note {
   margin-top: 8px !important;
   color: var(--faint) !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
 }
 
 .storage-usage-list {
@@ -2904,7 +2904,7 @@ button.book-action:disabled {
   grid-template-columns: auto minmax(0, 1fr);
   gap: 4px 12px;
   margin: 8px 0 0;
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
 .storage-usage-list dt {
@@ -2934,7 +2934,7 @@ button.book-action:disabled {
 
 .confirm-detail-list dt {
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -2981,7 +2981,7 @@ button.book-action:disabled {
   gap: 6px;
   padding: 4px 7px;
   color: var(--warning);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 550;
   background: var(--warning-soft);
   border: 1px solid var(--warning-border);
@@ -3007,7 +3007,7 @@ button.book-action:disabled {
 
 .validation-chip strong {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -3051,7 +3051,7 @@ button.book-action:disabled {
 .validation-issue-type {
   flex-shrink: 0;
   color: var(--warning);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -3068,7 +3068,7 @@ button.book-action:disabled {
 
 .validation-issue-message {
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.45;
 }
 
@@ -3097,14 +3097,14 @@ button.book-action:disabled {
 .history-count {
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
 
 .history-status {
   margin: -4px 0 10px;
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
 .history-status.is-error {
@@ -3152,7 +3152,7 @@ button.book-action:disabled {
 
 .history-item-meta {
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.4;
 }
 
@@ -3172,7 +3172,7 @@ button.book-action:disabled {
   gap: 4px;
   margin-top: 1px;
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -3236,7 +3236,7 @@ button.book-action:disabled {
 
 .overview-stat-label {
   color: var(--faint);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3278,21 +3278,21 @@ button.book-action:disabled {
 
 .overview-details dt {
   color: var(--faint);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .overview-details dd {
   margin: 0;
   color: var(--text-soft);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 
 .overview-longest {
   margin: 14px 0 0;
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -3353,7 +3353,7 @@ button.book-action:disabled {
 
 .template-option-description {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.45;
 }
 
@@ -3361,7 +3361,7 @@ button.book-action:disabled {
   flex-shrink: 0;
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3395,7 +3395,7 @@ button.book-action:disabled {
 
 .diff-control-label {
   color: var(--faint);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -3443,7 +3443,7 @@ button.book-action:disabled {
 .diff-summary-chip {
   padding: 4px 8px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
   border: 1px solid var(--border);
@@ -3516,7 +3516,7 @@ button.book-action:disabled {
   margin-left: auto;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .diff-book-body {
@@ -3527,7 +3527,7 @@ button.book-action:disabled {
   flex-shrink: 0;
   padding: 2px 6px;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -3582,7 +3582,7 @@ button.book-action:disabled {
 
 .diff-field-label {
   color: var(--faint);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -3601,7 +3601,7 @@ button.book-action:disabled {
   padding: 3px 6px;
   overflow-wrap: anywhere;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.45;
   border: 1px solid var(--border);
   border-radius: 5px;
@@ -3621,14 +3621,14 @@ button.book-action:disabled {
 
 .diff-value-arrow {
   color: var(--faint);
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .diff-lines {
   max-height: 260px;
   overflow: auto;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.5;
   background: #0a0d13;
   border: 1px solid var(--border);
@@ -3721,7 +3721,7 @@ button.book-action:disabled {
   min-width: 0;
   overflow: hidden;
   color: var(--text-soft);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3732,7 +3732,7 @@ button.book-action:disabled {
   overflow: hidden;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3748,7 +3748,7 @@ button.book-action:disabled {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: 5px 10px;
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .diff-entry-meta-label {
@@ -3855,7 +3855,7 @@ button.book-action:disabled {
   padding: 1px 6px;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 11px;
   background: var(--surface-sunken);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -3892,7 +3892,7 @@ button.book-action:disabled {
 
 .global-search-item-meta {
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .toast-stack {
@@ -4298,7 +4298,7 @@ button.book-action:disabled {
   margin: 0;
   padding: 2px 2px 4px;
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .card-item {
@@ -4360,7 +4360,7 @@ button.book-action:disabled {
 .card-item-meta {
   overflow: hidden;
   color: var(--faint);
-  font-size: 10px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -4460,7 +4460,7 @@ button.book-action:disabled {
 }
 
 .card-token-badge {
-  font-size: 11.5px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
 }
@@ -4581,14 +4581,14 @@ button.book-action:disabled {
 
 .entry-list-empty-actions .btn {
   justify-content: center;
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
 .link-btn {
   align-self: flex-start;
   padding: 0;
   color: var(--accent);
-  font-size: 10.5px;
+  font-size: 12px;
   background: none;
   border: 0;
   cursor: pointer;
@@ -4628,7 +4628,7 @@ button.book-action:disabled {
   flex-shrink: 0;
   padding: 3px 8px;
   color: var(--danger);
-  font-size: 10px;
+  font-size: 12px;
   border: 1px solid var(--danger-border);
   border-radius: 6px;
   cursor: pointer;
@@ -4652,7 +4652,7 @@ button.book-action:disabled {
   padding: 5px 8px;
   overflow: hidden;
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -4716,7 +4716,7 @@ button.book-action:disabled {
   overflow: auto;
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -4752,7 +4752,7 @@ button.book-action:disabled {
   flex: 0 0 42%;
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .shortcut-label {
@@ -4835,7 +4835,7 @@ button.book-action:disabled {
 
 .advanced-field > span {
   color: var(--text-soft);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
 .advanced-field input[type="number"],
@@ -4884,7 +4884,7 @@ button.book-action:disabled {
   gap: 7px;
   color: var(--text-soft);
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -4896,7 +4896,7 @@ button.book-action:disabled {
 .schema-list dd {
   margin: 0;
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
 .print-root {
@@ -5022,7 +5022,7 @@ button.book-action:disabled {
   width: min(320px, 78vw);
   padding: 8px 10px;
   color: var(--text);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 1.5;
   text-transform: none;
@@ -5128,7 +5128,7 @@ button.brand[aria-expanded="false"] .brand-chevron {
 .nav-group-label {
   padding: 0 10px 4px;
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -5189,7 +5189,7 @@ button.brand[aria-expanded="false"] .brand-chevron {
 
 .nav-shortcut {
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .nav-item.has-issues {
@@ -5524,7 +5524,7 @@ button.brand[aria-expanded="false"] .brand-chevron {
 .export-group-title {
   margin: 0;
   color: var(--faint);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -5594,7 +5594,7 @@ button.brand[aria-expanded="false"] .brand-chevron {
 .menu-item kbd {
   color: var(--muted);
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .menu-item:hover {
@@ -5823,7 +5823,7 @@ body:not([data-mode="editor"]) .nav-open-btn {
 .project-tag,
 .project-issues {
   padding: 2px 8px;
-  font-size: 11.5px;
+  font-size: 12px;
   border: 1px solid var(--border);
   border-radius: 999px;
 }
@@ -5898,4 +5898,208 @@ body:not([data-mode="editor"]) .nav-open-btn {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
+}
+
+
+/* ---- Foundation: type scale, touch density, focus, light theme completion ---- */
+
+:root {
+  --text-micro: 11px;
+  --text-small: 12px;
+  --text-body: 13.5px;
+  --target-min: 24px;
+  --target-touch: 44px;
+  --focus-ring: 0 0 0 3px var(--accent-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.nav-item:focus-visible,
+.menu-item:focus-visible,
+.filter-chip:focus-visible,
+.project-open:focus-visible,
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible,
+.key-chips:focus-within {
+  outline: none;
+}
+
+.sidebar-resizer:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.field .key-chips-input:focus-visible {
+  outline: none;
+}
+
+.key-chip-remove,
+.link-btn,
+.entry-color-option {
+  position: relative;
+}
+
+.key-chip-remove::after,
+.link-btn::after {
+  position: absolute;
+  inset: -4px;
+  content: "";
+}
+
+.link-btn {
+  min-height: var(--target-min);
+}
+
+.entry-color-option::after {
+  position: absolute;
+  inset: -3px;
+  content: "";
+}
+
+@media (pointer: coarse), (max-width: 780px) {
+  .btn,
+  .icon-btn,
+  .nav-item,
+  .menu-item,
+  .filter-chip,
+  .field select,
+  .field input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+  .sort-select,
+  .project-open,
+  .book-select {
+    min-height: var(--target-touch);
+  }
+
+  .icon-btn {
+    min-width: var(--target-touch);
+  }
+
+  .filter-chip {
+    padding-block: 10px;
+  }
+
+  .key-chip-remove {
+    width: 24px;
+    height: 24px;
+  }
+
+  .app-nav .nav-item {
+    height: var(--target-touch);
+  }
+}
+
+/* The details panel, chips and diff surfaces were hard-coded dark. */
+:root[data-theme="light"] .details-panel,
+:root[data-theme="light"] .details-panel.is-collapsed {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(238, 241, 246, 0.9));
+}
+
+:root[data-theme="light"] .diff-entry {
+  background: var(--surface);
+}
+
+:root[data-theme="light"] .field .key-chips-input {
+  background: transparent;
+}
+
+:root[data-theme="light"] .dialog-backdrop,
+:root[data-theme="light"] .overlay-backdrop {
+  background: rgba(20, 24, 33, 0.45);
+}
+
+:root[data-theme="light"] .stat-block,
+:root[data-theme="light"] .key-chips,
+:root[data-theme="light"] .chip,
+:root[data-theme="light"] .stepper {
+  background: var(--surface-sunken);
+}
+
+:root[data-theme="light"] .details-label,
+:root[data-theme="light"] .stat-name,
+:root[data-theme="light"] .details-head .section-label {
+  color: var(--muted);
+}
+
+@media (pointer: coarse), (max-width: 780px) {
+  .search,
+  .search input,
+  .recent-item,
+  .recent-section > summary,
+  .entry-title,
+  .doc-name,
+  .link-btn,
+  .entry-color-option {
+    min-height: var(--target-touch);
+  }
+
+  .entry-color-option {
+    min-width: var(--target-touch);
+  }
+
+  .topbar .btn,
+  .topbar .icon-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 430px) {
+  .topbar-actions #import-btn {
+    display: none;
+  }
+}
+
+.stat-name {
+  letter-spacing: 0.04em;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.details-scroll {
+  overflow-x: hidden;
+}
+
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 200;
+  padding: 8px 14px;
+  color: var(--text);
+  font-size: 13px;
+  background: var(--surface-raised);
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  transform: translateY(-160%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.command-btn {
+  width: auto;
+  gap: 6px;
+  padding: 0 10px;
+}
+
+.command-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .command-label {
+    display: none;
+  }
+
+  .command-btn {
+    padding: 0;
+  }
 }

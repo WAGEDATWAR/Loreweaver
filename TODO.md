@@ -109,8 +109,8 @@ defect or risk, **S3** improvement.
 - [x] Evaluate (DEF-125): 24 states at four widths, a keyboard pass, a ranked review and a lorebook and
       card parity matrix in `docs/reference/ui-review/REVIEW.md`. A real screen-reader pass is still open
       (DEF-043).
-- [ ] `H` Foundation: type scale with a 12 px floor, touch density, one focus style, finish the light
-      theme (DEF-130, DEF-131, DEF-132).
+- [x] Foundation: 12 px text floor, touch density, one focus style, light theme finished (DEF-130, DEF-131).
+- [x] Header: a skip link and a labelled palette button (DEF-132). A file menu grouping Open, Save, Import and Export is still owed.
 - [ ] `H` Responsive model: phone master-detail and mid-width drawers (DEF-128, DEF-129).
 - [ ] `H` Card and lorebook parity in the interface: a card workspace built from the shared page anatomy,
       list, tokens, notes, bulk and history (DEF-134, DEF-117 to DEF-124).

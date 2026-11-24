@@ -119,8 +119,8 @@ never learns a card quirk.
 | DEF-127 | Per-page command palette scoping and recent pages | the palette lists every command on every page | P5 | scheduled |
 | DEF-128 | Phone layout as master-detail: list, entry and details as separate screens (UI-01) | review S1 | P5 | scheduled |
 | DEF-129 | Mid-width layout: details as a drawer and the menu as a rail below about 1200 px (UI-02) | review S1 | P5 | scheduled |
-| DEF-130 | Finish the light theme: details panel, chip inputs and a light screenshot check (UI-04) | review S2 | P5 | scheduled |
-| DEF-131 | A touch density with 44 px targets and a type scale with a 12 px floor (UI-05, UI-06) | review S2 | P5 | scheduled |
+| DEF-130 | Finish the light theme: details panel, chip inputs and a light screenshot check (UI-04) | review S2 | P5 | done |
+| DEF-131 | A touch density with 44 px targets and a type scale with a 12 px floor (UI-05, UI-06) | review S2 | P5 | done |
 | DEF-132 | A leaner header: file menu, labelled palette button, skip link, shared focus style (UI-07, UI-12) | review S2/S3 | P5 | scheduled |
 | DEF-133 | A Review page combining overview, issues and simulation for a lorebook and a card (UI-08) | review S2 | P5 | scheduled |
 | DEF-135 | Library hub follow-ups: tag filter, multi-select with bulk actions, pinned projects, grid/list toggle, kind-specific thumbnails for lorebooks | extends DEF-117 and DEF-121 | P5 | scheduled |

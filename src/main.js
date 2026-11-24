@@ -5312,6 +5312,16 @@ refs.aboutBtn.addEventListener("click", () => {
   openAboutDialog();
 });
 
+document.querySelector("#skip-link").addEventListener("click", (event) => {
+  event.preventDefault();
+  const target = [...document.querySelectorAll("main")].find((element) => !element.hidden);
+
+  if (target) {
+    target.tabIndex = -1;
+    target.focus();
+  }
+});
+
 refs.appMenuBtn.addEventListener("click", () => setAppMenuOpen(refs.appMenu.hidden));
 
 refs.appMenu.addEventListener("click", (event) => {

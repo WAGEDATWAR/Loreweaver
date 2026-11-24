@@ -119,6 +119,10 @@ Mobile preview builds, bulk authoring tools and the completed scale phase.
 
 ### Fixed
 
+- UI foundation: text is no smaller than 12 px (11 px for uppercase micro-labels and count badges), touch
+  targets are 44 px on phones and touch devices, focus rings are consistent, and the light theme now
+  covers the details panel, chip inputs and diff views (DEF-130, DEF-131).
+
 - The command palette interleaved entry commands with the page commands, a stray marker sat above the
   Recent list, and the card dialog's token panel overlapped its form on phones.
 

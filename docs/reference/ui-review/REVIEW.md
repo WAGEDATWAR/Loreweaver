@@ -119,3 +119,10 @@ Each step ships with the gates (axe, contrast, e2e, a scenario per page) and ref
   history and the Review page remain (DEF-117 to DEF-123, DEF-133 to DEF-135).
 - **Next:** foundation tokens (type scale, touch density, light theme), then the responsive model
   (DEF-128, DEF-129).
+- **Step 2 (foundation, 2026-11-23):** a 12 px text floor (11 px only for uppercase micro-labels and count
+  badges; measured text under 11 px fell from dozens per state to none), 44 px touch targets on phones
+  and touch devices with enlarged hit areas for chip removes and link buttons (header controls stay at 40 px
+  so 320 px holds; Import is hidden at 430 px and below because the Library and Data pages carry it), one
+  focus style, and the light theme completed for the details panel, chip inputs and diff surfaces. This
+  addresses UI-04, UI-05, UI-06 and UI-12 in part. Still open: the phone master-detail layout and mid-width
+  drawers (UI-01, UI-02), the Review page, the header file menu and skip link.
