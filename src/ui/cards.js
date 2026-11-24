@@ -1,8 +1,4 @@
-import { getActiveCard, getCards, getRecentEntries, getState } from "../store.js";
-
-function cardLabel(card) {
-  return card.name.trim() || "Untitled card";
-}
+import { getRecentEntries, getState } from "../store.js";
 
 export function renderRecentList(refs) {
   if (!refs.recentList || !refs.recentSection) {
@@ -36,67 +32,6 @@ export function renderRecentList(refs) {
   }
 
   refs.recentList.append(fragment);
-}
-
-export function renderCardList(refs) {
-  const cards = getCards();
-  const active = getActiveCard();
-  refs.cardCount.textContent = String(cards.length);
-  refs.cardList.replaceChildren();
-
-  if (!cards.length) {
-    const empty = document.createElement("p");
-    empty.className = "card-list-empty";
-    empty.setAttribute("role", "listitem");
-    empty.textContent = "No cards yet. Add one to bundle a character with its book.";
-    refs.cardList.append(empty);
-    return;
-  }
-
-  const fragment = document.createDocumentFragment();
-
-  for (const card of cards) {
-    const item = document.createElement("div");
-    const avatar = document.createElement("span");
-    const main = document.createElement("span");
-    const name = document.createElement("span");
-    const meta = document.createElement("span");
-
-    item.className = "card-item";
-    item.dataset.cardId = card.id;
-    item.tabIndex = 0;
-    item.setAttribute("role", "listitem");
-    item.setAttribute("aria-selected", String(card.id === active?.id));
-
-    if (card.id === active?.id) {
-      item.classList.add("is-active");
-      item.setAttribute("aria-current", "true");
-    }
-
-    avatar.className = "card-item-avatar";
-
-    if (card.avatarDataUrl) {
-      const img = document.createElement("img");
-      img.alt = "";
-      img.src = card.avatarDataUrl;
-      avatar.append(img);
-    }
-
-    main.className = "card-item-main";
-    name.className = "card-item-name";
-    name.textContent = cardLabel(card);
-    meta.className = "card-item-meta";
-    const linked = card.bookId
-      ? getState().books.find((book) => book.id === card.bookId)?.name ?? "Linked book gone"
-      : "No linked book";
-    meta.textContent = card.tags?.length ? `${linked} · ${card.tags.slice(0, 3).join(", ")}` : linked;
-    main.append(name, meta);
-    item.append(avatar, main);
-    item.title = cardLabel(card);
-    fragment.append(item);
-  }
-
-  refs.cardList.append(fragment);
 }
 
 const SEVERITY_LABELS = { error: "Error", warning: "Warning", info: "Note" };

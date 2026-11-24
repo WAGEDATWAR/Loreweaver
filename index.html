@@ -16,7 +16,7 @@
   <div class="app">
     <header class="topbar">
       <h1 class="sr-only">Loreweaver</h1>
-      <button id="nav-toggle" class="brand" type="button" aria-controls="app-nav" aria-expanded="true" aria-label="Loreweaver navigation menu" title="Navigation menu">
+      <button id="app-menu-btn" class="brand" type="button" aria-controls="app-menu" aria-expanded="false" aria-label="Loreweaver menu" title="Menu">
         <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5V5.5Z"/>
@@ -26,6 +26,15 @@
         <span class="brand-name">Loreweaver</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="brand-chevron"><path d="m6 9 6 6 6-6"/></svg>
       </button>
+      <div id="app-menu" class="app-menu" hidden>
+        <a class="menu-item" href="#/library" data-view="library" aria-keyshortcuts="Alt+1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5V5.5Z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5V5.5Z"/></svg><span>Library</span><kbd>Alt 1</kbd></a>
+        <a class="menu-item" href="#/data" data-view="data" aria-keyshortcuts="Alt+2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg><span>Data</span><kbd>Alt 2</kbd></a>
+        <a class="menu-item" href="#/settings" data-view="settings" aria-keyshortcuts="Alt+3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3"/><path d="M12 19v3"/><path d="m4.9 4.9 2.1 2.1"/><path d="m17 17 2.1 2.1"/><path d="M2 12h3"/><path d="M19 12h3"/><path d="m4.9 19.1 2.1-2.1"/><path d="m17 7 2.1-2.1"/></svg><span>Settings</span><kbd>Alt 3</kbd></a>
+        <div class="menu-separator" role="separator"></div>
+        <button id="menu-palette-btn" class="menu-item" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17 10 11 4 5"/><path d="M12 19h8"/></svg><span>Command palette</span><kbd>Ctrl K</kbd></button>
+        <button id="menu-shortcuts-btn" class="menu-item" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01"/><path d="M11 10h.01"/><path d="M15 10h.01"/><path d="M8 14h8"/></svg><span>Keyboard shortcuts</span></button>
+        <button id="about-btn" class="menu-item" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6h.01"/></svg><span>About</span></button>
+      </div>
 
       <span class="topbar-divider" aria-hidden="true"></span>
 
@@ -41,6 +50,9 @@
       </div>
 
       <div class="topbar-actions">
+        <button id="nav-open-btn" class="icon-btn nav-open-btn" type="button" aria-label="Open editor menu" aria-controls="app-nav" aria-expanded="false" title="Editor menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+        </button>
         <button id="drawer-toggle" class="icon-btn drawer-toggle" type="button" aria-label="Open library drawer" aria-expanded="false" title="Library">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
             <path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>
@@ -162,30 +174,26 @@
     </div>
 
     <div class="shell" data-nav="expanded">
-      <nav id="app-nav" class="app-nav" aria-label="Main">
-        <div class="nav-group">
-          <a class="nav-item" href="#/entries" data-view="entries" title="Entries (Alt+1)" aria-keyshortcuts="Alt+1">
+      <nav id="app-nav" class="app-nav" aria-label="Editor" hidden>
+        <a id="nav-back" class="nav-item nav-back" href="#/library" title="Back to the library (Alt 1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+          <span class="nav-label">Library</span>
+        </a>
+        <div class="nav-context">
+          <span id="nav-context-kind" class="nav-group-label">Lorebook</span>
+          <strong id="nav-context-name" class="nav-context-name"></strong>
+        </div>
+        <div class="nav-group" data-nav-for="book">
+          <a class="nav-item" href="#/library" data-view="book">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5V4Z"/><path d="M8 11h8"/><path d="M8 15h8"/></svg>
           <span class="nav-label">Entries</span>
-          <span class="nav-shortcut" aria-hidden="true">Alt 1</span>
         </a>
-          <a class="nav-item" href="#/library" data-view="library" title="Library (Alt+2)" aria-keyshortcuts="Alt+2">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5V5.5Z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5V5.5Z"/></svg>
-          <span class="nav-label">Library</span>
-          <span class="nav-shortcut" aria-hidden="true">Alt 2</span>
-        </a>
-          <a class="nav-item" href="#/data" data-view="data" title="Data (Alt+3)" aria-keyshortcuts="Alt+3">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg>
-          <span class="nav-label">Data</span>
-          <span class="nav-shortcut" aria-hidden="true">Alt 3</span>
-        </a>
-          <a class="nav-item" href="#/settings" data-view="settings" title="Settings (Alt+4)" aria-keyshortcuts="Alt+4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
-          <span class="nav-label">Settings</span>
-          <span class="nav-shortcut" aria-hidden="true">Alt 4</span>
+          <a class="nav-item" href="#/library" data-view="book-settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10"/><path d="M18 7h2"/><circle cx="16" cy="7" r="2"/><path d="M4 17h2"/><path d="M10 17h10"/><circle cx="8" cy="17" r="2"/></svg>
+          <span class="nav-label">Lorebook settings</span>
         </a>
         </div>
-        <div class="nav-group" role="group" aria-labelledby="nav-tools-label">
+        <div class="nav-group" data-nav-for="book" role="group" aria-labelledby="nav-tools-label">
           <span id="nav-tools-label" class="nav-group-label">Tools</span>
           <button id="overview-btn" class="nav-item nav-tool" type="button" title="Overview">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg>
@@ -209,11 +217,34 @@
           <span class="nav-label">Find and replace</span>
         </button>
         </div>
-        <div class="nav-group nav-foot">
-          <button id="about-btn" class="nav-item nav-tool" type="button" title="About">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6h.01"/></svg>
-          <span class="nav-label">About</span>
+        <div class="nav-group" data-nav-for="card" role="group" aria-labelledby="nav-card-label">
+          <span id="nav-card-label" class="nav-group-label">Sections</span>
+          <button class="nav-item nav-anchor" type="button" data-scroll-to="card-name" title="Identity">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>
+          <span class="nav-label">Identity</span>
         </button>
+          <button class="nav-item nav-anchor" type="button" data-scroll-to="card-description" title="Definition">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5V4Z"/><path d="M8 11h8"/><path d="M8 15h8"/></svg>
+          <span class="nav-label">Definition</span>
+        </button>
+          <button class="nav-item nav-anchor" type="button" data-scroll-to="card-first-message" title="Greetings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/></svg>
+          <span class="nav-label">Greetings</span>
+        </button>
+          <button class="nav-item nav-anchor" type="button" data-scroll-to="card-example-messages" title="Examples and prompts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12"/><path d="M8 12h12"/><path d="M8 18h12"/><path d="M4 6h.01"/><path d="M4 12h.01"/><path d="M4 18h.01"/></svg>
+          <span class="nav-label">Examples and prompts</span>
+        </button>
+          <button class="nav-item nav-anchor" type="button" data-scroll-to="card-link-book" title="Lorebook link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
+          <span class="nav-label">Lorebook link</span>
+        </button>
+        </div>
+        <div class="nav-group nav-foot">
+          <button id="nav-collapse" class="nav-item" type="button" aria-controls="app-nav" aria-expanded="true" title="Collapse menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="nav-collapse-icon"><path d="m15 6-6 6 6 6"/></svg>
+            <span class="nav-label">Collapse</span>
+          </button>
         </div>
       </nav>
     <div class="workspace" data-view="entries">
@@ -233,17 +264,8 @@
               <div class="section-label" id="book-label">Lorebook</div>
               <div class="book-controls">
                 <select id="book-select" class="book-select" aria-label="Active lorebook" aria-labelledby="book-label"></select>
-                <a href="#/library" class="icon-btn" title="Manage lorebooks and cards" aria-label="Manage lorebooks and cards">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg>
-                </a>
               </div>
             </section>
-
-
-
-
-
-
 
             <div class="search">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
@@ -538,39 +560,73 @@
         </div>
       </main>
 
-      <main id="page-library" class="page" aria-labelledby="library-title" hidden>
-        <div class="page-inner">
-          <header class="page-head">
-            <h2 id="library-title" tabindex="-1">Library</h2>
-            <p>The lorebooks and character cards in this project.</p>
+      <main id="page-library" class="page page-hub" aria-labelledby="library-title" hidden>
+        <div class="page-inner page-inner-wide">
+          <header class="page-head hub-head">
+            <div>
+              <h2 id="library-title" tabindex="-1">Library</h2>
+              <p>Your lorebooks and character cards. Open one to edit it.</p>
+            </div>
+            <div class="page-actions">
+              <button id="new-book-btn" class="btn btn-primary" type="button" title="Create a lorebook">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                <span>New lorebook</span>
+              </button>
+              <button id="new-card-btn" class="btn" type="button" title="Create a character card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                <span>New character card</span>
+              </button>
+              <button id="hub-import-btn" class="btn" type="button" title="Import a lorebook, project or card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                <span>Import</span>
+              </button>
+            </div>
           </header>
 
-          <section class="page-section" aria-labelledby="books-heading">
-            <div class="page-section-head">
-              <h3 id="books-heading">Lorebooks</h3>
-              <span id="book-count" class="count" aria-live="polite">0</span>
-              <div class="page-actions">
-            <button id="book-actions-btn" class="btn" type="button" aria-label="Lorebook actions" title="Duplicate, split or merge lorebooks">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></svg>
-              <span>Actions</span>
-            </button>
-            <button id="new-book-btn" class="btn btn-primary" type="button" aria-label="New lorebook" title="New lorebook">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-              <span>New lorebook</span>
-            </button>
-            <button id="delete-book-btn" class="btn btn-danger" type="button" aria-label="Delete lorebook" title="Delete lorebook">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="m6 7 1 13h10l1-13"/></svg>
-              <span>Delete</span>
-            </button>
-          </div>
+          <div class="hub-toolbar">
+            <div class="search hub-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+              <label class="sr-only" for="hub-search">Search lorebooks and cards</label>
+              <input id="hub-search" type="search" placeholder="Search lorebooks and cards" autocomplete="off" spellcheck="false">
             </div>
-            <div id="book-list" class="book-list" role="list" aria-label="Lorebooks"></div>
-          </section>
+            <div id="hub-filters" class="entry-filters" role="group" aria-label="Show">
+              <button class="filter-chip" type="button" data-kind="all" aria-pressed="true">All</button>
+              <button class="filter-chip" type="button" data-kind="book" aria-pressed="false">Lorebooks</button>
+              <button class="filter-chip" type="button" data-kind="card" aria-pressed="false">Cards</button>
+            </div>
+            <label class="sort-control">
+              <span class="sr-only">Sort projects</span>
+              <select id="hub-sort" class="sort-select" title="Sort projects">
+                <option value="updated">Recently edited</option>
+                <option value="name">Name</option>
+                <option value="size">Largest first</option>
+              </select>
+            </label>
+            <span id="hub-count" class="count" aria-live="polite">0</span>
+          </div>
+
+          <div id="project-list" class="project-grid" role="list" aria-label="Lorebooks and character cards"></div>
+          <div id="hub-empty" class="hub-empty" hidden>
+            <p id="hub-empty-text">Nothing here yet.</p>
+            <div class="page-actions">
+              <button id="hub-empty-clear" class="btn" type="button" hidden>Clear search and filters</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <main id="page-book-settings" class="page" aria-labelledby="book-settings-title" hidden>
+        <div class="page-inner">
+          <header class="page-head">
+            <h2 id="book-settings-title" tabindex="-1">Lorebook settings</h2>
+            <p id="book-settings-subtitle">Description, tags, token budget and new-entry defaults.</p>
+          </header>
 
           <section class="page-section book-meta" aria-labelledby="book-meta-label">
             <div class="page-section-head">
-              <h3 id="book-meta-label">Active lorebook settings</h3>
+              <h3 id="book-meta-label">Details</h3>
             </div>
+
 
               <details id="book-description-details" class="book-description">
                 <summary>
@@ -610,22 +666,179 @@
               </details>
 
 
+
           </section>
 
-          <section class="page-section card-section" aria-labelledby="card-label">
+          <section class="page-section" aria-labelledby="book-manage-heading">
+            <div class="page-section-head"><h3 id="book-manage-heading">Manage</h3></div>
+            <p class="hint">Duplicate, split or merge this lorebook, or delete it. Deleting asks first.</p>
+            <div class="page-actions">
+              <button id="book-actions-btn" class="btn" type="button" title="Duplicate, split or merge lorebooks">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></svg>
+                <span>Duplicate, split or merge&hellip;</span>
+              </button>
+              <button id="delete-book-btn" class="btn btn-danger" type="button" aria-label="Delete lorebook" title="Delete lorebook">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="m6 7 1 13h10l1-13"/></svg>
+                <span>Delete lorebook</span>
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
 
-              <div class="card-section-head">
-                <span class="section-label" id="card-label">Character cards</span>
-                <span id="card-count" class="count" aria-live="polite">0</span>
-                <button id="new-card-btn" class="icon-btn" type="button" title="New character card" aria-label="New character card">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-                    <path d="M12 5v14"/><path d="M5 12h14"/>
-                  </svg>
-                </button>
+      <main id="page-card" class="page page-card" aria-labelledby="card-title" hidden>
+        <div class="page-inner page-inner-wide">
+          <header class="page-head hub-head">
+            <div>
+              <p class="eyebrow">Character card</p>
+              <h2 id="card-title" tabindex="-1">Edit card</h2>
+            </div>
+            <div class="page-actions">
+              <button id="card-duplicate" class="btn" type="button">Duplicate</button>
+              <label class="sr-only" for="card-export-format">Export format</label>
+              <select id="card-export-format" class="card-export-format">
+                <option value="png">PNG card (V3 + V2)</option>
+                <option value="charx">CHARX</option>
+                <option value="json-v3">JSON, V3</option>
+                <option value="json-v2">JSON, V2</option>
+              </select>
+              <button id="card-export" class="btn" type="button">Export</button>
+              <button id="card-delete" class="btn btn-danger" type="button">Delete</button>
+            </div>
+          </header>
+          <div class="card-editor">
+        <div class="card-editor-main">
+          <div class="card-avatar-row">
+            <div id="card-avatar" class="card-avatar" aria-hidden="true"></div>
+            <div class="card-avatar-side">
+              <div class="card-avatar-actions">
+                <label class="btn" for="card-avatar-input">Choose image</label>
+                <button id="card-avatar-remove" class="btn" type="button">Remove image</button>
               </div>
-              <div id="card-list" class="card-list" role="list" aria-label="Character cards"></div>
-
+              <input id="card-avatar-input" type="file" accept="image/png,image/webp,image/jpeg" hidden>
+              <span class="hint">Images are converted to PNG so the card can embed in them. The image is stored, never edited.</span>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="card-name">Name</label>
+              <input id="card-name" type="text" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="card-nickname">Nickname <span class="hint">optional</span></label>
+              <input id="card-nickname" type="text" autocomplete="off">
+            </div>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-description">Description</label><span class="card-token-badge" data-token-for="card-description" aria-hidden="true"></span></div>
+            <textarea id="card-description" rows="6"></textarea>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-personality">Personality</label><span class="card-token-badge" data-token-for="card-personality" aria-hidden="true"></span></div>
+            <textarea id="card-personality" rows="2"></textarea>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-scenario">Scenario</label><span class="card-token-badge" data-token-for="card-scenario" aria-hidden="true"></span></div>
+            <textarea id="card-scenario" rows="2"></textarea>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-first-message">First message</label><span class="card-token-badge" data-token-for="card-first-message" aria-hidden="true"></span></div>
+            <textarea id="card-first-message" rows="4"></textarea>
+          </div>
+          <div class="field">
+            <div class="card-field-head"><span id="card-alt-label" class="field-label">Alternate greetings</span><span class="card-token-badge" id="card-alt-tokens" aria-hidden="true"></span></div>
+            <div id="card-alt-greetings" class="greeting-list" role="group" aria-labelledby="card-alt-label"></div>
+            <button id="card-alt-add" class="btn" type="button">Add greeting</button>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-example-messages">Example messages</label><span class="card-token-badge" data-token-for="card-example-messages" aria-hidden="true"></span></div>
+            <textarea id="card-example-messages" rows="4"></textarea>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-system-prompt">System prompt</label><span class="card-token-badge" data-token-for="card-system-prompt" aria-hidden="true"></span></div>
+            <textarea id="card-system-prompt" rows="2"></textarea>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-post-history">Post-history instructions</label><span class="card-token-badge" data-token-for="card-post-history" aria-hidden="true"></span></div>
+            <textarea id="card-post-history" rows="2"></textarea>
+          </div>
+          <div class="field">
+            <label for="card-tags-input">Tags <span class="hint">optional</span></label>
+            <div id="card-tags" class="key-chips tag-chips">
+              <input id="card-tags-input" class="key-chips-input" type="text" placeholder="fantasy, npc" autocomplete="off" spellcheck="false">
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="card-creator">Creator</label>
+              <input id="card-creator" type="text" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="card-version">Version</label>
+              <input id="card-version" type="text" autocomplete="off">
+            </div>
+          </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-creator-notes">Creator notes</label><span class="card-token-badge" data-token-for="card-creator-notes" aria-hidden="true"></span></div>
+            <textarea id="card-creator-notes" rows="2"></textarea>
+          </div>
+          <details class="card-advanced">
+            <summary>Advanced</summary>
+            <div class="field">
+              <div class="card-field-head"><span id="card-group-label" class="field-label">Group-only greetings</span><span class="card-token-badge" id="card-group-tokens" aria-hidden="true"></span></div>
+              <div id="card-group-greetings" class="greeting-list" role="group" aria-labelledby="card-group-label"></div>
+              <button id="card-group-add" class="btn" type="button">Add group greeting</button>
+              <span class="hint">V3 only. Used instead of the normal greetings in group chats.</span>
+            </div>
+          <div class="field card-field">
+            <div class="card-field-head"><label for="card-depth-prompt">Depth prompt</label><span class="card-token-badge" data-token-for="card-depth-prompt" aria-hidden="true"></span></div>
+            <textarea id="card-depth-prompt" rows="2"></textarea>
+          </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="card-depth-depth">Depth</label>
+                <input id="card-depth-depth" type="number" min="0" max="999" step="1">
+              </div>
+              <div class="field">
+                <label for="card-depth-role">Role</label>
+                <select id="card-depth-role">
+                  <option value="system">System</option>
+                  <option value="user">User</option>
+                  <option value="assistant">Assistant</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="card-talkativeness">Talkativeness <output id="card-talkativeness-output">0.5</output></label>
+              <input id="card-talkativeness" type="range" min="0" max="1" step="0.05" value="0.5">
+              <span class="hint">How often the character speaks in group chats (SillyTavern).</span>
+            </div>
+          </details>
+          <div class="field">
+            <label for="card-link-book">Linked lorebook</label>
+            <select id="card-link-book">
+              <option value="">No linked lorebook</option>
+            </select>
+            <span id="card-book-info" class="hint"></span>
+          </div>
+        </div>
+        <aside class="card-editor-side" aria-label="Card summary">
+          <section class="card-summary" aria-labelledby="card-tokens-title">
+            <h3 id="card-tokens-title">Token cost</h3>
+            <dl class="card-token-list">
+              <dt>Sent every turn</dt><dd id="card-tokens-always">0</dd>
+              <dt>Example messages</dt><dd id="card-tokens-examples">0</dd>
+              <dt>Opening message</dt><dd id="card-tokens-opening">0</dd>
+              <dt>Total</dt><dd id="card-tokens-total">0</dd>
+            </dl>
           </section>
+          <section class="card-summary" aria-labelledby="card-issues-title">
+            <h3 id="card-issues-title">Checks</h3>
+            <ul id="card-issues" class="card-issues"></ul>
+          </section>
+        </aside>
+      </div>
+          <p id="card-status" class="hint" aria-live="polite"></p>
         </div>
       </main>
 
@@ -730,7 +943,6 @@
       </div>
       <div id="export-options" class="export-options"></div>
       <p class="backup-note">Backups, restore and storage live on the <a href="#/data" id="export-data-link">Data page</a>.</p>
-
 
       <div class="dialog-actions">
         <button id="export-cancel" class="btn" type="button">Close</button>
@@ -1097,161 +1309,7 @@
     </div>
   </dialog>
 
-  <dialog id="card-dialog" class="dialog card-dialog" aria-labelledby="card-title">
-    <div class="dialog-inner">
-      <div class="dialog-heading">
-        <p class="eyebrow">Character card</p>
-        <h2 id="card-title">Edit card</h2>
-      </div>
-      <div class="card-editor">
-        <div class="card-editor-main">
-          <div class="card-avatar-row">
-            <div id="card-avatar" class="card-avatar" aria-hidden="true"></div>
-            <div class="card-avatar-side">
-              <div class="card-avatar-actions">
-                <label class="btn" for="card-avatar-input">Choose image</label>
-                <button id="card-avatar-remove" class="btn" type="button">Remove image</button>
-              </div>
-              <input id="card-avatar-input" type="file" accept="image/png,image/webp,image/jpeg" hidden>
-              <span class="hint">Images are converted to PNG so the card can embed in them. The image is stored, never edited.</span>
-            </div>
-          </div>
-          <div class="field-grid">
-            <div class="field">
-              <label for="card-name">Name</label>
-              <input id="card-name" type="text" autocomplete="off">
-            </div>
-            <div class="field">
-              <label for="card-nickname">Nickname <span class="hint">optional</span></label>
-              <input id="card-nickname" type="text" autocomplete="off">
-            </div>
-          </div>
-          <div class="field card-field">
-            <div class="card-field-head"><label for="card-description">Description</label><span class="card-token-badge" data-token-for="card-description" aria-hidden="true"></span></div>
-            <textarea id="card-description" rows="6"></textarea>
-          </div>
-          <div class="field card-field">
-            <div class="card-field-head"><label for="card-personality">Personality</label><span class="card-token-badge" data-token-for="card-personality" aria-hidden="true"></span></div>
-            <textarea id="card-personality" rows="2"></textarea>
-          </div>
-          <div class="field card-field">
-            <div class="card-field-head"><label for="card-scenario">Scenario</label><span class="card-token-badge" data-token-for="card-scenario" aria-hidden="true"></span></div>
-            <textarea id="card-scenario" rows="2"></textarea>
-          </div>
-          <div class="field card-field">
-            <div class="card-field-head"><label for="card-first-message">First message</label><span class="card-token-badge" data-token-for="card-first-message" aria-hidden="true"></span></div>
-            <textarea id="card-first-message" rows="4"></textarea>
-          </div>
-          <div class="field">
-            <div class="card-field-head"><span id="card-alt-label" class="field-label">Alternate greetings</span><span class="card-token-badge" id="card-alt-tokens" aria-hidden="true"></span></div>
-            <div id="card-alt-greetings" class="greeting-list" role="group" aria-labelledby="card-alt-label"></div>
-            <button id="card-alt-add" class="btn" type="button">Add greeting</button>
-          </div>
-          <div class="field card-field">
-            <div class="card-field-head"><label for="card-example-messages">Example messages</label><span class="card-token-badge" data-token-for="card-example-messages" aria-hidden="true"></span></div>
-            <textarea id="card-example-messages" rows="4"></textarea>
-          </div>
-          <div class="field card-field">
-            <div class="card-field-head"><label for="card-system-prompt">System prompt</label><span class="card-token-badge" data-token-for="card-system-prompt" aria-hidden="true"></span></div>
-            <textarea id="card-system-prompt" rows="2"></textarea>
-          </div>
-          <div class="field card-field">
-            <div class="card-field-head"><label for="card-post-history">Post-history instructions</label><span class="card-token-badge" data-token-for="card-post-history" aria-hidden="true"></span></div>
-            <textarea id="card-post-history" rows="2"></textarea>
-          </div>
-          <div class="field">
-            <label for="card-tags-input">Tags <span class="hint">optional</span></label>
-            <div id="card-tags" class="key-chips tag-chips">
-              <input id="card-tags-input" class="key-chips-input" type="text" placeholder="fantasy, npc" autocomplete="off" spellcheck="false">
-            </div>
-          </div>
-          <div class="field-grid">
-            <div class="field">
-              <label for="card-creator">Creator</label>
-              <input id="card-creator" type="text" autocomplete="off">
-            </div>
-            <div class="field">
-              <label for="card-version">Version</label>
-              <input id="card-version" type="text" autocomplete="off">
-            </div>
-          </div>
-          <div class="field card-field">
-            <div class="card-field-head"><label for="card-creator-notes">Creator notes</label><span class="card-token-badge" data-token-for="card-creator-notes" aria-hidden="true"></span></div>
-            <textarea id="card-creator-notes" rows="2"></textarea>
-          </div>
-          <details class="card-advanced">
-            <summary>Advanced</summary>
-            <div class="field">
-              <div class="card-field-head"><span id="card-group-label" class="field-label">Group-only greetings</span><span class="card-token-badge" id="card-group-tokens" aria-hidden="true"></span></div>
-              <div id="card-group-greetings" class="greeting-list" role="group" aria-labelledby="card-group-label"></div>
-              <button id="card-group-add" class="btn" type="button">Add group greeting</button>
-              <span class="hint">V3 only. Used instead of the normal greetings in group chats.</span>
-            </div>
-          <div class="field card-field">
-            <div class="card-field-head"><label for="card-depth-prompt">Depth prompt</label><span class="card-token-badge" data-token-for="card-depth-prompt" aria-hidden="true"></span></div>
-            <textarea id="card-depth-prompt" rows="2"></textarea>
-          </div>
-            <div class="field-grid">
-              <div class="field">
-                <label for="card-depth-depth">Depth</label>
-                <input id="card-depth-depth" type="number" min="0" max="999" step="1">
-              </div>
-              <div class="field">
-                <label for="card-depth-role">Role</label>
-                <select id="card-depth-role">
-                  <option value="system">System</option>
-                  <option value="user">User</option>
-                  <option value="assistant">Assistant</option>
-                </select>
-              </div>
-            </div>
-            <div class="field">
-              <label for="card-talkativeness">Talkativeness <output id="card-talkativeness-output">0.5</output></label>
-              <input id="card-talkativeness" type="range" min="0" max="1" step="0.05" value="0.5">
-              <span class="hint">How often the character speaks in group chats (SillyTavern).</span>
-            </div>
-          </details>
-          <div class="field">
-            <label for="card-link-book">Linked lorebook</label>
-            <select id="card-link-book">
-              <option value="">No linked lorebook</option>
-            </select>
-            <span id="card-book-info" class="hint"></span>
-          </div>
-        </div>
-        <aside class="card-editor-side" aria-label="Card summary">
-          <section class="card-summary" aria-labelledby="card-tokens-title">
-            <h3 id="card-tokens-title">Token cost</h3>
-            <dl class="card-token-list">
-              <dt>Sent every turn</dt><dd id="card-tokens-always">0</dd>
-              <dt>Example messages</dt><dd id="card-tokens-examples">0</dd>
-              <dt>Opening message</dt><dd id="card-tokens-opening">0</dd>
-              <dt>Total</dt><dd id="card-tokens-total">0</dd>
-            </dl>
-          </section>
-          <section class="card-summary" aria-labelledby="card-issues-title">
-            <h3 id="card-issues-title">Checks</h3>
-            <ul id="card-issues" class="card-issues"></ul>
-          </section>
-        </aside>
-      </div>
-      <p id="card-status" class="hint" aria-live="polite"></p>
-      <div class="dialog-actions card-actions">
-        <button id="card-delete" class="btn btn-danger" type="button">Delete</button>
-        <button id="card-duplicate" class="btn" type="button">Duplicate</button>
-        <label class="sr-only" for="card-export-format">Export format</label>
-        <select id="card-export-format" class="card-export-format">
-          <option value="png">PNG card (V3 + V2)</option>
-          <option value="charx">CHARX</option>
-          <option value="json-v3">JSON, V3</option>
-          <option value="json-v2">JSON, V2</option>
-        </select>
-        <button id="card-export" class="btn" type="button">Export</button>
-        <button id="card-cancel" class="btn" type="button">Cancel</button>
-        <button id="card-save" class="btn btn-primary" type="button">Save card</button>
-      </div>
-    </div>
-  </dialog>
+
 
   <dialog id="token-settings-dialog" class="dialog token-settings-dialog" aria-labelledby="token-settings-title">
     <div class="dialog-inner">
@@ -1378,7 +1436,7 @@
         <h2 id="guide-title">Create and export your first lorebook</h2>
       </div>
       <ol class="guide-steps">
-        <li><strong>Name your lorebook.</strong> The title field at the top names the active lorebook. Use the sidebar dropdown to switch between lorebooks or add a new one.</li>
+        <li><strong>Name your lorebook.</strong> The title field at the top names the active lorebook. Open, add, duplicate or delete lorebooks and character cards from the Library (Alt+1), which is the home page. Inside a lorebook, the sidebar dropdown switches to another one.</li>
         <li><strong>Add entries.</strong> Choose <em>New entry</em> or <em>From template</em>, then fill in the title and content. Content is the text injected when the entry activates.</li>
         <li><strong>Add trigger keys.</strong> Type keys as chips: press Enter or comma to add, paste a comma-separated list, or write <code>/pattern/i</code> for a regex key. Always-on entries skip key matching.</li>
         <li><strong>Organize and search.</strong> Add tags to entries and lorebooks, filter the list by tag or status, and use search to highlight matches and see why an entry matched.</li>

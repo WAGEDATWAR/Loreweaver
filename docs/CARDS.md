@@ -72,7 +72,7 @@ round-trip unchanged (I-2). The export stamps `modification_date` and keeps the 
 
 ## 5.1 Authoring
 
-The card editor is a dialog that edits a draft and writes it on Save. It gives a card the same care a
+The card editor is a page (`#/card/<id>`) that autosaves, like a lorebook. It gives a card the same care a
 lorebook gets:
 
 - **Token cost**: a live report of text sent every turn, example messages and the opening message,
@@ -81,8 +81,9 @@ lorebook gets:
   greetings, legacy `<USER>`/`<BOT>` macros, examples without `<START>`, a missing linked lorebook, heavy
   always-sent text, and an invalid or empty depth prompt.
 - **Greetings**: alternate and group-only greetings are ordered lists with add, remove and move.
-- **Library**: avatar thumbnail, linked lorebook and tags per card; duplicate, delete (confirmed) and
-  discard-changes confirmation.
+- **Library**: cards sit beside lorebooks on the Library hub with an avatar thumbnail, token size, linked
+  lorebook, tags and an issue count; duplicate and delete (confirmed) from the tile or the card page. A
+  card left blank is discarded when you leave it.
 - **Export**: PNG (V3 + V2), CHARX, JSON V3 and JSON V2, each from the card dialog or the export dialog.
 
 ## 6. Invariants
@@ -100,8 +101,8 @@ lorebook gets:
 - `zTXt`/`iTXt` card chunks are read only when uncompressed; a compressed chunk falls back to `tEXt`
   or reports the card unreadable.
 - CHARX entries are written uncompressed (stored) rather than deflated.
-- The card editor is still a dialog, not a workspace; card search, templates, diff on re-import, bulk
-  operations and a prompt-assembly preview are scheduled (DEF-117 to DEF-124).
+- Card templates, diff on re-import, bulk operations, a prompt-assembly preview and extension editors are
+  scheduled (DEF-118 to DEF-123). Search, filter and sort come from the shared Library hub (DEF-117).
 
 ## 8. Definition of done
 

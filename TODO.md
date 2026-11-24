@@ -179,13 +179,13 @@ shipped (v0.8.0+). Open parity work: library search and filters (DEF-117), diff 
 templates (DEF-119), a prompt-assembly preview (DEF-120), bulk operations (DEF-121), schema/print/search
 coverage (DEF-122), extension editors (DEF-123) and a full-page workspace (DEF-124).
 
-- [ ] `M` `P5` Card library search, tag filter and sort (DEF-117).
+- [x] The Library is the home hub for lorebooks and cards; cards have an autosaving editor page; the left menu is editor-only (DEF-124, U-7 to U-9, U-12).
+- [ ] `M` `P5` Library hub follow-ups: tag filter, bulk actions, pinned projects (DEF-117, DEF-135).
 - [ ] `M` `P5` Card diff and merge on re-import, card revisions (DEF-118).
 - [ ] `M` `P5` Card templates (DEF-119).
 - [ ] `H` `P5` A prompt-assembly preview of card plus book (DEF-120).
 - [ ] `M` `P5` Card bulk operations (DEF-121).
 - [ ] `L` `P5` Cards in the schema page, print export and global search (DEF-122).
-- [ ] `H` `P5` A full-page card workspace (DEF-124).
 
 ## Known gaps
 

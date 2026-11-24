@@ -61,14 +61,14 @@ never learns a card quirk.
 | DEF-089 | Bind a lorebook to a card and export them together | card dialog book select; PNG and CHARX write the book | P5 | done |
 | DEF-090 | A card library with preview and avatar | sidebar card list, avatar thumbnails, editor dialog | P5 | done |
 | DEF-091 | Card field parity checklist | `docs/reference/PARITY.md` C section | P5 | done |
-| DEF-117 | Card library search, tag filter and sort | the library is a flat list; books have search, filters and sort | P5 | scheduled |
+| DEF-117 | Card library search, tag filter and sort | the Library hub searches, filters by kind and sorts lorebooks and cards together; tag filtering still owed | P5 | scheduled |
 | DEF-118 | Card diff and merge on re-import, and card revisions in History | books diff and merge by title; a re-imported card replaces nothing today | P5 | scheduled |
 | DEF-119 | Card templates and duplicate as template | mirrors DEF-004 for books | P5 | scheduled |
 | DEF-120 | A prompt-assembly preview: card plus linked book against a context budget | extends the simulation (C-5) so authors see what a frontend would send | P5 | scheduled |
 | DEF-121 | Card bulk operations: multi-select, bulk tags, export all cards | mirrors the entry bulk bar | P5 | scheduled |
 | DEF-122 | Cards in the schema reference page, print export and global search | the schema page and print view cover books only | P5 | scheduled |
 | DEF-123 | Editors for other card extensions: world, regex scripts, V3 assets | preserved verbatim today, not editable | post-v1 | scheduled |
-| DEF-124 | A full-page card workspace instead of a dialog | the dialog is the interim surface (ARCHITECTURE 9) | P5 | scheduled |
+| DEF-124 | A full-page card workspace instead of a dialog | the card page (`#/card/<id>`) with autosave, section menu, token and checks panel | P5 | done |
 
 
 ## O. Organization
@@ -123,6 +123,7 @@ never learns a card quirk.
 | DEF-131 | A touch density with 44 px targets and a type scale with a 12 px floor (UI-05, UI-06) | review S2 | P5 | scheduled |
 | DEF-132 | A leaner header: file menu, labelled palette button, skip link, shared focus style (UI-07, UI-12) | review S2/S3 | P5 | scheduled |
 | DEF-133 | A Review page combining overview, issues and simulation for a lorebook and a card (UI-08) | review S2 | P5 | scheduled |
+| DEF-135 | Library hub follow-ups: tag filter, multi-select with bulk actions, pinned projects, grid/list toggle, kind-specific thumbnails for lorebooks | extends DEF-117 and DEF-121 | P5 | scheduled |
 | DEF-134 | Card and lorebook UI parity checklist: destination, workspace, list, tokens, notes, bulk, history (UI-03) | the matrix in the review, section 4; extends DEF-117 to DEF-124 | P5 | scheduled |
 | DEF-038 | A changelog link in the About panel | link to CHANGELOG.md on GitHub in the About dialog | P5 | done |
 

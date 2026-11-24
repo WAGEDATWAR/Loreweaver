@@ -19,6 +19,12 @@ async function resetApp(page) {
 
 async function openPage(page, view) {
   await page.evaluate(`location.hash = "#/${view}"; true`);
+
+  if (view === "entries") {
+    await page.waitFor('document.querySelector("#sidebar")?.hidden === false');
+    return;
+  }
+
   await page.waitFor(`!document.querySelector("#page-${view}")?.hidden`);
 }
 
@@ -536,58 +542,76 @@ export const scenarios = [
     }
   },
   {
-    name: "navigates between pages with the menu, hash and shortcuts",
+    name: "opens projects from the library hub and keeps the editor menu to the editor",
     timeout: 40000,
     async run(page) {
       await resetApp(page);
       assert.equal(await page.evaluate('document.querySelector("#sidebar").hidden'), false);
-      assert.equal(await page.evaluate('document.querySelector(".nav-item[data-view=entries]").getAttribute("aria-current")'), "page");
+      assert.equal(await page.evaluate('document.querySelector("#app-nav").hidden'), false);
+      assert.match(await page.evaluate("location.hash"), /^#\/book\/book_/);
 
-      await page.click('.nav-item[data-view="library"]');
+      await page.click("#app-menu-btn");
+      await page.waitFor('!document.querySelector("#app-menu")?.hidden');
+      assert.equal(await page.evaluate('document.querySelector("#app-menu-btn").getAttribute("aria-expanded")'), "true");
+      await page.click('#app-menu a[data-view="library"]');
       await page.waitFor('!document.querySelector("#page-library")?.hidden');
+      assert.equal(await page.evaluate('document.querySelector("#app-menu").hidden'), true);
       assert.equal(await page.evaluate('document.querySelector("#sidebar").hidden'), true);
+      assert.equal(await page.evaluate('document.querySelector("#app-nav").hidden'), true);
       assert.equal(await page.evaluate('location.hash'), "#/library");
-      assert.equal(await page.evaluate('document.querySelector(".nav-item[data-view=library]").getAttribute("aria-current")'), "page");
-      assert.equal(await page.evaluate('document.querySelectorAll("#book-list .book-item").length'), 1);
       assert.match(await page.evaluate("document.title"), /^Library/);
+      assert.equal(await page.evaluate('document.querySelectorAll("#project-list .project-tile").length'), 1);
+      assert.equal(await page.evaluate('document.querySelector("#project-list .project-name").textContent'), "Aurora Vale");
 
-      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "3", altKey: true, bubbles: true, cancelable: true })); true');
+      await page.click("#project-list .project-open");
+      await page.waitFor('document.querySelector("#sidebar")?.hidden === false');
+      assert.equal(await page.evaluate('document.querySelector("#app-nav").hidden'), false);
+      assert.equal(await page.evaluate('document.querySelector("#nav-context-name").textContent'), "Aurora Vale");
+      assert.equal(await page.evaluate('document.querySelector("#nav-context-kind").textContent'), "Lorebook");
+
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "2", altKey: true, bubbles: true, cancelable: true })); true');
       await page.waitFor('!document.querySelector("#page-data")?.hidden');
       await page.waitFor('document.querySelector("#storage-usage-backend")?.textContent !== "\u2014"');
+      assert.equal(await page.evaluate('document.querySelector("#app-nav").hidden'), true);
 
-      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "4", altKey: true, bubbles: true, cancelable: true })); true');
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "3", altKey: true, bubbles: true, cancelable: true })); true');
       await page.waitFor('!document.querySelector("#page-settings")?.hidden');
 
       await page.evaluate('history.back(); true');
       await page.waitFor('!document.querySelector("#page-data")?.hidden');
 
       await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "1", altKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('!document.querySelector("#page-library")?.hidden');
+
+      await page.click("#project-list .project-open");
       await page.waitFor('document.querySelector("#sidebar")?.hidden === false');
-      assert.equal(await page.evaluate('document.querySelector("#page-data").hidden'), true);
+      await page.click("#nav-back");
+      await page.waitFor('!document.querySelector("#page-library")?.hidden');
 
       await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true, cancelable: true })); true');
       await page.waitFor('document.querySelector("#command-dialog")?.open');
-      assert.equal(await page.evaluate('document.querySelector("#command-dialog").textContent.includes("Go to Library")'), true);
+      const palette = await page.evaluate('document.querySelector("#command-dialog").textContent');
+      assert.ok(palette.includes("Go to Library") && palette.includes("Open lorebook: Aurora Vale"));
       assert.deepEqual(page.errors, []);
     }
   },
   {
-    name: "collapses and expands the navigation menu and remembers it",
+    name: "collapses and expands the editor menu and remembers it",
     async run(page) {
       await resetApp(page);
       await page.setViewport(1440, 900);
       await sleep(100);
       assert.equal(await page.evaluate('document.querySelector(".shell").dataset.nav'), "expanded");
-      assert.equal(await page.evaluate('document.querySelector("#nav-toggle").getAttribute("aria-expanded")'), "true");
+      assert.equal(await page.evaluate('document.querySelector("#nav-collapse").getAttribute("aria-expanded")'), "true");
 
-      await page.click("#nav-toggle");
+      await page.click("#nav-collapse");
       await page.waitFor('document.querySelector(".shell").dataset.nav === "collapsed"');
-      assert.equal(await page.evaluate('document.querySelector("#nav-toggle").getAttribute("aria-expanded")'), "false");
+      assert.equal(await page.evaluate('document.querySelector("#nav-collapse").getAttribute("aria-expanded")'), "false");
       await page.waitFor('document.querySelector("#app-nav").getBoundingClientRect().width < 80');
 
       await page.reload();
       await page.waitFor('document.querySelector(".shell")?.dataset.nav === "collapsed"');
-      await page.click("#nav-toggle");
+      await page.click("#nav-collapse");
       await page.waitFor('document.querySelector(".shell").dataset.nav === "expanded"');
       assert.deepEqual(page.errors, []);
     }
@@ -608,18 +632,62 @@ export const scenarios = [
     }
   },
   {
-    name: "manages lorebooks and cards from the library page",
+    name: "creates, searches, duplicates and deletes projects from the library hub",
+    timeout: 40000,
     async run(page) {
       await resetApp(page);
       await openPage(page, "library");
+
       await page.click("#new-book-btn");
-      await page.waitFor('document.querySelectorAll("#book-list .book-item").length === 2');
-      await page.evaluate('document.querySelectorAll("#book-list .book-item")[0].click(); true');
-      await page.waitFor('document.querySelector("#book-list .book-item.is-active")?.textContent.includes("Aurora Vale")');
+      await page.waitFor('document.querySelector("#sidebar")?.hidden === false');
+      assert.equal(await page.evaluate('document.querySelector("#book-name").value'), "Untitled Lorebook");
+      await page.click("#nav-back");
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile").length === 2');
+
+      await setValue(page, "#hub-search", "aurora");
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile").length === 1');
+      await setValue(page, "#hub-search", "zzzz");
+      await page.waitFor('!document.querySelector("#hub-empty").hidden');
+      await page.click("#hub-empty-clear");
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile").length === 2');
+
+      await page.click('#hub-filters [data-kind="card"]');
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile").length === 0');
+      await page.click('#hub-filters [data-kind="all"]');
+
+      await page.click('#project-list [data-project-action="duplicate"][data-project-kind="book"]');
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile").length === 3');
+
+      await page.click('#project-list [data-project-action="delete"][data-project-kind="book"]');
+      await page.waitFor('document.querySelector("#confirm-dialog")?.open');
+      await page.click("#confirm-accept");
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile").length === 2');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "a blank card is discarded when you leave it, and a named card stays",
+    timeout: 40000,
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "library");
       await page.click("#new-card-btn");
-      await page.waitFor('document.querySelector("#card-dialog")?.open');
-      await page.click("#card-cancel");
-      await page.waitFor('!document.querySelector("#card-dialog")?.open');
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      assert.match(await page.evaluate("location.hash"), /^#\/card\/card_/);
+      assert.equal(await page.evaluate('document.querySelector("#nav-context-kind").textContent'), "Character card");
+      assert.equal(await page.evaluate('document.querySelector("#sidebar").hidden'), true);
+
+      await page.click("#nav-back");
+      await page.waitFor('!document.querySelector("#page-library")?.hidden');
+      assert.equal(await page.evaluate('document.querySelectorAll("#project-list .project-tile[data-kind=card]").length'), 0);
+
+      await page.click("#new-card-btn");
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      await setValue(page, "#card-name", "Mara Voss");
+      await sleep(500);
+      await page.click("#nav-back");
+      await page.waitFor('!document.querySelector("#page-library")?.hidden');
+      assert.equal(await page.evaluate('document.querySelector("#project-list .project-tile[data-kind=card] .project-name").textContent'), "Mara Voss");
       assert.deepEqual(page.errors, []);
     }
   },
@@ -831,11 +899,10 @@ export const scenarios = [
 
       await page.click("#diff-accept");
       await page.waitFor('!document.querySelector("#diff-dialog")?.open');
-      await page.waitFor('document.querySelectorAll(".card-item").length === 1');
-      const name = await page.evaluate('document.querySelector(".card-item-name").textContent');
-      assert.equal(name, "Mara Voss");
-      const meta = await page.evaluate('document.querySelector(".card-item-meta").textContent');
-      assert.match(meta, /Mara Book/);
+      await openPage(page, "library");
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile[data-kind=card]").length === 1');
+      assert.equal(await page.evaluate('document.querySelector("#project-list .project-tile[data-kind=card] .project-name").textContent'), "Mara Voss");
+      assert.match(await page.evaluate('document.querySelector("#project-list .project-tile[data-kind=card] .project-sub").textContent'), /Mara Book/);
       assert.deepEqual(page.errors, []);
     }
   },
@@ -843,8 +910,9 @@ export const scenarios = [
     name: "creates, links and exports a character card",
     async run(page) {
       await resetApp(page);
+      await openPage(page, "library");
       await page.click("#new-card-btn");
-      await page.waitFor('document.querySelector("#card-dialog")?.open');
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
 
       await setValue(page, "#card-name", "Mara Voss");
       await setValue(page, "#card-personality", "Gruff and careful");
@@ -855,14 +923,12 @@ export const scenarios = [
         select.dispatchEvent(new Event("change", { bubbles: true }));
         return true;
       })()`);
-      await page.click("#card-save");
-      await page.waitFor('!document.querySelector("#card-dialog")?.open');
+      await sleep(500);
 
-      await page.waitFor('document.querySelectorAll(".card-item").length === 1');
-      const name = await page.evaluate('document.querySelector(".card-item-name").textContent');
-      assert.equal(name, "Mara Voss");
-      const meta = await page.evaluate('document.querySelector(".card-item-meta").textContent');
-      assert.match(meta, /Aurora Vale/);
+      await page.click("#nav-back");
+      await page.waitFor('!document.querySelector("#page-library")?.hidden');
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile[data-kind=card]").length === 1');
+      assert.match(await page.evaluate('document.querySelector("#project-list .project-tile[data-kind=card] .project-sub").textContent'), /Aurora Vale/);
 
       await page.evaluate(`(() => {
         window.__downloads = [];
@@ -873,12 +939,12 @@ export const scenarios = [
         };
         return true;
       })()`);
-      await page.evaluate('document.querySelector(".card-item").click(); true');
-      await page.waitFor('document.querySelector("#card-dialog")?.open');
+      await page.click("#project-list .project-tile[data-kind=card] .project-open");
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      assert.equal(await page.evaluate('document.querySelector("#card-name").value'), "Mara Voss");
       await page.evaluate('document.querySelector("#card-export-format").value = "json-v3"; true');
       await page.click("#card-export");
-      await page.waitFor('document.querySelector("#card-status")?.textContent.length >= 0');
-      await sleep(150);
+      await sleep(250);
       const download = await page.evaluate('window.__downloads?.[0] ?? null');
       assert.equal(download?.type, "application/json");
       assert.deepEqual(page.errors, []);
@@ -889,8 +955,9 @@ export const scenarios = [
     timeout: 40000,
     async run(page) {
       await resetApp(page);
+      await openPage(page, "library");
       await page.click("#new-card-btn");
-      await page.waitFor('document.querySelector("#card-dialog")?.open');
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
 
       await page.waitFor('document.querySelector("#card-issues")?.textContent.includes("Give the card a name")');
       await setValue(page, "#card-name", "Mara Voss");
@@ -918,28 +985,25 @@ export const scenarios = [
       await page.waitFor('Number(document.querySelector("#card-tokens-always").textContent) > 0');
       assert.equal(await page.evaluate('document.querySelector("#card-issues").textContent.includes("Give the card a name")'), false);
       assert.equal(await page.evaluate('document.querySelector("#card-alt-greetings textarea").value'), "Late, aren't you?");
+      await page.waitFor('document.querySelector("#card-title").textContent === "Mara Voss"');
 
-      await page.click("#card-save");
-      await page.waitFor('!document.querySelector("#card-dialog")?.open');
-      await page.waitFor('document.querySelectorAll(".card-item").length === 1');
-      assert.match(await page.evaluate('document.querySelector(".card-item-meta").textContent'), /npc/);
-
-      await page.evaluate('document.querySelector(".card-item").click(); true');
-      await page.waitFor('document.querySelector("#card-dialog")?.open');
+      await sleep(500);
+      await page.reload();
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
       assert.equal(await page.evaluate('document.querySelector("#card-description").value.startsWith("A smuggler")'), true);
       assert.equal(await page.evaluate('document.querySelectorAll("#card-alt-greetings .greeting-row").length'), 2);
+      assert.equal(await page.evaluate('document.querySelector("#card-alt-greetings textarea").value'), "Late, aren't you?");
 
-      await setValue(page, "#card-name", "Edited but cancelled");
-      await page.click("#card-cancel");
-      await page.waitFor('document.querySelector("#confirm-dialog")?.open');
-      await page.click("#confirm-cancel");
-      await page.waitFor('!document.querySelector("#confirm-dialog")?.open');
-      assert.equal(await page.evaluate('document.querySelector("#card-dialog").open'), true);
+      await page.click('#app-nav [data-scroll-to="card-first-message"]');
+      assert.equal(await page.evaluate('document.activeElement.id'), "card-first-message");
 
       await page.click("#card-duplicate");
-      await page.waitFor('!document.querySelector("#card-dialog")?.open');
-      await page.waitFor('document.querySelectorAll(".card-item").length === 2');
-      assert.equal(await page.evaluate('[...document.querySelectorAll(".card-item-name")].some((n) => n.textContent.endsWith(" copy"))'), true);
+      await page.waitFor('document.querySelector("#card-name").value === "Mara Voss copy"');
+      await page.click("#card-delete");
+      await page.waitFor('document.querySelector("#confirm-dialog")?.open');
+      await page.click("#confirm-accept");
+      await page.waitFor('!document.querySelector("#page-library")?.hidden');
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile[data-kind=card]").length === 1');
       assert.deepEqual(page.errors, []);
     }
   },
@@ -1245,6 +1309,7 @@ export const scenarios = [
       };
 
       await page.resetStorage({ seed });
+      await openPage(page, "entries");
       await page.waitFor('document.querySelector("#book-name")?.value === "Migrated Book"');
       const result = await readIndexedDbProject(page);
       assert.ok(result.value.includes("Migrated Book"));
@@ -1325,6 +1390,7 @@ export const scenarios = [
       };
 
       await page.resetStorage({ seed });
+      await openPage(page, "entries");
       await page.waitFor('document.querySelector("#book-name")?.value === "Big Book"');
       await page.waitFor('document.querySelector("#entry-list")?.classList.contains("is-virtual")');
 
@@ -1372,6 +1438,7 @@ export const scenarios = [
       };
 
       await page.resetStorage({ seed });
+      await openPage(page, "entries");
       await page.waitFor('document.querySelector("#book-name")?.value === "Big Book"');
       await dismissOnboarding(page);
       await page.waitFor('document.querySelector("#entry-list")?.classList.contains("is-virtual")');

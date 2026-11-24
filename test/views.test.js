@@ -1,31 +1,56 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { DEFAULT_VIEW, VIEWS, getView, isView, parseViewHash, viewForShortcut, viewHref } from "../src/views.js";
+import {
+  DEFAULT_VIEW,
+  VIEWS,
+  getView,
+  isEditorView,
+  isHubView,
+  parseRoute,
+  routeHref,
+  viewForShortcut
+} from "../src/views.js";
 
-test("parses a view from the location hash", () => {
-  assert.equal(parseViewHash("#/library"), "library");
-  assert.equal(parseViewHash("#data"), "data");
-  assert.equal(parseViewHash("#/settings?x=1"), "settings");
+test("parses hub routes", () => {
+  assert.deepEqual(parseRoute("#/library"), { view: "library", id: null });
+  assert.deepEqual(parseRoute("#data"), { view: "data", id: null });
+  assert.deepEqual(parseRoute("#/settings?x=1"), { view: "settings", id: null });
 });
 
-test("falls back to the default view for anything unknown", () => {
-  assert.equal(parseViewHash(""), DEFAULT_VIEW);
-  assert.equal(parseViewHash("#/nope"), DEFAULT_VIEW);
-  assert.equal(parseViewHash(undefined), DEFAULT_VIEW);
-  assert.equal(parseViewHash("#/__proto__"), DEFAULT_VIEW);
+test("parses editor routes with ids", () => {
+  assert.deepEqual(parseRoute("#/book/book_abc123"), { view: "book", id: "book_abc123" });
+  assert.deepEqual(parseRoute("#/book/book_abc123/settings"), { view: "book-settings", id: "book_abc123" });
+  assert.deepEqual(parseRoute("#/card/card_9"), { view: "card", id: "card_9" });
 });
 
-test("builds hrefs and resolves shortcuts", () => {
-  assert.equal(viewHref("data"), "#/data");
-  assert.equal(viewHref("bogus"), "#/entries");
-  assert.equal(viewForShortcut("2"), "library");
-  assert.equal(viewForShortcut("9"), null);
-  assert.equal(getView("settings").label, "Settings");
-  assert.equal(getView("bogus").id, "entries");
+test("keeps the entries alias for the active lorebook", () => {
+  assert.deepEqual(parseRoute("#/entries"), { view: "book", id: null });
 });
 
-test("every view has a unique id and shortcut key", () => {
-  assert.equal(new Set(VIEWS.map((view) => view.id)).size, VIEWS.length);
+test("falls back to the library for anything unknown or malformed", () => {
+  for (const hash of ["", "#/", "#/nope", undefined, "#/__proto__", "#/book", "#/book/", "#/book/a b", "#/card", "#/book/x/y", "#/library/extra", "#/book/x/settings/more"]) {
+    assert.equal(parseRoute(hash).view, DEFAULT_VIEW, String(hash));
+  }
+});
+
+test("builds hrefs that parse back", () => {
+  for (const [view, id] of [["library", null], ["data", null], ["settings", null], ["book", "book_1"], ["book-settings", "book_1"], ["card", "card_1"]]) {
+    assert.deepEqual(parseRoute(routeHref(view, id)), { view, id });
+  }
+
+  assert.equal(routeHref("bogus"), "#/library");
+  assert.equal(routeHref("book"), "#/library");
+});
+
+test("separates hub pages from editor views", () => {
+  assert.ok(isHubView("library") && !isHubView("book"));
+  assert.ok(isEditorView("card") && isEditorView("book-settings") && !isEditorView("data"));
+});
+
+test("hub shortcuts are unique and resolve", () => {
   assert.equal(new Set(VIEWS.map((view) => view.key)).size, VIEWS.length);
-  assert.ok(VIEWS.every((view) => isView(view.id) && view.shortcut.endsWith(view.key)));
+  assert.equal(viewForShortcut("1"), "library");
+  assert.equal(viewForShortcut("9"), null);
+  assert.equal(getView("bogus").id, "library");
+  assert.equal(DEFAULT_VIEW, "library");
 });

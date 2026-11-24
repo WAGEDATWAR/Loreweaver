@@ -108,3 +108,14 @@ a menu that names both Lorebooks and Cards. Build cards to the same checklist th
 6. **Settings** with real controls (UI-10).
 
 Each step ships with the gates (axe, contrast, e2e, a scenario per page) and refreshed review screenshots.
+
+## 7. Redesign progress
+
+- **Step 1 (hub and menus, started 2026-11-12):** the Library is the home hub for lorebooks and cards
+  (U-12), the left menu is editor-only (U-7), routes carry project ids (U-8), and cards have an autosaving
+  editor page (DEF-124). This addresses UI-03 for destination, editing surface, autosave and library
+  presentation; UI-07 and UI-13 in part. The card and lorebook parity rows for search and filter, list
+  information, shortcuts and the editing surface are now at parity; tokens in list, notes, bulk actions,
+  history and the Review page remain (DEF-117 to DEF-123, DEF-133 to DEF-135).
+- **Next:** foundation tokens (type scale, touch density, light theme), then the responsive model
+  (DEF-128, DEF-129).

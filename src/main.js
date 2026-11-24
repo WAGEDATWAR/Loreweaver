@@ -134,7 +134,6 @@ import {
   handleGreetingClick,
   readCardForm,
   renderCardAvatar,
-  renderCardList,
   renderCardSummary,
   renderRecentList
 } from "./ui/cards.js";
@@ -142,8 +141,9 @@ import { buildCardTokenReport } from "./cardTokens.js";
 import { validateCardRecord } from "./cardValidation.js";
 import { clamp } from "./utils.js";
 import { createTabGuard } from "./tabGuard.js";
-import { VIEWS, getView, parseViewHash, viewForShortcut, viewHref } from "./views.js";
-import { renderBookList } from "./ui/books.js";
+import { VIEWS, getView, isEditorView, parseRoute, routeHref, viewForShortcut } from "./views.js";
+import { buildProjectItems, filterProjects, sortProjects } from "./projects.js";
+import { renderProjectList } from "./ui/projects.js";
 import { selectEntriesByTokenSize } from "./bulk.js";
 import { applyReplace, parseReplaceQuery, planReplace } from "./replace.js";
 import { VALIDATION_LABELS, validateBook } from "./validation.js";
@@ -166,12 +166,11 @@ const refs = {
   defaultSelective: document.querySelector("#default-selective"),
   defaultCaseSensitive: document.querySelector("#default-case-sensitive"),
   defaultWholeWords: document.querySelector("#default-whole-words"),
-  cardList: document.querySelector("#card-list"),
   recentList: document.querySelector("#recent-list"),
   recentSection: document.querySelector(".recent-section"),
-  cardCount: document.querySelector("#card-count"),
   newCardBtn: document.querySelector("#new-card-btn"),
-  cardDialog: document.querySelector("#card-dialog"),
+  cardDialog: document.querySelector("#page-card"),
+  cardTitle: document.querySelector("#card-title"),
   cardName: document.querySelector("#card-name"),
   cardNickname: document.querySelector("#card-nickname"),
   cardDescription: document.querySelector("#card-description"),
@@ -213,19 +212,35 @@ const refs = {
   cardStatus: document.querySelector("#card-status"),
   cardDelete: document.querySelector("#card-delete"),
   cardExport: document.querySelector("#card-export"),
-  cardCancel: document.querySelector("#card-cancel"),
-  cardSave: document.querySelector("#card-save"),
   saveState: document.querySelector("#save-state"),
   storageBanner: document.querySelector("#storage-banner"),
   storageBannerMessage: document.querySelector("#storage-banner-message"),
   storageExportBtn: document.querySelector("#storage-export-btn"),
   shell: document.querySelector(".shell"),
   appNav: document.querySelector("#app-nav"),
-  navToggle: document.querySelector("#nav-toggle"),
-  navItems: [...document.querySelectorAll(".nav-item[data-view]")],
   pages: [...document.querySelectorAll(".page")],
-  bookList: document.querySelector("#book-list"),
-  bookCount: document.querySelector("#book-count"),
+  appMenuBtn: document.querySelector("#app-menu-btn"),
+  appMenu: document.querySelector("#app-menu"),
+  menuItems: [...document.querySelectorAll("#app-menu [data-view]")],
+  menuPaletteBtn: document.querySelector("#menu-palette-btn"),
+  menuShortcutsBtn: document.querySelector("#menu-shortcuts-btn"),
+  navCollapse: document.querySelector("#nav-collapse"),
+  navOpenBtn: document.querySelector("#nav-open-btn"),
+  navBack: document.querySelector("#nav-back"),
+  navContextKind: document.querySelector("#nav-context-kind"),
+  navContextName: document.querySelector("#nav-context-name"),
+  navViewLinks: [...document.querySelectorAll("#app-nav a[data-view]")],
+  navGroups: [...document.querySelectorAll("#app-nav [data-nav-for]")],
+  navAnchors: [...document.querySelectorAll("#app-nav [data-scroll-to]")],
+  hubSearch: document.querySelector("#hub-search"),
+  hubFilters: document.querySelector("#hub-filters"),
+  hubSort: document.querySelector("#hub-sort"),
+  hubCount: document.querySelector("#hub-count"),
+  hubImportBtn: document.querySelector("#hub-import-btn"),
+  hubEmpty: document.querySelector("#hub-empty"),
+  hubEmptyText: document.querySelector("#hub-empty-text"),
+  hubEmptyClear: document.querySelector("#hub-empty-clear"),
+  projectList: document.querySelector("#project-list"),
   dataImportBtn: document.querySelector("#data-import-btn"),
   dataExportBtn: document.querySelector("#data-export-btn"),
   dataOpenBtn: document.querySelector("#data-open-btn"),
@@ -800,7 +815,9 @@ function syncSidebarWidthToViewport() {
 
 const NAV_STATE_KEY = storageKey("nav-expanded:v1");
 const MOBILE_NAV_QUERY = window.matchMedia("(max-width: 780px)");
-let currentView = "entries";
+let currentView = "library";
+let currentRouteId = null;
+const hubState = { query: "", kind: "all", sort: "updated" };
 
 function readNavExpanded() {
   try {
@@ -818,7 +835,8 @@ function readNavExpanded() {
 
 function setNavExpanded(expanded, persist = true) {
   refs.shell.dataset.nav = expanded ? "expanded" : "collapsed";
-  refs.navToggle.setAttribute("aria-expanded", String(expanded));
+  refs.navCollapse.setAttribute("aria-expanded", String(expanded));
+  refs.navCollapse.title = expanded ? "Collapse menu" : "Expand menu";
 
   if (persist) {
     try {
@@ -831,7 +849,7 @@ function setNavExpanded(expanded, persist = true) {
 
 function setMobileNavOpen(open) {
   refs.shell.classList.toggle("is-nav-open", open);
-  refs.navToggle.setAttribute("aria-expanded", String(open));
+  refs.navOpenBtn.setAttribute("aria-expanded", String(open));
 }
 
 function toggleNav() {
@@ -843,69 +861,191 @@ function toggleNav() {
   setNavExpanded(refs.shell.dataset.nav !== "expanded");
 }
 
-function showView(id, { focusHeading = false } = {}) {
-  currentView = getView(id).id;
-  refs.workspace.dataset.view = currentView;
-  const onEntries = currentView === "entries";
-  refs.sidebar.hidden = !onEntries;
-  refs.editorMain.hidden = !onEntries;
+function setAppMenuOpen(open) {
+  refs.appMenu.hidden = !open;
+  refs.appMenuBtn.setAttribute("aria-expanded", String(open));
+}
 
-  for (const page of refs.pages) {
-    page.hidden = page.id !== `page-${currentView}`;
+function hubEstimate(text) {
+  return Math.ceil(String(text ?? "").length / 4);
+}
+
+function renderHub() {
+  if (currentView !== "library") {
+    return;
   }
 
-  for (const item of refs.navItems) {
-    if (item.dataset.view === currentView) {
+  const state = getState();
+  const bookExists = (id) => state.books.some((book) => book.id === id);
+  const items = buildProjectItems(state, {
+    estimate: hubEstimate,
+    countBookIssues: (book) => validateBook(book, hubEstimate).length,
+    countCardIssues: (card) => validateCardRecord(card, { bookExists, count: hubEstimate }).filter((issue) => issue.severity !== "info").length
+  });
+  const visible = sortProjects(filterProjects(items, hubState), hubState.sort);
+  const recentIds = new Set([state.activeBookId, state.activeCardId].filter(Boolean));
+
+  renderProjectList(refs, visible, {
+    total: items.length,
+    hasFilters: Boolean(hubState.query.trim()) || hubState.kind !== "all",
+    recentIds
+  });
+}
+
+function currentCardName() {
+  const card = getCards().find((item) => item.id === currentRouteId);
+  return card?.name.trim() || "Untitled card";
+}
+
+function updateNavContext() {
+  const onCard = currentView === "card";
+  const book = getActiveBook();
+
+  refs.navContextKind.textContent = onCard ? "Character card" : "Lorebook";
+  refs.navContextName.textContent = onCard ? currentCardName() : book?.name.trim() || "Untitled Lorebook";
+}
+
+function resolveRoute(route) {
+  const state = getState();
+
+  if (route.view === "book" || route.view === "book-settings") {
+    const id = route.id ?? state.activeBookId;
+    return state.books.some((book) => book.id === id) ? { view: route.view, id } : { view: "library", id: null };
+  }
+
+  if (route.view === "card") {
+    return getCards().some((card) => card.id === route.id) ? route : { view: "library", id: null };
+  }
+
+  return route;
+}
+
+const HEADING_FOR_VIEW = {
+  library: "#library-title",
+  data: "#data-title",
+  settings: "#settings-title",
+  "book-settings": "#book-settings-title",
+  card: "#card-title"
+};
+
+function showRoute(requested, { focusHeading = false } = {}) {
+  const leavingCard = currentView === "card" ? editingCardId : null;
+  const route = resolveRoute(requested);
+
+  if (leavingCard && !(route.view === "card" && route.id === leavingCard)) {
+    leaveCard(leavingCard);
+  }
+
+  currentView = route.view;
+  currentRouteId = route.id;
+  const editor = isEditorView(route.view);
+  const onBook = route.view === "book";
+
+  document.body.dataset.view = route.view;
+  document.body.dataset.mode = editor ? "editor" : "hub";
+  refs.workspace.dataset.view = route.view;
+  refs.sidebar.hidden = !onBook;
+  refs.editorMain.hidden = !onBook;
+  refs.appNav.hidden = !editor;
+
+  for (const page of refs.pages) {
+    page.hidden = page.id !== `page-${route.view}`;
+  }
+
+  const target = routeHref(route.view, route.id);
+
+  if (window.location.hash !== target) {
+    window.history.replaceState(null, "", target);
+  }
+
+  if (route.view === "book" || route.view === "book-settings") {
+    if (getState().activeBookId !== route.id) {
+      setActiveBook(route.id);
+      setTagFilters([]);
+      persistTagFilters([]);
+      clearSearch();
+      scheduleSave();
+    }
+
+    renderAll();
+  } else if (route.view === "card") {
+    setActiveCard(route.id);
+    openCardEditor(route.id);
+  }
+
+  for (const item of refs.menuItems) {
+    if (item.dataset.view === route.view) {
       item.setAttribute("aria-current", "page");
     } else {
       item.removeAttribute("aria-current");
     }
   }
 
-  if (MOBILE_NAV_QUERY.matches) {
-    setMobileNavOpen(false);
+  const bookId = getState().activeBookId;
+
+  for (const link of refs.navViewLinks) {
+    link.href = routeHref(link.dataset.view, bookId);
+
+    if (link.dataset.view === route.view) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
   }
 
-  if (currentView === "library") {
-    renderBookList(refs);
-    renderCardList(refs);
-  } else if (currentView === "data") {
+  const group = route.view === "card" ? "card" : "book";
+
+  for (const element of refs.navGroups) {
+    element.hidden = element.dataset.navFor !== group;
+  }
+
+  setMobileNavOpen(false);
+  setAppMenuOpen(false);
+
+  if (route.view === "library") {
+    renderHub();
+  } else if (route.view === "data") {
     refreshBackupStatus();
     refreshStorageUsage();
     refs.aboutAuditLog.textContent = formatAudit(readAuditLog());
-  } else if (currentView === "settings") {
+  } else if (route.view === "settings") {
     syncThemeButton();
     syncDensityButton();
   }
 
   updateDocumentTitle();
 
-  if (focusHeading && !onEntries) {
-    document.querySelector(`#${currentView}-title`)?.focus({ preventScroll: true });
+  if (focusHeading && HEADING_FOR_VIEW[route.view]) {
+    document.querySelector(HEADING_FOR_VIEW[route.view])?.focus({ preventScroll: true });
   }
 }
 
-function goToView(id) {
-  const target = viewHref(id);
+function goToView(view, id = null) {
+  const resolvedId = id ?? (view === "book" || view === "book-settings" ? getState().activeBookId : null);
+  const target = routeHref(view, resolvedId);
 
   if (window.location.hash !== target) {
     window.location.hash = target;
   }
 
-  showView(id, { focusHeading: true });
+  showRoute({ view, id: resolvedId }, { focusHeading: true });
 }
 
 function ensureEntriesView() {
-  if (currentView !== "entries") {
-    goToView("entries");
+  if (currentView !== "book") {
+    goToView("book", getState().activeBookId);
   }
 }
 
 window.addEventListener("hashchange", () => {
-  const next = parseViewHash(window.location.hash);
+  if (!getState()) {
+    return;
+  }
 
-  if (next !== currentView) {
-    showView(next, { focusHeading: true });
+  const next = resolveRoute(parseRoute(window.location.hash));
+
+  if (next.view !== currentView || next.id !== currentRouteId) {
+    showRoute(parseRoute(window.location.hash), { focusHeading: true });
   }
 });
 
@@ -1596,7 +1736,19 @@ function buildCommands() {
       keywords: ["page", "navigate", "open", view.id],
       run: () => goToView(view.id)
     })),
-    { title: "Toggle navigation menu", keywords: ["menu", "sidebar", "collapse", "layout"], run: toggleNav },
+    { title: "Go to entries", keywords: ["editor", "lorebook", "write"], run: () => goToView("book") },
+    { title: "Lorebook settings", keywords: ["description", "tags", "budget", "defaults"], run: () => goToView("book-settings") },
+    ...getState().books.map((book) => ({
+      title: `Open lorebook: ${book.name.trim() || "Untitled Lorebook"}`,
+      keywords: ["open", "edit", "book"],
+      run: () => goToView("book", book.id)
+    })),
+    ...getCards().map((card) => ({
+      title: `Open card: ${card.name.trim() || "Untitled card"}`,
+      keywords: ["open", "edit", "character"],
+      run: () => goToView("card", card.id)
+    })),
+    { title: "Toggle editor menu", keywords: ["menu", "sidebar", "collapse", "layout"], run: toggleNav },
     { title: "New entry", hint: "Alt+N", keywords: ["add", "create"], run: handleAddEntry },
     { title: "New entry from template", keywords: ["add", "create", "starter"], run: openTemplateDialog },
     { title: "New lorebook", keywords: ["add", "create", "book"], run: () => {
@@ -1610,7 +1762,7 @@ function buildCommands() {
     { title: "Lorebook actions", keywords: ["duplicate", "merge", "split", "book"], run: openBookActionsDialog },
     { title: "Select entries by token size", keywords: ["bulk", "select", "tokens", "size"], run: openBulkSizeDialog },
     { title: "Bulk find and replace", hint: "Ctrl+H", keywords: ["replace", "bulk", "find"], run: openReplaceDialog },
-    { title: "New character card", keywords: ["card", "character", "avatar"], run: () => openCardDialog() },
+    { title: "New character card", keywords: ["card", "character", "avatar"], run: handleNewCard },
     { title: "Toggle light theme", keywords: ["theme", "colour", "dark"], run: toggleTheme },
     { title: "Keyboard shortcuts", keywords: ["keys", "help"], run: openShortcutsDialog },
     { title: "Schema reference", keywords: ["schema", "docs", "fields"], run: openSchemaDialog },
@@ -1797,9 +1949,16 @@ async function saveProjectFile({ saveAs = false } = {}) {
 
 function updateDocumentTitle() {
   const book = getActiveBook();
-  const view = getView(currentView);
-  const where = currentView === "entries" ? "" : `${view.label} · `;
-  document.title = `${where}${book?.name.trim() || "Untitled Lorebook"} — Loreweaver ${appVersion()}`;
+  const bookName = book?.name.trim() || "Untitled Lorebook";
+  const subject = currentView === "card"
+    ? currentCardName()
+    : currentView === "book-settings"
+      ? `Settings · ${bookName}`
+      : currentView === "book"
+        ? bookName
+        : getView(currentView).label;
+  document.title = `${subject} — Loreweaver ${appVersion()}`;
+  updateNavContext();
 }
 
 function updateHistoryButtons() {
@@ -1825,8 +1984,7 @@ function renderAll() {
   updateBookDescriptionPreview(book?.description ?? "");
   refs.bookTagChips?.setKeys(book?.tags ?? []);
   renderSidebar(refs);
-  renderCardList(refs);
-  renderBookList(refs);
+  renderHub();
   renderRecentList(refs);
   renderEditor(refs);
   updateHistoryButtons();
@@ -1882,7 +2040,7 @@ function updateBudgetStatus() {
 }
 
 function handleTokenUpdate() {
-  if (refs.cardDialog.open) {
+  if (currentView === "card") {
     refreshCardSummary();
   }
 
@@ -3283,9 +3441,9 @@ async function handleDeleteBook() {
   deleteBook(book.id);
   clearSearch();
   renderAll();
-  refs.bookSelect.focus();
   scheduleSave();
   toast("Lorebook deleted");
+  goToView("library");
 }
 
 function renderBookActionsDialog() {
@@ -3732,12 +3890,61 @@ function importResultMessage(strategy, parsed, stats, entryCount) {
 let editingCardId = null;
 let editingAvatarDataUrl = "";
 
-let cardDirty = false;
 let cardSummaryFrame = 0;
+let cardCommitTimer = 0;
+
+function cardIsBlank(card) {
+  return !card.name.trim()
+    && !card.nickname.trim()
+    && !card.description.trim()
+    && !card.personality.trim()
+    && !card.scenario.trim()
+    && !card.firstMessage.trim()
+    && !card.exampleMessages.trim()
+    && !card.systemPrompt.trim()
+    && !card.postHistoryInstructions.trim()
+    && !card.creator.trim()
+    && !card.creatorNotes.trim()
+    && !card.characterVersion.trim()
+    && !card.depthPrompt.prompt.trim()
+    && card.alternateGreetings.length === 0
+    && card.groupOnlyGreetings.length === 0
+    && card.tags.length === 0
+    && !card.avatarDataUrl
+    && !card.bookId;
+}
 
 function markCardDirty() {
-  cardDirty = true;
+  window.clearTimeout(cardCommitTimer);
+  cardCommitTimer = window.setTimeout(commitCard, 250);
   refreshCardSummary();
+}
+
+function commitCard() {
+  window.clearTimeout(cardCommitTimer);
+  cardCommitTimer = 0;
+
+  if (!editingCardId || !getCards().some((item) => item.id === editingCardId)) {
+    return;
+  }
+
+  updateCard(editingCardId, { ...readCardForm(refs), avatarDataUrl: editingAvatarDataUrl });
+  refs.cardTitle.textContent = currentCardName();
+  scheduleSave();
+  renderHub();
+  updateDocumentTitle();
+}
+
+function leaveCard(id) {
+  commitCard();
+  const card = getCards().find((item) => item.id === id);
+  editingCardId = null;
+  editingAvatarDataUrl = "";
+
+  if (card && cardIsBlank(card)) {
+    deleteCard(id);
+    scheduleSave();
+  }
 }
 
 function currentCardDraft() {
@@ -3753,7 +3960,7 @@ function refreshCardSummary() {
   cardSummaryFrame = window.requestAnimationFrame(() => {
     cardSummaryFrame = 0;
 
-    if (!refs.cardDialog.open) {
+    if (currentView !== "card") {
       return;
     }
 
@@ -3772,42 +3979,32 @@ function refreshCardSummary() {
   });
 }
 
-function openCardDialog(cardId = null) {
-  const card = cardId ? getCards().find((item) => item.id === cardId) : null;
-  editingCardId = card?.id ?? null;
-  editingAvatarDataUrl = card?.avatarDataUrl ?? "";
-  refs.cardDialog.querySelector("#card-title").textContent = card ? "Edit card" : "New character card";
-  refs.cardDelete.hidden = !card;
-  refs.cardDuplicate.hidden = !card;
-  refs.cardStatus.textContent = "";
-  fillCardForm(refs, card ?? {});
-  cardDirty = false;
-  refreshCardSummary();
-  refs.cardDialog.showModal();
-  refs.cardName.focus();
-}
+function openCardEditor(cardId) {
+  const card = getCards().find((item) => item.id === cardId);
 
-function closeCardDialog() {
-  refs.cardDialog.close();
-  editingCardId = null;
-  editingAvatarDataUrl = "";
-  cardDirty = false;
-}
-
-async function requestCloseCardDialog() {
-  if (cardDirty) {
-    const accepted = await confirmAction({
-      title: "Discard card changes?",
-      message: "This card has edits that are not saved.",
-      confirmLabel: "Discard changes"
-    });
-
-    if (!accepted) {
-      return;
-    }
+  if (!card) {
+    return;
   }
 
-  closeCardDialog();
+  editingCardId = card.id;
+  editingAvatarDataUrl = card.avatarDataUrl ?? "";
+  refs.cardTitle.textContent = card.name.trim() || "New character card";
+  refs.cardStatus.textContent = "";
+  fillCardForm(refs, card);
+  refreshCardSummary();
+}
+
+function handleNewCard() {
+  const card = addCard(createCard());
+
+  if (!card) {
+    return;
+  }
+
+  renderAll();
+  scheduleSave();
+  goToView("card", card.id);
+  refs.cardName.focus();
 }
 
 function convertImageToPng(dataUrl) {
@@ -3866,70 +4063,44 @@ async function readAvatarFile(file) {
   return converted;
 }
 
-function handleSaveCard() {
-  const values = readCardForm(refs);
-
-  if (!values.name.trim()) {
-    refs.cardStatus.textContent = "Give the card a name first.";
-    refs.cardName.focus();
-    return;
-  }
-
-  if (editingCardId) {
-    updateCard(editingCardId, { ...values, avatarDataUrl: editingAvatarDataUrl });
-    toast("Card saved", "success");
-  } else {
-    const card = addCard(createCard({ ...values, avatarDataUrl: editingAvatarDataUrl }));
-
-    if (card) {
-      toast("Card added", "success");
-    }
-  }
-
-  closeCardDialog();
-  renderAll();
-  scheduleSave();
-}
-
 function handleDuplicateCard() {
   if (!editingCardId) {
     return;
   }
 
+  commitCard();
   const copy = duplicateCard(editingCardId);
 
   if (!copy) {
     return;
   }
 
-  closeCardDialog();
-  renderAll();
   scheduleSave();
+  goToView("card", copy.id);
   toast(`Duplicated as "${copy.name}"`, "success");
+}
+
+async function confirmDeleteCard(card) {
+  return confirmAction({
+    title: "Delete card?",
+    message: `"${card.name.trim() || "Untitled card"}" will be permanently removed. Its linked lorebook stays.`,
+    confirmLabel: "Delete card"
+  });
 }
 
 async function handleDeleteCard() {
   const card = editingCardId ? getCards().find((item) => item.id === editingCardId) : null;
 
-  if (!card) {
+  if (!card || !await confirmDeleteCard(card)) {
     return;
   }
 
-  const accepted = await confirmAction({
-    title: "Delete card?",
-    message: `"${card.name.trim() || "Untitled card"}" will be permanently removed. Its linked lorebook stays.`,
-    confirmLabel: "Delete card"
-  });
-
-  if (!accepted) {
-    return;
-  }
-
+  window.clearTimeout(cardCommitTimer);
+  editingCardId = null;
   deleteCard(card.id);
-  closeCardDialog();
-  renderAll();
   scheduleSave();
   toast("Card deleted");
+  goToView("library");
 }
 
 async function handleExportCard() {
@@ -4092,9 +4263,10 @@ refs.newBookBtn.addEventListener("click", () => {
   addBook();
   clearSearch();
   renderAll();
+  scheduleSave();
+  goToView("book", getState().activeBookId);
   refs.bookName.focus();
   refs.bookName.select();
-  scheduleSave();
 });
 
 refs.deleteBookBtn.addEventListener("click", () => {
@@ -4112,15 +4284,7 @@ function closeDrawerAfterSelection() {
 }
 
 refs.newCardBtn.addEventListener("click", () => {
-  openCardDialog();
-});
-
-refs.cardList.addEventListener("click", (event) => {
-  const item = event.target.closest("[data-card-id]");
-
-  if (item) {
-    openCardDialog(item.dataset.cardId);
-  }
+  handleNewCard();
 });
 
 refs.recentList.addEventListener("click", (event) => {
@@ -4135,19 +4299,6 @@ refs.recentList.addEventListener("click", (event) => {
   renderAll();
   scrollEntryCardIntoView(item.dataset.entryId);
   focusEntryCard(item.dataset.entryId);
-});
-
-refs.cardList.addEventListener("keydown", (event) => {
-  const item = event.target.closest("[data-card-id]");
-
-  if (!item) {
-    return;
-  }
-
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    openCardDialog(item.dataset.cardId);
-  }
 });
 
 refs.cardAvatarInput.addEventListener("change", async (event) => {
@@ -4201,22 +4352,9 @@ refs.cardDialog.addEventListener("change", (event) => {
   }
 });
 
-refs.cardDialog.addEventListener("cancel", (event) => {
-  event.preventDefault();
-  requestCloseCardDialog();
-});
-
-refs.cardCancel.addEventListener("click", requestCloseCardDialog);
-refs.cardSave.addEventListener("click", handleSaveCard);
 refs.cardDelete.addEventListener("click", handleDeleteCard);
 refs.cardDuplicate.addEventListener("click", handleDuplicateCard);
 refs.cardExport.addEventListener("click", handleExportCard);
-
-refs.cardDialog.addEventListener("click", (event) => {
-  if (event.target === refs.cardDialog) {
-    requestCloseCardDialog();
-  }
-});
 
 refs.bookActionsBtn.addEventListener("click", () => {
   openBookActionsDialog();
@@ -4245,12 +4383,7 @@ refs.bookActionsDialog.addEventListener("click", (event) => {
 });
 
 refs.bookSelect.addEventListener("change", (event) => {
-  setActiveBook(event.target.value);
-  setTagFilters([]);
-  persistTagFilters([]);
-  clearSearch();
-  renderAll();
-  scheduleSave();
+  goToView("book", event.target.value);
 });
 
 refs.bookName.addEventListener("input", (event) => {
@@ -5149,12 +5282,14 @@ refs.sampleDialog.addEventListener("click", (event) => {
 refs.onboardingSampleBtn.addEventListener("click", () => {
   markOnboarded();
   refs.onboardingDialog.close();
+  goToView("book", getState().activeBookId);
 });
 
 refs.onboardingEmptyBtn.addEventListener("click", () => {
   markOnboarded();
   refs.onboardingDialog.close();
   startEmptyProject();
+  goToView("book", getState().activeBookId);
 });
 
 refs.onboardingGuideBtn.addEventListener("click", () => {
@@ -5177,42 +5312,147 @@ refs.aboutBtn.addEventListener("click", () => {
   openAboutDialog();
 });
 
-refs.navToggle.addEventListener("click", toggleNav);
+refs.appMenuBtn.addEventListener("click", () => setAppMenuOpen(refs.appMenu.hidden));
+
+refs.appMenu.addEventListener("click", (event) => {
+  if (event.target.closest(".menu-item")) {
+    setAppMenuOpen(false);
+  }
+});
+
+document.addEventListener("click", (event) => {
+  if (!refs.appMenu.hidden && !refs.appMenu.contains(event.target) && !refs.appMenuBtn.contains(event.target)) {
+    setAppMenuOpen(false);
+  }
+});
+
+refs.menuPaletteBtn.addEventListener("click", () => openCommandPalette(buildCommands()));
+refs.menuShortcutsBtn.addEventListener("click", openShortcutsDialog);
+
+refs.navCollapse.addEventListener("click", toggleNav);
+refs.navOpenBtn.addEventListener("click", () => setMobileNavOpen(!refs.shell.classList.contains("is-nav-open")));
 
 refs.appNav.addEventListener("click", (event) => {
-  const link = event.target.closest("a.nav-item[data-view]");
+  const anchor = event.target.closest("[data-scroll-to]");
 
-  if (link) {
-    event.preventDefault();
-    goToView(link.dataset.view);
-    return;
+  if (anchor) {
+    const target = document.getElementById(anchor.dataset.scrollTo);
+    target?.scrollIntoView({ block: "center" });
+    target?.focus();
   }
 
-  if (MOBILE_NAV_QUERY.matches && event.target.closest("button.nav-item")) {
+  if (MOBILE_NAV_QUERY.matches && event.target.closest(".nav-item:not(#nav-collapse)")) {
     setMobileNavOpen(false);
   }
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && refs.shell.classList.contains("is-nav-open") && !document.querySelector("dialog[open]")) {
-    setMobileNavOpen(false);
-    refs.navToggle.focus();
-  }
-});
-
-refs.bookList.addEventListener("click", (event) => {
-  const item = event.target.closest("[data-book-id]");
-
-  if (!item) {
+  if (event.key !== "Escape" || document.querySelector("dialog[open]")) {
     return;
   }
 
-  setActiveBook(item.dataset.bookId);
-  setTagFilters([]);
-  persistTagFilters([]);
-  clearSearch();
-  renderAll();
-  scheduleSave();
+  if (!refs.appMenu.hidden) {
+    setAppMenuOpen(false);
+    refs.appMenuBtn.focus();
+  } else if (refs.shell.classList.contains("is-nav-open")) {
+    setMobileNavOpen(false);
+    refs.navOpenBtn.focus();
+  }
+});
+
+refs.hubSearch.addEventListener("input", (event) => {
+  hubState.query = event.target.value;
+  renderHub();
+});
+
+refs.hubFilters.addEventListener("click", (event) => {
+  const chip = event.target.closest("[data-kind]");
+
+  if (!chip) {
+    return;
+  }
+
+  hubState.kind = chip.dataset.kind;
+
+  for (const button of refs.hubFilters.querySelectorAll("[data-kind]")) {
+    button.setAttribute("aria-pressed", String(button === chip));
+  }
+
+  renderHub();
+});
+
+refs.hubSort.addEventListener("change", (event) => {
+  hubState.sort = event.target.value;
+  renderHub();
+});
+
+refs.hubEmptyClear.addEventListener("click", () => {
+  hubState.query = "";
+  hubState.kind = "all";
+  refs.hubSearch.value = "";
+
+  for (const button of refs.hubFilters.querySelectorAll("[data-kind]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.kind === "all"));
+  }
+
+  renderHub();
+});
+
+refs.hubImportBtn.addEventListener("click", () => refs.importInput.click());
+
+refs.projectList.addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-project-action]");
+
+  if (!button) {
+    return;
+  }
+
+  const { projectAction: action, projectKind: kind, projectId: id } = button.dataset;
+
+  if (kind === "book") {
+    if (action === "duplicate") {
+      setActiveBook(id);
+      duplicateActiveBook();
+      renderAll();
+      scheduleSave();
+      toast("Lorebook duplicated", "success");
+    } else {
+      const book = getState().books.find((item) => item.id === id);
+      const count = book?.entries.length ?? 0;
+      const accepted = book && await confirmAction({
+        title: "Delete lorebook?",
+        message: `"${book.name.trim() || "Untitled Lorebook"}" and its ${count} ${count === 1 ? "entry" : "entries"} will be permanently removed.`,
+        confirmLabel: "Delete lorebook"
+      });
+
+      if (accepted) {
+        deleteBook(id);
+        renderAll();
+        scheduleSave();
+        toast("Lorebook deleted");
+      }
+    }
+
+    return;
+  }
+
+  const card = getCards().find((item) => item.id === id);
+
+  if (!card) {
+    return;
+  }
+
+  if (action === "duplicate") {
+    duplicateCard(id);
+    renderAll();
+    scheduleSave();
+    toast("Card duplicated", "success");
+  } else if (await confirmDeleteCard(card)) {
+    deleteCard(id);
+    renderAll();
+    scheduleSave();
+    toast("Card deleted");
+  }
 });
 
 refs.dataImportBtn.addEventListener("click", () => refs.importInput.click());
@@ -5785,7 +6025,7 @@ if (initialSave.ok) {
 tabGuard.announce();
 requestPersistence();
 setNavExpanded(readNavExpanded(), false);
-showView(parseViewHash(window.location.hash));
+showRoute(parseRoute(window.location.hash));
 
 refs.saveFileBtn.hidden = false;
 refs.dataSaveBtn.hidden = false;

@@ -16,6 +16,16 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- The Library is now the home page and a hub of projects. Lorebooks and character cards appear as tiles
+  with size, tags, linked lorebook and an issue count, with search, a kind filter and a sort, and open
+  into their own editor. The left menu now exists only in the editor (Library link, project name,
+  Entries, Lorebook settings and the Tools for a lorebook; section jump links for a card); the brand opens
+  an app menu with Library, Data, Settings, the command palette, shortcuts and About. Routes are
+  `#/library`, `#/book/<id>`, `#/book/<id>/settings`, `#/card/<id>`, `#/data` and `#/settings`, with
+  `Alt+1`-`Alt+3` and palette commands to open any project. Decision U-12.
+- Character cards have a full editor page that autosaves like a lorebook (DEF-124); a blank card is
+  discarded when you leave it. Lorebook settings moved to their own page.
+
 - A UI evaluation (DEF-125): `npm run ui:review` captures 24 states at four widths with layout metrics,
   `npm run ui:keyboard` walks focus and dialogs, and `docs/reference/ui-review/REVIEW.md` ranks 15
   findings and holds a lorebook and card parity matrix. New ledger rows DEF-128 to DEF-134; decision U-11.

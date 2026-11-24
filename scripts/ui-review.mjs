@@ -13,9 +13,11 @@ const hash = (view) => `location.hash = "#/${view}"; true`;
 
 const STATES = [
   { name: "entries", setup: [hash("entries")] },
-  { name: "entries-nav-collapsed", setup: [hash("entries"), click("#nav-toggle")], teardown: [click("#nav-toggle")], desktopOnly: true },
-  { name: "entries-nav-open", setup: [hash("entries"), click("#nav-toggle")], teardown: [click("#nav-toggle")], mobileOnly: true },
-  { name: "library", setup: [hash("library")] },
+  { name: "library-hub", setup: [hash("library")] },
+  { name: "book-settings", setup: [hash("entries"), click("#app-nav a[data-view=\"book-settings\"]")] },
+  { name: "app-menu", setup: [hash("library"), click("#app-menu-btn")], teardown: [click("#app-menu-btn")] },
+  { name: "entries-nav-collapsed", setup: [hash("entries"), click("#nav-collapse")], teardown: [click("#nav-collapse")], desktopOnly: true },
+  { name: "entries-nav-open", setup: [hash("entries"), click("#nav-open-btn")], teardown: [click("#nav-open-btn")], mobileOnly: true },
   { name: "data", setup: [hash("data")] },
   { name: "settings", setup: [hash("settings")] },
   { name: "dialog-export", setup: [hash("entries"), click("#export-btn")], dialog: "#export-dialog" },
@@ -24,7 +26,7 @@ const STATES = [
   { name: "dialog-issues", setup: [hash("entries"), click("#validation-btn")], dialog: "#validation-dialog" },
   { name: "dialog-history", setup: [hash("entries"), click("#history-btn")], dialog: "#history-dialog" },
   { name: "dialog-template", setup: [hash("entries"), click("#template-btn")], dialog: "#template-dialog" },
-  { name: "dialog-card", setup: [hash("library"), click("#new-card-btn")], dialog: "#card-dialog" },
+  { name: "page-card", setup: [hash("library"), click("#new-card-btn")], teardown: [click("#nav-back")] },
   { name: "dialog-search", setup: [hash("entries"), click("#nav-search-btn")], dialog: "#global-search-dialog" },
   { name: "dialog-replace", setup: [hash("entries"), click("#nav-replace-btn")], dialog: "#replace-dialog" },
   { name: "dialog-shortcuts", setup: [hash("settings"), click("#about-shortcuts-btn")], dialog: "#shortcuts-dialog" },
@@ -32,7 +34,7 @@ const STATES = [
   { name: "dialog-tokens", setup: [hash("settings"), click("#about-token-btn")], dialog: "#token-settings-dialog" },
   { name: "dialog-about", setup: [hash("entries"), click("#about-btn")], dialog: "#about-dialog" },
   { name: "dialog-guide", setup: [hash("settings"), click("#settings-guide-btn")], dialog: "#guide-dialog" },
-  { name: "dialog-bookactions", setup: [hash("library"), click("#book-actions-btn")], dialog: "#book-actions-dialog" },
+  { name: "dialog-bookactions", setup: [hash("entries"), click("#app-nav a[data-view=\"book-settings\"]"), click("#book-actions-btn")], dialog: "#book-actions-dialog" },
   {
     name: "dialog-palette",
     setup: [hash("entries"), 'document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true, cancelable: true })); true'],
@@ -44,7 +46,7 @@ const STATES = [
     teardown: [`(() => { const i = document.querySelector("#entry-search"); i.value = ""; i.dispatchEvent(new Event("input", { bubbles: true })); return true; })()`]
   },
   { name: "light-entries", setup: ['document.documentElement.dataset.theme = "light"; true', hash("entries")], teardown: ["delete document.documentElement.dataset.theme; true"] },
-  { name: "light-library", setup: ['document.documentElement.dataset.theme = "light"; true', hash("library")], teardown: ["delete document.documentElement.dataset.theme; true"] }
+  { name: "light-library-hub", setup: ['document.documentElement.dataset.theme = "light"; true', hash("library")], teardown: ["delete document.documentElement.dataset.theme; true"] }
 ];
 
 const METRICS = (rootSelector, minTarget) => `(() => {
@@ -117,7 +119,7 @@ async function main() {
         }
 
         await sleep(420);
-        const scope = state.dialog ?? (state.name.includes("library") || state.name === "data" || state.name === "settings" ? `#page-${state.name.replace("light-", "")}` : "body");
+        const scope = state.dialog ?? (state.name.includes("library") ? "#page-library" : state.name === "data" || state.name === "settings" ? `#page-${state.name}` : state.name === "book-settings" ? "#page-book-settings" : state.name === "page-card" ? "#page-card" : "body");
         const minTarget = mobile ? 44 : 24;
         const metrics = JSON.parse(await page.evaluate(METRICS(scope, minTarget)));
         report[key][state.name] = metrics;

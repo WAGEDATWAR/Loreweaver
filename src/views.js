@@ -1,32 +1,84 @@
+/**
+ * Pages and routes. The location hash is the only view state.
+ *
+ * Hub pages (library, data, settings) have no editor menu. Editor routes open one project, a lorebook
+ * or a character card, and show the editor menu for that project.
+ */
 export const VIEWS = Object.freeze([
-  { id: "entries", label: "Entries", shortcut: "Alt+1", key: "1", description: "Write and organize the active lorebook's entries." },
-  { id: "library", label: "Library", shortcut: "Alt+2", key: "2", description: "Manage lorebooks, their settings and character cards." },
-  { id: "data", label: "Data", shortcut: "Alt+3", key: "3", description: "Import, export, back up and check your project." },
-  { id: "settings", label: "Settings", shortcut: "Alt+4", key: "4", description: "Appearance, tokenizer, shortcuts and reference." }
+  { id: "library", label: "Library", shortcut: "Alt+1", key: "1", description: "Your lorebooks and character cards." },
+  { id: "data", label: "Data", shortcut: "Alt+2", key: "2", description: "Import, export, back up and check your data." },
+  { id: "settings", label: "Settings", shortcut: "Alt+3", key: "3", description: "Appearance, tokenizer, shortcuts and reference." }
 ]);
 
-export const DEFAULT_VIEW = "entries";
+export const DEFAULT_VIEW = "library";
 
-const VIEW_IDS = new Set(VIEWS.map((view) => view.id));
+const HUB_IDS = new Set(VIEWS.map((view) => view.id));
+const EDITOR_VIEWS = new Set(["book", "book-settings", "card"]);
+
+export function isHubView(value) {
+  return HUB_IDS.has(value);
+}
+
+export function isEditorView(value) {
+  return EDITOR_VIEWS.has(value);
+}
 
 export function isView(value) {
-  return VIEW_IDS.has(value);
+  return isHubView(value) || isEditorView(value);
 }
 
-export function viewHref(id) {
-  return `#/${isView(id) ? id : DEFAULT_VIEW}`;
-}
-
-/** The view named by a location hash such as `#/library`; anything unknown is the default view. */
-export function parseViewHash(hash) {
-  const match = /^#\/?([a-z-]+)/.exec(String(hash ?? ""));
-  return match && isView(match[1]) ? match[1] : DEFAULT_VIEW;
+export function getView(id) {
+  return VIEWS.find((view) => view.id === id) ?? VIEWS[0];
 }
 
 export function viewForShortcut(key) {
   return VIEWS.find((view) => view.key === key)?.id ?? null;
 }
 
-export function getView(id) {
-  return VIEWS.find((view) => view.id === id) ?? VIEWS[0];
+const ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+
+/** `#/book/<id>` and friends become `{ view, id }`; anything unknown is the library. */
+export function parseRoute(hash) {
+  const parts = String(hash ?? "").replace(/^#\/?/, "").split("?")[0].split("/").filter(Boolean);
+  const [head, id, tail] = parts;
+
+  if (head === "entries") {
+    return { view: "book", id: null };
+  }
+
+  if (isHubView(head) && parts.length === 1) {
+    return { view: head, id: null };
+  }
+
+  if (head === "book" && ID_PATTERN.test(id ?? "")) {
+    if (tail === "settings" && parts.length === 3) {
+      return { view: "book-settings", id };
+    }
+
+    if (parts.length === 2) {
+      return { view: "book", id };
+    }
+  }
+
+  if (head === "card" && ID_PATTERN.test(id ?? "") && parts.length === 2) {
+    return { view: "card", id };
+  }
+
+  return { view: DEFAULT_VIEW, id: null };
+}
+
+export function routeHref(view, id = null) {
+  if (view === "book" && id) {
+    return `#/book/${id}`;
+  }
+
+  if (view === "book-settings" && id) {
+    return `#/book/${id}/settings`;
+  }
+
+  if (view === "card" && id) {
+    return `#/card/${id}`;
+  }
+
+  return `#/${isHubView(view) ? view : DEFAULT_VIEW}`;
 }

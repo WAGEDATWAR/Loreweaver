@@ -6,6 +6,12 @@ import { launchBrowser, Page } from "./harness.mjs";
 
 async function openPage(page, view) {
   await page.evaluate(`location.hash = "#/${view}"; true`);
+
+  if (view === "entries") {
+    await page.waitFor('document.querySelector("#sidebar")?.hidden === false');
+    return;
+  }
+
   await page.waitFor(`!document.querySelector("#page-${view}")?.hidden`);
 }
 
@@ -125,9 +131,24 @@ const states = [
     await page.click("#bulk-tag-btn");
     await page.waitFor('document.querySelector("#bulk-tag-dialog")?.open');
   } },
-  { name: "card dialog", setup: async (page) => {
+  { name: "card page", setup: async (page) => {
+    await openPage(page, "library");
     await page.click("#new-card-btn");
-    await page.waitFor('document.querySelector("#card-dialog")?.open');
+    await page.waitFor('!document.querySelector("#page-card")?.hidden');
+  } },
+  { name: "mobile card page", setup: async (page) => {
+    await page.setViewport(390, 844);
+    await openPage(page, "library");
+    await page.click("#new-card-btn");
+    await page.waitFor('!document.querySelector("#page-card")?.hidden');
+  } },
+  { name: "book settings page", setup: async (page) => {
+    await page.click("#app-nav a[data-view=\"book-settings\"]");
+    await page.waitFor('!document.querySelector("#page-book-settings")?.hidden');
+  } },
+  { name: "app menu", setup: async (page) => {
+    await page.click("#app-menu-btn");
+    await page.waitFor('!document.querySelector("#app-menu")?.hidden');
   } },
   { name: "replace dialog", setup: async (page) => {
     await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "h", ctrlKey: true, bubbles: true, cancelable: true })); true');
@@ -156,7 +177,11 @@ const states = [
     await page.click("#delete-entry-btn");
     await page.waitFor('document.querySelector("#confirm-dialog")?.open');
   } },
-  { name: "library page", setup: async (page) => {
+  { name: "library hub", setup: async (page) => {
+    await openPage(page, "library");
+  } },
+  { name: "mobile library hub", setup: async (page) => {
+    await page.setViewport(390, 844);
     await openPage(page, "library");
   } },
   { name: "data page", setup: async (page) => {
@@ -166,19 +191,19 @@ const states = [
   { name: "settings page", setup: async (page) => {
     await openPage(page, "settings");
   } },
-  { name: "light library page", setup: async (page) => {
+  { name: "light library hub", setup: async (page) => {
     await page.evaluate('document.documentElement.dataset.theme = "light"; true');
     await openPage(page, "library");
   } },
-  { name: "collapsed navigation", setup: async (page) => {
-    await page.click("#nav-toggle");
+  { name: "collapsed editor menu", setup: async (page) => {
+    await page.click("#nav-collapse");
     await page.waitFor('document.querySelector(".shell")?.dataset.nav === "collapsed"');
     await sleep(400);
   } },
-  { name: "mobile navigation", setup: async (page) => {
+  { name: "mobile editor menu", setup: async (page) => {
     await page.setViewport(390, 844);
     await sleep(150);
-    await page.click("#nav-toggle");
+    await page.click("#nav-open-btn");
     await page.waitFor('document.querySelector(".shell")?.classList.contains("is-nav-open")');
     await sleep(400);
   } },

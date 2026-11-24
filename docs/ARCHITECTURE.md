@@ -50,13 +50,14 @@ index.html
    snapshot through the same project parser, and refreshes the editor through normal project
    replacement.
 
-## 2.1 Pages
+## 2.1 Pages and routes
 
-The window shows one page at a time: Entries (the editor), Library, Data or Settings, chosen from the
-navigation menu, the command palette or `Alt+1`-`Alt+4`. `src/views.js` is the pure registry; the
-location hash is the only view state, so the UI still holds none (A-2). `main.js` reads the hash, shows
-the matching page and re-renders what that page needs (the book list, backup and storage details). See
-`docs/UI.md` 1.
+The app is a library hub plus editors. `src/views.js` is the pure route table: `#/library` (home),
+`#/data`, `#/settings`, `#/book/<id>`, `#/book/<id>/settings` and `#/card/<id>`. The location hash is the
+only view state, so the UI still holds none (A-2). `main.js` parses the hash, resolves it against the project
+(a missing id falls back to the library), shows the matching page, activates the book or card in the store,
+and shows the editor menu only for editor routes. `src/projects.js` is the pure library model: it turns books
+and cards into one item shape and filters and sorts them. See `docs/UI.md` 1.
 
 ## 3. Why vanilla
 
@@ -216,7 +217,8 @@ ids (see `DECISIONS.md` I-4).
 | `src/zip.js` | Minimal zip reader and writer for CHARX |
 | `src/formats/card.js` | The card adapter: PNG, CHARX and JSON import, `exportCard` for every target |
 | `src/tabGuard.js` | Pure cross-tab presence and save notifications over `BroadcastChannel` |
-| `src/ui/cards.js` | Card library, card editor form, greeting lists, token and issue summary |
+| `src/ui/cards.js` | Card editor form, greeting lists, token and issue summary |
+| `src/ui/projects.js` | Library tiles for lorebooks and cards |
 | `src/windowing.js` | Pure row-window math for the virtualized entry list |
 | `src/overview.js` | Book metrics, token summaries, key coverage |
 | `src/templates.js` | Built-in entry templates and patch builders |
@@ -229,7 +231,8 @@ ids (see `DECISIONS.md` I-4).
 | `src/integrity.js` | Project integrity checks and repair |
 | `src/diff.js`, `src/merge.js` | Diff engine and import strategies |
 | `src/tokenizer/*` | BPE encoder, worker, client, vendored ranks |
-| `src/views.js` | Pure page registry and location-hash routing for the navigation menu |
+| `src/views.js` | Pure route table and location-hash parsing for the hub and editor pages |
+| `src/projects.js` | Pure library model: one item shape for lorebooks and cards, filter and sort |
 | `src/ui/*` | Sidebar, editor, library, card and overlay renderers |
 | `src/formats/*` | Detection, normalization, serialization, adapters |
 | `src/limits.js` | Import size and schema limits |
@@ -258,7 +261,8 @@ Cards are the second record kind in a project. This section owns how they flow t
   deleting a book leaves the card with a visible "linked lorebook missing" check.
 - The store owns every card mutation (`addCard`, `updateCard`, `duplicateCard`, `deleteCard`,
   `linkCardBook`) and each one captures an undo step, so cards share the book history, revisions,
-  backups and integrity machinery. The card dialog is a draft: nothing reaches the store until Save.
+  backups and integrity machinery. The card page edits the store directly with a short autosave debounce,
+  the same model as a lorebook; a card left blank is dropped when you leave it.
 - `schema.js` normalizes a card (`createCard`) the way it normalizes a book, and `migrations.js` upgrades
   stored cards (3 to 4 added description, nickname, group greetings, depth prompt and talkativeness).
 
@@ -268,7 +272,7 @@ Cards are the second record kind in a project. This section owns how they flow t
 | --- | --- | --- |
 | Pure card logic | `cardCodec.js`, `cardTokens.js`, `cardValidation.js` | No DOM, storage or `main.js`; the tokenizer is injected as `count` |
 | Containers | `cardPng.js`, `zip.js`, `formats/card.js` | Adapters at the rim; no card quirk reaches the book model (A-8) |
-| Surface | `ui/cards.js`, the card dialog in `index.html`, card handlers in `main.js` | Renders the draft; holds no derived state |
+| Surface | `ui/cards.js`, the card page in `index.html`, card handlers in `main.js` | Renders the form; holds no derived state |
 
 ### 9.3 Data flow
 
@@ -277,9 +281,9 @@ Cards are the second record kind in a project. This section owns how they flow t
    (preserving `data.extensions` and unknown keys), and extracts an embedded `character_book` into a
    lorebook. The import dialog previews both; nothing is added until confirmed, and the current project
    is backed up first (G-6).
-2. **Edit.** The card dialog fills a draft from the store. Every keystroke recomputes the token report
-   (`cardTokens.js`) and the issue list (`cardValidation.js`) from the draft in an animation frame; Save
-   writes the draft through `updateCard`/`addCard`. Closing with edits asks for confirmation.
+2. **Edit.** The card page (`#/card/<id>`) fills its form from the store. Every keystroke recomputes the token
+   report (`cardTokens.js`) and the issue list (`cardValidation.js`) in an animation frame and, after a short
+   debounce, writes the form through `updateCard`. There is no Save step.
 3. **Export.** `CARD_ADAPTER.exportCard(card, { format, book })` serializes the active card for a target:
    PNG (V3 and V2 chunks), CHARX, JSON V3 or JSON V2. A linked book is serialized by the shared
    character-book adapter, so it carries every field that format supports and its own lossy warnings.

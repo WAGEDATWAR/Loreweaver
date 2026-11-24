@@ -10,50 +10,74 @@
 
 ## 1. Layout and navigation
 
+The app has two modes, and the navigation follows the mode.
+
+**Hub mode: the Library is home.** The Library lists every lorebook and character card as an openable
+tile: kind, name, size, linked lorebook, tags, an issue count and a description excerpt. It has search, a
+kind filter (All, Lorebooks, Cards), a sort (recently edited, name, largest) and the actions New
+lorebook, New character card and Import. A tile opens the editor for that project; its hover or focus
+actions duplicate or delete it. Data and Settings are the other hub pages. Hub pages have no side menu.
+
 ```text
-+--------------------------------------------------------------------------+
-| [mark Loreweaver v] | lorebook name | save state          Open Save Import Export |
-+-----------+---------------------+-----------------------------+----------+
-| Entries   | Entries (sidebar)   | entry name        Enabled   | Details  |
-| Library   | lorebook picker     | trigger keys | secondary    |          |
-| Data      | search + filters    | content + live statistics   |          |
-| Settings  | entry list (fills)  | author notes                |          |
-| Tools     | bulk bar            |                             |          |
-|  Overview | New entry           |                             |          |
-|  Simulate |                     |                             |          |
-|  Issues   |                     |                             |          |
-|  Search   |                     |                             |          |
-|  Replace  |                     |                             |          |
-| About     |                     |                             |          |
-+-----------+---------------------+-----------------------------+----------+
++--------------------------------------------------------------------+
+| [mark Loreweaver v]                      save state   history  file |
++--------------------------------------------------------------------+
+| Library                                [New lorebook][New card][Import] |
+| [search] [All|Lorebooks|Cards] [sort]                              |
+| +--------------+ +--------------+ +--------------+                 |
+| | tile: Aurora | | tile: Mara   | | tile: ...    |                 |
+| +--------------+ +--------------+ +--------------+                 |
++--------------------------------------------------------------------+
 ```
 
-**The brand is the main navigation.** The logo and name at the left of the header is a button that
-expands and collapses the navigation menu, the same way the entries sidebar collapses. Expanded it is a
-208 px menu with labels and shortcuts; collapsed it is a 54 px icon rail with tooltips. The choice
-persists. At 780 px and below the menu is an overlay opened from the same button and closed on selection
-or `Escape`.
+**Editor mode: one project, one menu.** Opening a lorebook or card enters the editor and shows the
+editor menu on the left, which carries only what that editor needs:
 
-**The app is a set of pages.** The menu switches between:
+```text
++-------------+------------------+-----------------------------+----------+
+| < Library   | Entries sidebar  | entry editor                | Details  |
+| LOREBOOK    | picker, search,  |                             |          |
+| Aurora Vale | filters, list    |                             |          |
+| Entries     |                  |                             |          |
+| Lorebook    |                  |                             |          |
+|  settings   |                  |                             |          |
+| TOOLS       |                  |                             |          |
+|  Overview...|                  |                             |          |
+| Collapse    |                  |                             |          |
++-------------+------------------+-----------------------------+----------+
+```
 
-| Page | Hash | Shortcut | Holds |
-| --- | --- | --- | --- |
-| Entries | `#/entries` | `Alt+1` | the entries sidebar, entry editor and details panel (default) |
-| Library | `#/library` | `Alt+2` | the lorebook list, active lorebook settings and entry defaults, character cards |
-| Data | `#/data` | `Alt+3` | import, export, project files, pre-import backup, storage and persistence, integrity, import log |
-| Settings | `#/settings` | `Alt+4` | theme, density, tokenizer, shortcuts, schema reference, guide |
+- **A lorebook** shows Entries and Lorebook settings (description, tags, token budget, new-entry
+  defaults, duplicate, split, merge, delete), and the Tools: Overview, Simulate, Issues, Search all and
+  Find and replace.
+- **A character card** shows its sections (Identity, Definition, Greetings, Examples and prompts,
+  Lorebook link) as jump links. The card page autosaves like a lorebook, with a live token report and
+  checks beside the form, and Duplicate, Export and Delete in its header. A card left completely blank
+  is discarded when you leave it.
+- The menu has a **Library** link at its top, the project's name and kind, and a Collapse control that
+  turns it into a 54 px icon rail (remembered). On phones it is an overlay opened from the header.
 
-The **Tools** group in the menu opens the Overview, Simulate, Issues, Search all and Find and replace
-dialogs; **About** opens the About dialog. Every page and tool is also a command-palette entry
-(`Go to Library`, and so on).
+**The brand is the app menu.** The logo and name at the left of the header open a small menu with the
+hub destinations (Library, Data, Settings), the command palette, keyboard shortcuts and About. It is
+available everywhere and closes on selection, an outside click or `Escape`.
 
-The location hash is the only source of truth for the current page (`src/views.js`), so the Back
-button, reloads and links work and the UI holds no view state of its own. The window title names the
-page when it is not Entries.
+**Routes.** The location hash is the only view state (`src/views.js`), so Back, reloads and links work:
 
-The **Entries sidebar** holds only what is needed to find and open an entry: a compact lorebook picker
-(with a link to the Library), search, filters, a collapsed Recent list, the sort control, the entry list
-(which takes all remaining height), the bulk bar and the New entry actions.
+| Route | Shows | Shortcut |
+| --- | --- | --- |
+| `#/library` (default) | the Library hub | `Alt+1` |
+| `#/data` | import, export, project files, backup, storage, integrity, import log | `Alt+2` |
+| `#/settings` | theme, density, tokenizer, shortcuts, schema reference, guide | `Alt+3` |
+| `#/book/<id>` | the lorebook editor (`#/entries` opens the last-used lorebook) | palette |
+| `#/book/<id>/settings` | lorebook settings | palette |
+| `#/card/<id>` | the card editor | palette |
+
+The palette has a `Go to` command for every hub page and an `Open lorebook:` or `Open card:` command
+for every project. The window title names the project or page.
+
+The **entries sidebar** holds only what is needed to find and open an entry: a compact lorebook picker
+(switching goes through the route), search, filters, a collapsed Recent list, the sort control, the entry
+list (which takes the remaining height), the bulk bar and the New entry actions.
 
 ## 2. Design tokens
 
@@ -103,8 +127,8 @@ the About panel and the command palette and persists locally. Both themes are he
   Loreweaver files, Character card). Backup, restore and storage diagnostics live on the Data page.
 - Above 120 entries the sidebar windows the list: only visible rows plus an 8-row overscan render,
   spacers hold the scroll height, and the active card stays focused.
-- Book descriptions, tags, the token budget and new-entry defaults live in the Library page's active
-  lorebook settings; the overview and validation controls are Tools in the navigation menu.
+- Book descriptions, tags, the token budget and new-entry defaults live on the lorebook's settings page;
+  the overview and validation controls are Tools in the editor menu.
 - The validation control summarizes issues; its dialog groups issues by type, lets category counts
   filter the list, and jumps to the affected entry.
 - The lorebook actions dialog duplicates, splits or merges the active book; merging remaps ids.
@@ -126,10 +150,10 @@ the About panel and the command palette and persists locally. Both themes are he
 
 ## 7. Responsive behavior
 
-- Above 780 px: navigation menu (208 px, or a 54 px rail), auto-fitted 200-460 px entries sidebar and a
-  fluid editor; never overflow horizontally.
-- 780 px and below: the navigation menu is an overlay, the sidebar is the library drawer, and the header is
-  compact.
+- Above 780 px: in the editor, the editor menu (208 px, or a 54 px rail), an auto-fitted 200-460 px entries
+  sidebar and a fluid editor; hub pages use the full width. Never overflow horizontally.
+- 780 px and below: the editor menu is an overlay opened from the header, the sidebar is the library
+  drawer, and the header is compact.
 - Collapsing the entries sidebar uses a 50 px rail at every width.
 - 600 px and below: the header drops Open and Save (they stay on the Data page and in the palette).
 - 1000 px and below: two-column settings.
@@ -141,7 +165,6 @@ the About panel and the command palette and persists locally. Both themes are he
 
 - The Tools (Overview, Simulate, Issues, History) are still dialogs; promoting them to pages belongs to
   the UI redesign (DEF-126).
-- The card editor is still a dialog (DEF-124).
 - A light theme ships opt-in (DEF-031); both themes pass `npm run contrast` (DEF-112).
 - There is no density option or remembered text-area height (DEF-032, DEF-033).
 - Virtualized rows hide tag chips and the matched-field note; the full card returns when the list is

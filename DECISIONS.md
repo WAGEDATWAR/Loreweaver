@@ -44,7 +44,7 @@ C = context, U = surface.
 | A-6 | **Frontend quirks belong in adapters**, never in the canonical model. | locked |
 | A-7 | **SillyTavern World Info v2 is the primary v1 export target.** It sorts first, is marked primary, and carries the most complete round-trip. | locked |
 | A-8 | **A card container is an adapter, not a model change.** PNG text chunks and CHARX live at the rim; the card record and its book stay canonical. | locked |
-| A-9 | **Cards get the same care as books**: store-owned mutations with undo, pure validation and token reports, and a draft editor that writes only on Save. | locked |
+| A-9 | **Cards get the same care as books**: store-owned mutations with undo, pure validation and token reports, and an autosaving editor page like a lorebook's. | locked |
 | A-10 | **One writer tab.** A cross-tab guard pauses saving in a tab another tab has outdated and asks the user; it never overwrites silently. | locked |
 
 ## Editor (E-series)
@@ -110,9 +110,10 @@ migration of the `lorebook-studio` namespace on load. | locked |
 | U-4 | **The library auto-fits 200-460 px and collapses to a 50 px rail**; width persists. | locked |
 | U-5 | **`prefers-reduced-motion` disables animation.** | locked |
 | U-6 | **Icon-only buttons carry `aria-label` and `title`.** | locked |
-| U-7 | **The brand is the main navigation**, an expandable and collapsible menu (208 px or a 54 px rail; an overlay on phones). | locked |
-| U-8 | **Pages are routed by the location hash** (`#/entries`, `#/library`, `#/data`, `#/settings`), owned by `src/views.js`; the hash is the only view state. Every page has `Alt+1`-`Alt+4` and a palette command. | locked |
-| U-9 | **The entries sidebar holds only entry navigation**; lorebook and card management live on the Library page, and backup, storage and import/export live on the Data page. | locked |
+| U-7 | **Two modes, two menus.** Hub pages (Library, Data, Settings) have no side menu and are reached from the brand's app menu; editor routes show an editor menu that carries only that project's pages and tools, collapsible to a 54 px rail (an overlay on phones). | locked |
+| U-8 | **Routes are the location hash** (`#/library`, `#/data`, `#/settings`, `#/book/<id>`, `#/book/<id>/settings`, `#/card/<id>`), owned by `src/views.js`; the hash is the only view state. Hub pages have `Alt+1`-`Alt+3`; every page and project has a palette command. | locked |
+| U-9 | **The entries sidebar holds only entry navigation.** Lorebook settings live on their own editor page; backup, storage and import/export live on the Data page; creating, finding, duplicating and deleting projects lives on the Library. | locked |
+| U-12 | **The Library is the home page and a hub of projects.** A project is a lorebook or a character card; both appear as one kind of tile and open their own editor. The app still holds one saved workspace (G-12 keeps accounts and sync out of v1). | locked |
 | U-11 | **Cards and lorebooks are presented with the same care.** The redesign builds both from one page anatomy and component set, and the review's parity matrix is the checklist. | locked |
 | U-10 | **A UI evaluation and redesign precedes v1** (DEF-125, DEF-126); it may change layout and style but not the model, adapters or pure core. | provisional |
 
