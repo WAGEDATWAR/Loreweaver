@@ -16,6 +16,8 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- Library: a tag filter and pinned projects (pins stay in this browser and lead every sort).
+
 - The Library is now the home page and a hub of projects. Lorebooks and character cards appear as tiles
   with size, tags, linked lorebook and an issue count, with search, a kind filter and a sort, and open
   into their own editor. The left menu now exists only in the editor (Library link, project name,

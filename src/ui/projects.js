@@ -6,6 +6,7 @@ const ICONS = {
   book: ["M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5V5.5Z", "M20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5V5.5Z"],
   card: ["M4 5h16v14H4z", "M8 10a2 2 0 1 0 4 0 2 2 0 0 0-4 0", "M7 16c.5-1.5 1.5-2 3-2s2.5.5 3 2", "M15 9h2", "M15 13h2"],
   copy: ["M9 9h11v11H9z", "M15 5V4H4v11h1"],
+  pin: ["M9 4h6l-1 6 3 3H7l3-3-1-6Z", "M12 13v7"],
   trash: ["M4 7h16", "M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2", "m6 7 1 13h10l1-13"]
 };
 
@@ -55,7 +56,7 @@ function subtitle(item) {
   return parts.join(" · ");
 }
 
-function createTile(item, activeIds) {
+function createTile(item, activeIds, pinnedIds) {
   const row = document.createElement("div");
   const link = document.createElement("a");
   const thumb = document.createElement("span");
@@ -66,6 +67,12 @@ function createTile(item, activeIds) {
   row.setAttribute("role", "listitem");
   row.className = "project-tile";
   row.dataset.kind = item.kind;
+
+  const pinned = pinnedIds.has(item.id);
+
+  if (pinned) {
+    row.classList.add("is-pinned");
+  }
 
   if (activeIds.has(item.id)) {
     row.classList.add("is-recent");
@@ -114,7 +121,7 @@ function createTile(item, activeIds) {
   link.append(thumb, body);
   actions.className = "project-actions";
 
-  for (const [action, label, name] of [["duplicate", "Duplicate", "copy"], ["delete", "Delete", "trash"]]) {
+  for (const [action, label, name] of [["pin", pinned ? "Unpin" : "Pin", "pin"], ["duplicate", "Duplicate", "copy"], ["delete", "Delete", "trash"]]) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = action === "delete" ? "icon-btn danger" : "icon-btn";
@@ -123,6 +130,10 @@ function createTile(item, activeIds) {
     button.dataset.projectId = item.id;
     button.title = `${label} ${item.name}`;
     button.setAttribute("aria-label", `${label} ${kindLabel.toLowerCase()} ${item.name}`);
+
+    if (action === "pin") {
+      button.setAttribute("aria-pressed", String(pinned));
+    }
     button.append(icon(name));
     actions.append(button);
   }
@@ -131,8 +142,12 @@ function createTile(item, activeIds) {
   return row;
 }
 
-export function renderProjectList(refs, items, { total, hasFilters, recentIds = new Set() }) {
-  refs.projectList.replaceChildren(...items.map((item) => createTile(item, recentIds)));
+export function renderProjectList(refs, items, { total, hasFilters, recentIds = new Set(), pinnedIds = new Set(), tags = [], tag = "" }) {
+  refs.projectList.replaceChildren(...items.map((item) => createTile(item, recentIds, pinnedIds)));
+
+  const options = [new Option("All tags", ""), ...tags.map(({ tag: name, count }) => new Option(`${name} (${count})`, name))];
+  refs.hubTag.replaceChildren(...options);
+  refs.hubTag.value = tags.some((entry) => entry.tag === tag) ? tag : "";
   refs.hubCount.textContent = String(items.length);
   refs.hubEmpty.hidden = items.length > 0;
 

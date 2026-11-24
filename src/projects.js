@@ -58,11 +58,29 @@ export function buildProjectItems(project, { estimate, countBookIssues = () => n
   return [...bookItems, ...cardItems];
 }
 
-export function filterProjects(items, { query = "", kind = "all" } = {}) {
+export function collectTags(items) {
+  const counts = new Map();
+
+  for (const item of items) {
+    for (const tag of new Set(item.tags.map((value) => value.trim()).filter(Boolean))) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+
+  return [...counts.entries()]
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag, undefined, { sensitivity: "base" }));
+}
+
+export function filterProjects(items, { query = "", kind = "all", tag = "" } = {}) {
   const needle = query.trim().toLowerCase();
 
   return items.filter((item) => {
     if (kind !== "all" && item.kind !== kind) {
+      return false;
+    }
+
+    if (tag && !item.tags.some((value) => value.trim() === tag)) {
       return false;
     }
 
@@ -75,7 +93,17 @@ export function filterProjects(items, { query = "", kind = "all" } = {}) {
   });
 }
 
-export function sortProjects(items, mode = "updated") {
+export function sortProjects(items, mode = "updated", pinned = new Set()) {
+  const ordered = sortByMode(items, mode);
+
+  if (!pinned.size) {
+    return ordered;
+  }
+
+  return [...ordered.filter((item) => pinned.has(item.id)), ...ordered.filter((item) => !pinned.has(item.id))];
+}
+
+function sortByMode(items, mode) {
   const copy = [...items];
 
   if (mode === "name") {

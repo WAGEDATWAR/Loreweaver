@@ -142,7 +142,7 @@ import { validateCardRecord } from "./cardValidation.js";
 import { clamp } from "./utils.js";
 import { createTabGuard } from "./tabGuard.js";
 import { VIEWS, getView, isEditorView, parseRoute, routeHref, viewForShortcut } from "./views.js";
-import { buildProjectItems, filterProjects, sortProjects } from "./projects.js";
+import { buildProjectItems, collectTags, filterProjects, sortProjects } from "./projects.js";
 import { renderProjectList } from "./ui/projects.js";
 import { selectEntriesByTokenSize } from "./bulk.js";
 import { applyReplace, parseReplaceQuery, planReplace } from "./replace.js";
@@ -235,6 +235,7 @@ const refs = {
   hubSearch: document.querySelector("#hub-search"),
   hubFilters: document.querySelector("#hub-filters"),
   hubSort: document.querySelector("#hub-sort"),
+  hubTag: document.querySelector("#hub-tag"),
   hubCount: document.querySelector("#hub-count"),
   hubImportBtn: document.querySelector("#hub-import-btn"),
   hubEmpty: document.querySelector("#hub-empty"),
@@ -819,7 +820,31 @@ const NAV_STATE_KEY = storageKey("nav-expanded:v1");
 const MOBILE_NAV_QUERY = window.matchMedia("(max-width: 780px)");
 let currentView = "library";
 let currentRouteId = null;
-const hubState = { query: "", kind: "all", sort: "updated" };
+const hubState = { query: "", kind: "all", sort: "updated", tag: "" };
+const PINNED_KEY = storageKey("pinned-projects:v1");
+
+function readPinned() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(PINNED_KEY) ?? "[]");
+    return new Set(Array.isArray(parsed) ? parsed.filter((id) => typeof id === "string") : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function togglePinned(id) {
+  const pinned = readPinned();
+
+  if (!pinned.delete(id)) {
+    pinned.add(id);
+  }
+
+  try {
+    localStorage.setItem(PINNED_KEY, JSON.stringify([...pinned]));
+  } catch {
+    return;
+  }
+}
 
 function readNavExpanded() {
   try {
@@ -884,13 +909,23 @@ function renderHub() {
     countBookIssues: (book) => validateBook(book, hubEstimate).length,
     countCardIssues: (card) => validateCardRecord(card, { bookExists, count: hubEstimate }).filter((issue) => issue.severity !== "info").length
   });
-  const visible = sortProjects(filterProjects(items, hubState), hubState.sort);
+  const tags = collectTags(items);
+
+  if (hubState.tag && !tags.some((entry) => entry.tag === hubState.tag)) {
+    hubState.tag = "";
+  }
+
+  const pinnedIds = readPinned();
+  const visible = sortProjects(filterProjects(items, hubState), hubState.sort, pinnedIds);
   const recentIds = new Set([state.activeBookId, state.activeCardId].filter(Boolean));
 
   renderProjectList(refs, visible, {
     total: items.length,
-    hasFilters: Boolean(hubState.query.trim()) || hubState.kind !== "all",
-    recentIds
+    hasFilters: Boolean(hubState.query.trim()) || hubState.kind !== "all" || Boolean(hubState.tag),
+    recentIds,
+    pinnedIds,
+    tags,
+    tag: hubState.tag
   });
 }
 
@@ -5412,9 +5447,15 @@ refs.hubSort.addEventListener("change", (event) => {
   renderHub();
 });
 
+refs.hubTag.addEventListener("change", (event) => {
+  hubState.tag = event.target.value;
+  renderHub();
+});
+
 refs.hubEmptyClear.addEventListener("click", () => {
   hubState.query = "";
   hubState.kind = "all";
+  hubState.tag = "";
   refs.hubSearch.value = "";
 
   for (const button of refs.hubFilters.querySelectorAll("[data-kind]")) {
@@ -5434,6 +5475,13 @@ refs.projectList.addEventListener("click", async (event) => {
   }
 
   const { projectAction: action, projectKind: kind, projectId: id } = button.dataset;
+
+  if (action === "pin") {
+    togglePinned(id);
+    renderHub();
+    refs.projectList.querySelector(`[data-project-action="pin"][data-project-id="${id}"]`)?.focus();
+    return;
+  }
 
   if (kind === "book") {
     if (action === "duplicate") {

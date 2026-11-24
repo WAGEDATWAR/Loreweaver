@@ -655,6 +655,14 @@ export const scenarios = [
       await page.waitFor('document.querySelectorAll("#project-list .project-tile").length === 0');
       await page.click('#hub-filters [data-kind="all"]');
 
+      const lastId = await page.evaluate('document.querySelector("#project-list .project-tile:last-child .project-open").dataset.projectId');
+      await page.click(`#project-list [data-project-action="pin"][data-project-id="${lastId}"]`);
+      await page.waitFor(`document.querySelector("#project-list .project-tile .project-open").dataset.projectId === ${JSON.stringify(lastId)}`);
+      assert.equal(await page.evaluate(`document.querySelector('[data-project-action="pin"][data-project-id="${lastId}"]').getAttribute("aria-pressed")`), "true");
+      await page.click(`#project-list [data-project-action="pin"][data-project-id="${lastId}"]`);
+      await page.waitFor(`document.querySelector("#project-list .project-tile:last-child .project-open").dataset.projectId === ${JSON.stringify(lastId)}`);
+      assert.equal(await page.evaluate('document.querySelector("#hub-tag").options.length >= 1'), true);
+
       await page.click('#project-list [data-project-action="duplicate"][data-project-kind="book"]');
       await page.waitFor('document.querySelectorAll("#project-list .project-tile").length === 3');
 

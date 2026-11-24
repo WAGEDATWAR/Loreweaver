@@ -6224,3 +6224,15 @@ body:not([data-mode="editor"]) .nav-open-btn {
     overflow: hidden;
   }
 }
+
+.project-tile.is-pinned [data-project-action="pin"] {
+  color: var(--accent);
+}
+
+.project-tile.is-pinned .project-actions {
+  opacity: 1;
+}
+
+.project-tile.is-pinned [data-project-action="pin"] svg {
+  fill: currentColor;
+}

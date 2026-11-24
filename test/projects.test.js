@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ISSUE_COUNT_ENTRY_LIMIT, buildProjectItems, filterProjects, sortProjects } from "../src/projects.js";
+import { ISSUE_COUNT_ENTRY_LIMIT, buildProjectItems, collectTags, filterProjects, sortProjects } from "../src/projects.js";
 import { createBook, createCard, createEntry, createProject } from "../src/schema.js";
 
 const estimate = (text) => String(text).split(/\s+/).filter(Boolean).length;
@@ -56,4 +56,27 @@ test("sorts by recency, name and size without mutating the input", () => {
   assert.deepEqual(sortProjects(items, "name").map((item) => item.name), ["Aurora Vale", "Mara Voss", "Orphan", "Untitled Lorebook"]);
   assert.equal(sortProjects(items, "size")[0].id, "card_a");
   assert.deepEqual(items.map((item) => item.id), before);
+});
+
+test("collects tags with counts across books and cards", () => {
+  const items = buildProjectItems(sample(), { estimate });
+
+  assert.deepEqual(collectTags(items), [{ tag: "campaign", count: 1 }, { tag: "npc", count: 1 }]);
+});
+
+test("filters by tag together with kind and query", () => {
+  const items = buildProjectItems(sample(), { estimate });
+
+  assert.deepEqual(filterProjects(items, { tag: "npc" }).map((item) => item.id), ["card_a"]);
+  assert.deepEqual(filterProjects(items, { tag: "npc", kind: "book" }), []);
+  assert.deepEqual(filterProjects(items, { tag: "campaign", query: "coastal" }).map((item) => item.id), ["book_a"]);
+});
+
+test("pinned projects lead every sort order", () => {
+  const items = buildProjectItems(sample(), { estimate });
+  const pinned = new Set(["card_b"]);
+
+  assert.equal(sortProjects(items, "updated", pinned)[0].id, "card_b");
+  assert.equal(sortProjects(items, "name", pinned)[0].id, "card_b");
+  assert.equal(sortProjects(items, "updated")[0].id, "card_a");
 });
