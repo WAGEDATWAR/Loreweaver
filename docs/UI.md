@@ -150,16 +150,20 @@ the About panel and the command palette and persists locally. Both themes are he
 
 ## 7. Responsive behavior
 
-- Above 780 px: in the editor, the editor menu (208 px, or a 54 px rail), an auto-fitted 200-460 px entries
-  sidebar and a fluid editor; hub pages use the full width. Never overflow horizontally.
-- 780 px and below: the editor menu is an overlay opened from the header, the sidebar is the library
-  drawer, and the header is compact.
-- Collapsing the entries sidebar uses a 50 px rail at every width.
+- **Above 1200 px:** the editor menu is expanded (208 px) unless you collapsed it, with the entries
+  sidebar, the editor and the details panel side by side.
+- **1180 px and below:** the details panel is an overlay opened from the **Details** button in the entry
+  header, so the editor keeps its width (it is collapsed by default); the editor menu defaults to the 54 px
+  rail. Choosing an option yourself is remembered and stops the automatic change.
+- **780 px and below:** entries are two screens. Opening a lorebook shows the entry list full screen;
+  choosing an entry shows the editor full screen, and the list button in the header returns to the list.
+  The editor menu is an overlay opened from the header and card pages stack their summary above the form.
+- Hub pages use the full width at every size and never overflow horizontally.
 - 600 px and below: the header drops Open and Save (they stay on the Data page and in the palette).
-- 1000 px and below: two-column settings.
-- 900 px and below: compact topbar, brand text hidden.
-- 600 px and below: single-column fields, icon-only import/export.
-- 430 px and below: hidden save label, compact dialog padding, hidden export meta pills.
+- 430 px and below: the header also drops Import (the Library and Data pages carry it), the save label is
+  hidden and dialog padding is compact.
+- Text is never below 12 px, except uppercase micro-labels and count badges (11 px). Touch devices and
+  phone widths get 44 px targets; header controls stay at 40 px so 320 px fits.
 
 ## 8. Known gaps
 

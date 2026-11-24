@@ -441,6 +441,7 @@ const refs = {
   editorPane: document.querySelector("#editor-pane"),
   detailsPanel: document.querySelector("#details-panel"),
   detailsToggle: document.querySelector("#details-toggle"),
+  detailsOpenBtn: document.querySelector("#details-open-btn"),
   emptyTitle: document.querySelector("#empty-title"),
   emptyText: document.querySelector("#empty-text"),
   entryTitle: document.querySelector("#entry-title"),
@@ -694,6 +695,7 @@ function setDetailsCollapsed(collapsed, persist = true) {
   const label = collapsed ? "Show entry details" : "Hide entry details";
   refs.detailsToggle.setAttribute("aria-label", label);
   refs.detailsToggle.title = label;
+  refs.detailsOpenBtn.setAttribute("aria-expanded", String(!collapsed));
 
   if (persist) {
     try {
@@ -929,6 +931,7 @@ const HEADING_FOR_VIEW = {
 };
 
 function showRoute(requested, { focusHeading = false } = {}) {
+  const previousView = currentView;
   const leavingCard = currentView === "card" ? editingCardId : null;
   const route = resolveRoute(requested);
 
@@ -1001,6 +1004,14 @@ function showRoute(requested, { focusHeading = false } = {}) {
 
   setMobileNavOpen(false);
   setAppMenuOpen(false);
+
+  if (MOBILE_NAV_QUERY.matches) {
+    if (onBook && previousView !== "book" && !refs.sidebar.classList.contains("is-drawer")) {
+      setDrawerOpen(true);
+    } else if (!onBook && refs.sidebar.classList.contains("is-drawer")) {
+      setDrawerOpen(false);
+    }
+  }
 
   if (route.view === "library") {
     renderHub();
@@ -5138,6 +5149,11 @@ refs.historyDialog.addEventListener("click", (event) => {
   }
 });
 
+refs.detailsOpenBtn.addEventListener("click", () => {
+  setDetailsCollapsed(false);
+  refs.detailsToggle.focus();
+});
+
 refs.detailsToggle.addEventListener("click", () => {
   setDetailsCollapsed(!refs.detailsPanel.classList.contains("is-collapsed"));
 });
@@ -5970,7 +5986,13 @@ textareaHeights = readTextareaHeights();
 watchTextareaHeights();
 
 const storedDetailsState = readDetailsState();
-setDetailsCollapsed(storedDetailsState ?? window.matchMedia("(max-width: 720px)").matches, false);
+setDetailsCollapsed(storedDetailsState ?? window.matchMedia("(max-width: 1180px)").matches, false);
+
+window.matchMedia("(max-width: 1180px)").addEventListener("change", (event) => {
+  if (readDetailsState() === null) {
+    setDetailsCollapsed(event.matches, false);
+  }
+});
 
 const storedSidebarState = readSidebarState();
 setSidebarCollapsed(storedSidebarState ?? false, false);
@@ -6035,6 +6057,20 @@ if (initialSave.ok) {
 tabGuard.announce();
 requestPersistence();
 setNavExpanded(readNavExpanded(), false);
+
+window.matchMedia("(min-width: 1200px)").addEventListener("change", (event) => {
+  let stored = null;
+
+  try {
+    stored = localStorage.getItem(NAV_STATE_KEY);
+  } catch {
+    stored = null;
+  }
+
+  if (stored === null) {
+    setNavExpanded(event.matches, false);
+  }
+});
 showRoute(parseRoute(window.location.hash));
 
 refs.saveFileBtn.hidden = false;

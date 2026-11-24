@@ -707,6 +707,46 @@ export const scenarios = [
     }
   },
   {
+    name: "keeps the editor wide at mid widths and opens details as an overlay",
+    async run(page) {
+      await resetApp(page);
+      await page.setViewport(1024, 768);
+      await sleep(150);
+      assert.equal(await page.evaluate('document.querySelector("#details-panel").classList.contains("is-collapsed")'), true);
+      assert.ok(await page.evaluate('document.querySelector(".editor-scroll").getBoundingClientRect().width') >= 560);
+
+      await page.click("#details-open-btn");
+      await page.waitFor('!document.querySelector("#details-panel").classList.contains("is-collapsed")');
+      assert.equal(await page.evaluate('document.querySelector("#details-open-btn").getAttribute("aria-expanded")'), "true");
+      assert.ok(await page.evaluate('document.querySelector("#entry-order").getBoundingClientRect().width') > 0);
+      assert.ok(await page.evaluate('document.querySelector(".editor-scroll").getBoundingClientRect().width') >= 560);
+
+      await page.click("#details-toggle");
+      await page.waitFor('document.querySelector("#details-panel").classList.contains("is-collapsed")');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "starts on the entry list on phones and opens an entry full screen",
+    async run(page) {
+      await resetApp(page);
+      await page.setViewport(390, 844);
+      await sleep(150);
+      await openPage(page, "library");
+      await page.click("#project-list .project-open");
+      await page.waitFor('document.querySelector("#sidebar")?.classList.contains("is-drawer")');
+      assert.ok(await page.evaluate('document.querySelector("#entry-list").getBoundingClientRect().height') > 150);
+
+      await page.evaluate('document.querySelectorAll(".entry-card")[1].click(); true');
+      await page.waitFor('!document.querySelector("#sidebar").classList.contains("is-drawer")');
+      assert.ok(await page.evaluate('document.querySelector("#entry-content").getBoundingClientRect().width') > 300);
+      const overflow = await page.evaluate('document.documentElement.scrollWidth - window.innerWidth');
+      assert.ok(overflow <= 0, `overflow ${overflow}px`);
+      await page.setViewport(1440, 900);
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "registers a service worker and caches the shell",
     timeout: 30000,
     async run(page) {
@@ -727,6 +767,7 @@ export const scenarios = [
   {
     name: "opens the library as a mobile drawer",
     async run(page) {
+      await page.setViewport(1440, 900);
       await resetApp(page);
       await page.setViewport(390, 844);
       await sleep(150);

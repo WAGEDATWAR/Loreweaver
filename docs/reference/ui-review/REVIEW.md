@@ -126,3 +126,8 @@ Each step ships with the gates (axe, contrast, e2e, a scenario per page) and ref
   focus style, and the light theme completed for the details panel, chip inputs and diff surfaces. This
   addresses UI-04, UI-05, UI-06 and UI-12 in part. Still open: the phone master-detail layout and mid-width
   drawers (UI-01, UI-02), the Review page, the header file menu and skip link.
+- **Step 3 (responsive, 2026-11-23):** the details panel is an overlay below 1180 px with a Details button,
+  the editor menu and details follow the window width until you choose, and phones get a list screen and an
+  editor screen instead of a stacked layout. This addresses UI-01 and UI-02. Still open: card parity
+  extras (list tokens, notes, bulk, history), the Review page, the header file menu, Settings with real
+  controls.

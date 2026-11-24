@@ -119,6 +119,10 @@ Mobile preview builds, bulk authoring tools and the completed scale phase.
 
 ### Fixed
 
+- Responsive layout: below 1180 px the details panel is an overlay opened from a Details button, so the
+  editor keeps its width, and on phones the entry list and the entry editor are separate full screens
+  (DEF-128, DEF-129).
+
 - UI foundation: text is no smaller than 12 px (11 px for uppercase micro-labels and count badges), touch
   targets are 44 px on phones and touch devices, focus rings are consistent, and the light theme now
   covers the details panel, chip inputs and diff views (DEF-130, DEF-131).
