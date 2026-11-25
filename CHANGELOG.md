@@ -16,6 +16,9 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- Library multi-select: pick lorebooks and cards, then add or remove a tag, export the selection as a project file, or delete them with one confirmation.
+- A header File menu groups Open, Save, Import and Export; Open and Save still appear only where the browser supports them.
+
 - A Review page for lorebooks and cards (`#/book/<id>/review`, `#/card/<id>/review`): size, checks that jump to the entry or field, and a simulation shortcut.
 
 - Library: a tag filter and pinned projects (pins stay in this browser and lead every sort).

@@ -1197,6 +1197,7 @@ export const scenarios = [
     name: "reports local storage usage in the export dialog",
     async run(page) {
       await resetApp(page);
+      await page.click("#file-menu-btn");
       await page.click("#export-btn");
       await page.waitFor('document.querySelector("#export-dialog")?.open');
       await page.waitFor('document.querySelector("#storage-usage-backend").textContent === "IndexedDB"');
@@ -1213,6 +1214,7 @@ export const scenarios = [
     name: "lists SillyTavern first as the primary export and warns before lossy export",
     async run(page) {
       await resetApp(page);
+      await page.click("#file-menu-btn");
       await page.click("#export-btn");
       await page.waitFor('document.querySelector("#export-dialog")?.open');
       await page.waitFor('document.querySelector("#export-options [data-export-format]")');
@@ -1254,6 +1256,7 @@ export const scenarios = [
         return true;
       })()`);
 
+      await page.click("#file-menu-btn");
       await page.click("#export-btn");
       await page.waitFor('document.querySelector("#export-dialog")?.open');
       await page.waitFor('document.querySelector("#export-options [data-export-format=\\"native\\"]")');
@@ -1295,6 +1298,7 @@ export const scenarios = [
     name: "exports a standalone character book",
     async run(page) {
       await resetApp(page);
+      await page.click("#file-menu-btn");
       await page.click("#export-btn");
       await page.waitFor('document.querySelector("#export-dialog")?.open');
       await page.waitFor('document.querySelector(\'#export-options [data-export-format="characterbook"]\')');
@@ -1950,6 +1954,52 @@ export const scenarios = [
       await page.click('#review-body [data-review-field="description"]');
       await page.waitFor('!document.querySelector("#page-card")?.hidden');
       assert.equal(await page.evaluate('document.activeElement?.id'), "card-description");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "selects projects in the Library and applies bulk actions",
+    timeout: 40000,
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "library");
+      await page.click("#new-book-btn");
+      await page.waitFor('document.querySelector("#sidebar")?.hidden === false');
+      await page.click("#nav-back");
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile").length === 2');
+
+      await page.click("#hub-select-btn");
+      await page.waitFor('!document.querySelector("#hub-bulk-bar").hidden');
+      await page.click("#hub-bulk-all");
+      await page.waitFor('document.querySelector("#hub-bulk-count").textContent === "2 selected"');
+
+      await setValue(page, "#hub-bulk-tag", "batch");
+      await page.click("#hub-bulk-tag-add");
+      await page.waitFor('[...document.querySelectorAll("#hub-tag option")].some((o) => o.value === "batch")');
+      await page.click("#hub-bulk-tag-remove");
+      await page.waitFor('![...document.querySelectorAll("#hub-tag option")].some((o) => o.value === "batch")');
+
+      await page.click("#hub-bulk-delete");
+      await page.waitFor('document.querySelector("#confirm-dialog")?.open');
+      await page.click("#confirm-accept");
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile").length === 1');
+      await page.click("#hub-bulk-done");
+      await page.waitFor('document.querySelector("#hub-bulk-bar").hidden');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "groups file actions in the header File menu",
+    async run(page) {
+      await resetApp(page);
+      assert.equal(await page.evaluate('document.querySelector("#file-menu").hidden'), true);
+      await page.click("#file-menu-btn");
+      await page.waitFor('!document.querySelector("#file-menu").hidden');
+      assert.equal(await page.evaluate('document.querySelector("#file-menu-btn").getAttribute("aria-expanded")'), "true");
+      await page.click("#export-btn");
+      await page.waitFor('document.querySelector("#export-dialog")?.open');
+      assert.equal(await page.evaluate('document.querySelector("#file-menu").hidden'), true);
+      await page.evaluate('document.querySelector("#export-dialog").close(); true');
       assert.deepEqual(page.errors, []);
     }
   },

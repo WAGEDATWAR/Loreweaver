@@ -56,7 +56,7 @@ function subtitle(item) {
   return parts.join(" · ");
 }
 
-function createTile(item, activeIds, pinnedIds) {
+function createTile(item, activeIds, pinnedIds, selection) {
   const row = document.createElement("div");
   const link = document.createElement("a");
   const thumb = document.createElement("span");
@@ -138,12 +138,29 @@ function createTile(item, activeIds, pinnedIds) {
     actions.append(button);
   }
 
+  if (selection.active) {
+    const label = document.createElement("label");
+    const box = document.createElement("input");
+
+    label.className = "project-select";
+    box.type = "checkbox";
+    box.dataset.projectId = item.id;
+    box.dataset.projectSelect = "1";
+    box.checked = selection.ids.has(item.id);
+    box.setAttribute("aria-label", `Select ${kindLabel.toLowerCase()} ${item.name}`);
+    label.append(box);
+    row.classList.add("is-selecting");
+    row.classList.toggle("is-selected", box.checked);
+    row.append(label);
+  }
+
   row.append(link, actions);
   return row;
 }
 
-export function renderProjectList(refs, items, { total, hasFilters, recentIds = new Set(), pinnedIds = new Set(), tags = [], tag = "" }) {
-  refs.projectList.replaceChildren(...items.map((item) => createTile(item, recentIds, pinnedIds)));
+export function renderProjectList(refs, items, { total, hasFilters, recentIds = new Set(), pinnedIds = new Set(), tags = [], tag = "", selecting = false, selectedIds = new Set() }) {
+  const selection = { active: selecting, ids: selectedIds };
+  refs.projectList.replaceChildren(...items.map((item) => createTile(item, recentIds, pinnedIds, selection)));
 
   const options = [new Option("All tags", ""), ...tags.map(({ tag: name, count }) => new Option(`${name} (${count})`, name))];
   refs.hubTag.replaceChildren(...options);

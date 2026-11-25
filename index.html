@@ -85,31 +85,40 @@
           </button>
         </div>
         <span class="action-divider" aria-hidden="true"></span>
-        <button id="open-file-btn" class="btn" type="button" aria-label="Open project file" title="Open a project file (Ctrl+O)" hidden>
+        <div class="file-menu-wrap">
+          <button id="file-menu-btn" class="btn" type="button" aria-expanded="false" aria-controls="file-menu" title="Open, save, import and export">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l3 3v15H5V3Z"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
+            <span class="btn-label">File</span>
+            <svg class="file-menu-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div id="file-menu" class="app-menu file-menu" role="group" aria-label="File" hidden>
+        <button id="open-file-btn" class="menu-item" type="button" title="Open a project file (Ctrl+O)" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/>
           </svg>
-          <span class="btn-label">Open</span>
+          <span>Open project file</span><kbd>Ctrl O</kbd>
         </button>
-        <button id="save-file-btn" class="btn" type="button" aria-label="Save project file" title="Save project file (Ctrl+Shift+S)" hidden>
+        <button id="save-file-btn" class="menu-item" type="button" title="Save project file (Ctrl+Shift+S)" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M5 3h11l3 3v15H5V3Z"/><path d="M8 3v6h7V3"/><path d="M8 14h8"/>
           </svg>
-          <span class="btn-label">Save</span>
+          <span>Save project file</span><kbd>Ctrl Shift S</kbd>
         </button>
-        <button id="import-btn" class="btn" type="button" aria-label="Import lorebook" title="Import a lorebook or Loreweaver project">
+        <button id="import-btn" class="menu-item" type="button" title="Import a lorebook or Loreweaver project">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>
           </svg>
-          <span class="btn-label">Import</span>
+          <span>Import…</span>
         </button>
-        <button id="export-btn" class="btn" type="button" aria-label="Export lorebook or project" aria-keyshortcuts="Control+Shift+E" title="Export lorebook or project">
+        <button id="export-btn" class="menu-item" type="button" aria-keyshortcuts="Control+Shift+E" title="Export lorebook or project">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/>
           </svg>
-          <span class="btn-label">Export</span>
+          <span>Export…</span><kbd>Ctrl Shift E</kbd>
         </button>
 
+          </div>
+        </div>
       </div>
     </header>
 
@@ -629,7 +638,20 @@
                 <option value="size">Largest first</option>
               </select>
             </label>
+            <button id="hub-select-btn" class="btn" type="button" aria-pressed="false" title="Select several lorebooks and cards">Select</button>
             <span id="hub-count" class="count" aria-live="polite">0</span>
+          </div>
+
+          <div id="hub-bulk-bar" class="bulk-bar hub-bulk-bar" role="toolbar" aria-label="Selected projects" hidden>
+            <span id="hub-bulk-count" class="bulk-count" aria-live="polite">0 selected</span>
+            <button id="hub-bulk-all" class="btn" type="button">Select all shown</button>
+            <label class="sr-only" for="hub-bulk-tag">Tag to add or remove</label>
+            <input id="hub-bulk-tag" class="sort-select" type="text" placeholder="Tag" autocomplete="off" spellcheck="false">
+            <button id="hub-bulk-tag-add" class="btn" type="button">Add tag</button>
+            <button id="hub-bulk-tag-remove" class="btn" type="button">Remove tag</button>
+            <button id="hub-bulk-export" class="btn" type="button">Export selected</button>
+            <button id="hub-bulk-delete" class="btn btn-danger" type="button">Delete</button>
+            <button id="hub-bulk-done" class="btn" type="button">Done</button>
           </div>
 
           <div id="project-list" class="project-grid" role="list" aria-label="Lorebooks and character cards"></div>

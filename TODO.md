@@ -110,7 +110,7 @@ defect or risk, **S3** improvement.
       card parity matrix in `docs/reference/ui-review/REVIEW.md`. A real screen-reader pass is still open
       (DEF-043).
 - [x] Foundation: 12 px text floor, touch density, one focus style, light theme finished (DEF-130, DEF-131).
-- [x] Header: a skip link and a labelled palette button (DEF-132). A file menu grouping Open, Save, Import and Export is still owed.
+- [x] Header: a skip link, a labelled palette button and a File menu grouping Open, Save, Import and Export (DEF-132).
 - [x] Responsive model: phone list-then-editor screens and a details overlay at mid widths (DEF-128, DEF-129).
 - [ ] `H` Card and lorebook parity in the interface: a card workspace built from the shared page anatomy,
       list, tokens, notes, bulk and history (DEF-134, DEF-117 to DEF-124).
@@ -176,16 +176,16 @@ defect or risk, **S3** improvement.
 Cards are a first-class record (G-16); the container is an adapter (A-8). Record, PNG/CHARX/JSON
 adapters, extraction, linking, the library, the full field set, token report, checks and V2/V3 export have
 shipped (v0.8.0+). Open parity work: diff on re-import (DEF-118),
-templates (DEF-119), a prompt-assembly preview (DEF-120), bulk operations (DEF-121), schema/print/search
+templates (DEF-119), a prompt-assembly preview (DEF-120), schema/print/search
 coverage (DEF-122), extension editors (DEF-123) and a full-page workspace (DEF-124).
 
 - [x] The Library is the home hub for lorebooks and cards; cards have an autosaving editor page; the left menu is editor-only (DEF-124, U-7 to U-9, U-12).
 - [x] The Library filters by tag and pins projects to the top (DEF-117; pins live in localStorage).
-- [ ] `M` `P5` Library hub follow-ups: bulk actions, grid/list toggle (DEF-135).
+- [ ] `S` `P5` Library grid/list toggle and kind-specific lorebook thumbnails (DEF-135).
 - [ ] `M` `P5` Card diff and merge on re-import, card revisions (DEF-118).
 - [ ] `M` `P5` Card templates (DEF-119).
 - [ ] `H` `P5` A prompt-assembly preview of card plus book (DEF-120).
-- [ ] `M` `P5` Card bulk operations (DEF-121).
+- [x] Library multi-select with bulk tag, export and delete for lorebooks and cards (DEF-121).
 - [ ] `L` `P5` Cards in the schema page, print export and global search (DEF-122).
 
 ## Known gaps

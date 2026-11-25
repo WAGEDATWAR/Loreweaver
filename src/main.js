@@ -240,6 +240,10 @@ const refs = {
   hubFilters: document.querySelector("#hub-filters"),
   hubSort: document.querySelector("#hub-sort"),
   hubTag: document.querySelector("#hub-tag"),
+  hubSelectBtn: document.querySelector("#hub-select-btn"),
+  hubBulkBar: document.querySelector("#hub-bulk-bar"),
+  hubBulkCount: document.querySelector("#hub-bulk-count"),
+  hubBulkTag: document.querySelector("#hub-bulk-tag"),
   hubCount: document.querySelector("#hub-count"),
   hubImportBtn: document.querySelector("#hub-import-btn"),
   hubEmpty: document.querySelector("#hub-empty"),
@@ -274,6 +278,8 @@ const refs = {
   historyCloseBtn: document.querySelector("#history-close"),
   importBtn: document.querySelector("#import-btn"),
   exportBtn: document.querySelector("#export-btn"),
+  fileMenuBtn: document.querySelector("#file-menu-btn"),
+  fileMenu: document.querySelector("#file-menu"),
   openFileBtn: document.querySelector("#open-file-btn"),
   saveFileBtn: document.querySelector("#save-file-btn"),
   fileName: document.querySelector("#file-name"),
@@ -824,7 +830,8 @@ const NAV_STATE_KEY = storageKey("nav-expanded:v1");
 const MOBILE_NAV_QUERY = window.matchMedia("(max-width: 780px)");
 let currentView = "library";
 let currentRouteId = null;
-const hubState = { query: "", kind: "all", sort: "updated", tag: "" };
+const hubState = { query: "", kind: "all", sort: "updated", tag: "", selecting: false };
+const hubSelected = new Set();
 const PINNED_KEY = storageKey("pinned-projects:v1");
 
 function readPinned() {
@@ -892,6 +899,11 @@ function toggleNav() {
   setNavExpanded(refs.shell.dataset.nav !== "expanded");
 }
 
+function setFileMenuOpen(open) {
+  refs.fileMenu.hidden = !open;
+  refs.fileMenuBtn.setAttribute("aria-expanded", String(open));
+}
+
 function setAppMenuOpen(open) {
   refs.appMenu.hidden = !open;
   refs.appMenuBtn.setAttribute("aria-expanded", String(open));
@@ -922,8 +934,21 @@ function renderHub() {
   const pinnedIds = readPinned();
   const visible = sortProjects(filterProjects(items, hubState), hubState.sort, pinnedIds);
   const recentIds = new Set([state.activeBookId, state.activeCardId].filter(Boolean));
+  const knownIds = new Set(items.map((item) => item.id));
+
+  for (const id of [...hubSelected]) {
+    if (!knownIds.has(id)) {
+      hubSelected.delete(id);
+    }
+  }
+
+  refs.hubSelectBtn.setAttribute("aria-pressed", String(hubState.selecting));
+  refs.hubBulkBar.hidden = !hubState.selecting;
+  refs.hubBulkCount.textContent = `${hubSelected.size} selected`;
 
   renderProjectList(refs, visible, {
+    selecting: hubState.selecting,
+    selectedIds: hubSelected,
     total: items.length,
     hasFilters: Boolean(hubState.query.trim()) || hubState.kind !== "all" || Boolean(hubState.tag),
     recentIds,
@@ -5427,7 +5452,21 @@ document.querySelector("#skip-link").addEventListener("click", (event) => {
   }
 });
 
-refs.appMenuBtn.addEventListener("click", () => setAppMenuOpen(refs.appMenu.hidden));
+refs.appMenuBtn.addEventListener("click", () => {
+  setFileMenuOpen(false);
+  setAppMenuOpen(refs.appMenu.hidden);
+});
+
+refs.fileMenuBtn.addEventListener("click", () => {
+  setAppMenuOpen(false);
+  setFileMenuOpen(refs.fileMenu.hidden);
+});
+
+refs.fileMenu.addEventListener("click", (event) => {
+  if (event.target.closest(".menu-item")) {
+    setFileMenuOpen(false);
+  }
+});
 
 refs.appMenu.addEventListener("click", (event) => {
   if (event.target.closest(".menu-item")) {
@@ -5436,6 +5475,10 @@ refs.appMenu.addEventListener("click", (event) => {
 });
 
 document.addEventListener("click", (event) => {
+  if (!refs.fileMenu.hidden && !refs.fileMenu.contains(event.target) && !refs.fileMenuBtn.contains(event.target)) {
+    setFileMenuOpen(false);
+  }
+
   if (!refs.appMenu.hidden && !refs.appMenu.contains(event.target) && !refs.appMenuBtn.contains(event.target)) {
     setAppMenuOpen(false);
   }
@@ -5495,7 +5538,10 @@ document.addEventListener("keydown", (event) => {
     return;
   }
 
-  if (!refs.appMenu.hidden) {
+  if (!refs.fileMenu.hidden) {
+    setFileMenuOpen(false);
+    refs.fileMenuBtn.focus();
+  } else if (!refs.appMenu.hidden) {
     setAppMenuOpen(false);
     refs.appMenuBtn.focus();
   } else if (refs.shell.classList.contains("is-nav-open")) {
@@ -5550,7 +5596,161 @@ refs.hubEmptyClear.addEventListener("click", () => {
 
 refs.hubImportBtn.addEventListener("click", () => refs.importInput.click());
 
+function setProjectSelected(id, selected) {
+  if (selected) {
+    hubSelected.add(id);
+  } else {
+    hubSelected.delete(id);
+  }
+}
+
+function selectedProjects() {
+  const state = getState();
+
+  return {
+    books: state.books.filter((book) => hubSelected.has(book.id)),
+    cards: getCards().filter((card) => hubSelected.has(card.id))
+  };
+}
+
+function describeSelection({ books, cards }) {
+  const parts = [];
+
+  if (books.length) {
+    parts.push(`${books.length} ${books.length === 1 ? "lorebook" : "lorebooks"}`);
+  }
+
+  if (cards.length) {
+    parts.push(`${cards.length} ${cards.length === 1 ? "card" : "cards"}`);
+  }
+
+  return parts.join(" and ");
+}
+
+refs.hubSelectBtn.addEventListener("click", () => {
+  hubState.selecting = !hubState.selecting;
+  hubSelected.clear();
+  renderHub();
+});
+
+refs.hubBulkBar.addEventListener("click", async (event) => {
+  const button = event.target.closest("button");
+
+  if (!button) {
+    return;
+  }
+
+  const selection = selectedProjects();
+  const total = selection.books.length + selection.cards.length;
+
+  if (button.id === "hub-bulk-done") {
+    hubState.selecting = false;
+    hubSelected.clear();
+    renderHub();
+    refs.hubSelectBtn.focus();
+    return;
+  }
+
+  if (button.id === "hub-bulk-all") {
+    for (const box of refs.projectList.querySelectorAll("[data-project-select]")) {
+      hubSelected.add(box.dataset.projectId);
+    }
+
+    renderHub();
+    return;
+  }
+
+  if (!total) {
+    toast("Select at least one lorebook or card first.");
+    return;
+  }
+
+  if (button.id === "hub-bulk-tag-add" || button.id === "hub-bulk-tag-remove") {
+    const [tag] = normalizeTagList([refs.hubBulkTag.value]);
+
+    if (!tag) {
+      toast("Type a tag first.");
+      refs.hubBulkTag.focus();
+      return;
+    }
+
+    const adding = button.id === "hub-bulk-tag-add";
+    const change = (tags) => normalizeTagList(adding ? [...tags, tag] : tags.filter((value) => value !== tag));
+    const previousBookId = getState().activeBookId;
+
+    for (const book of selection.books) {
+      setActiveBook(book.id);
+      updateActiveBookTags(change(book.tags ?? []));
+    }
+
+    setActiveBook(previousBookId);
+
+    for (const card of selection.cards) {
+      updateCard(card.id, { tags: change(card.tags ?? []) });
+    }
+
+    renderAll();
+    scheduleSave();
+    toast(`${adding ? "Added" : "Removed"} tag "${tag}" on ${describeSelection(selection)}`, "success");
+    return;
+  }
+
+  if (button.id === "hub-bulk-export") {
+    const state = getState();
+    const subset = { ...state, books: selection.books, cards: selection.cards, activeBookId: selection.books[0]?.id ?? null, activeEntryId: selection.books[0]?.entries[0]?.id ?? null };
+    downloadJson(buildExport(subset), `loreweaver-selection-${new Date().toISOString().slice(0, 10)}.lwproj`);
+    toast(`Exported ${describeSelection(selection)}`, "success");
+    return;
+  }
+
+  if (button.id === "hub-bulk-delete") {
+    const accepted = await confirmAction({
+      title: "Delete selected projects?",
+      message: `${describeSelection(selection)} will be permanently removed, including every entry in the lorebooks.`,
+      confirmLabel: "Delete selected"
+    });
+
+    if (!accepted) {
+      return;
+    }
+
+    for (const book of selection.books) {
+      deleteBook(book.id);
+    }
+
+    for (const card of selection.cards) {
+      deleteCard(card.id);
+    }
+
+    hubSelected.clear();
+    renderAll();
+    scheduleSave();
+    toast(`Deleted ${describeSelection(selection)}`);
+  }
+});
+
+refs.projectList.addEventListener("change", (event) => {
+  const box = event.target.closest("[data-project-select]");
+
+  if (box) {
+    setProjectSelected(box.dataset.projectId, box.checked);
+    renderHub();
+    refs.projectList.querySelector(`[data-project-select][data-project-id="${box.dataset.projectId}"]`)?.focus();
+  }
+});
+
 refs.projectList.addEventListener("click", async (event) => {
+  if (hubState.selecting) {
+    const open = event.target.closest(".project-open");
+
+    if (open) {
+      event.preventDefault();
+      setProjectSelected(open.dataset.projectId, !hubSelected.has(open.dataset.projectId));
+      renderHub();
+      return;
+    }
+  }
+
   const button = event.target.closest("[data-project-action]");
 
   if (!button) {
@@ -6212,7 +6412,7 @@ if (supportsFileSystemAccess()) {
   refs.dataOpenBtn.hidden = false;
 } else {
   refs.saveFileBtn.title = "Download the project as a file";
-  refs.saveFileBtn.setAttribute("aria-label", "Download project file");
+  refs.saveFileBtn.querySelector("span").textContent = "Download project file";
 }
 
 maybeRemindBackup();

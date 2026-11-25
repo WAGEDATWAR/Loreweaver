@@ -5481,13 +5481,6 @@ button.brand[aria-expanded="false"] .brand-chevron {
   }
 }
 
-@media (max-width: 600px) {
-  .topbar-actions #open-file-btn,
-  .topbar-actions #save-file-btn {
-    display: none;
-  }
-}
-
 .sidebar[hidden],
 .editor[hidden] {
   display: none;
@@ -6049,12 +6042,6 @@ body:not([data-mode="editor"]) .nav-open-btn {
   }
 }
 
-@media (max-width: 430px) {
-  .topbar-actions #import-btn {
-    display: none;
-  }
-}
-
 .stat-name {
   letter-spacing: 0.04em;
   overflow: visible;
@@ -6274,4 +6261,87 @@ body:not([data-mode="editor"]) .nav-open-btn {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+/* ---- Library selection ---- */
+
+.hub-bulk-bar {
+  margin-bottom: 12px;
+}
+
+.hub-bulk-bar input {
+  width: 140px;
+}
+
+.project-tile {
+  position: relative;
+}
+
+.project-select {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  background: var(--surface-raised);
+  border-radius: 6px;
+}
+
+.project-select input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.project-tile.is-selecting .project-thumb {
+  margin-left: 22px;
+}
+
+.project-tile.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* ---- File menu ---- */
+
+.file-menu-wrap {
+  position: relative;
+}
+
+.file-menu-caret {
+  width: 12px;
+  height: 12px;
+}
+
+.app-menu.file-menu {
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  width: 260px;
+}
+
+.app-menu.file-menu[hidden] {
+  display: none;
+}
+
+.app-menu.file-menu .menu-item[hidden] {
+  display: none;
+}
+
+@media (max-width: 780px) {
+  .file-menu-wrap .btn-label,
+  .file-menu-caret {
+    display: none;
+  }
+
+  .app-menu.file-menu {
+    position: fixed;
+    top: calc(var(--topbar-height) + 4px);
+    right: 8px;
+    width: min(280px, calc(100vw - 16px));
+  }
 }

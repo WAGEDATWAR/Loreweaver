@@ -42,6 +42,7 @@ const states = [
     await page.waitFor('document.querySelector("#command-dialog")?.open');
   } },
   { name: "export dialog", setup: async (page) => {
+    await page.click("#file-menu-btn");
     await page.click("#export-btn");
     await page.waitFor('document.querySelector("#export-dialog")?.open');
     await page.waitFor('document.querySelector("#storage-usage-backend").textContent !== "—"');
@@ -150,6 +151,10 @@ const states = [
     await page.click("#app-nav a[data-view=\"book-review\"]");
     await page.waitFor('!document.querySelector("#page-review")?.hidden');
     await page.waitFor('document.querySelectorAll("#review-body .review-stat").length >= 4');
+  } },
+  { name: "file menu", setup: async (page) => {
+    await page.click("#file-menu-btn");
+    await page.waitFor('!document.querySelector("#file-menu")?.hidden');
   } },
   { name: "app menu", setup: async (page) => {
     await page.click("#app-menu-btn");
