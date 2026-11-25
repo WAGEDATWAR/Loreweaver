@@ -65,3 +65,17 @@ test("routes the review pages for books and cards", async () => {
   assert.equal(isEditorView("card-review"), true);
   assert.equal(parseRoute("#/card/card_a/other").view, "library");
 });
+
+test("routes the lorebook tool pages", async () => {
+  const { parseRoute, routeHref, isBookView, isEditorView } = await import("../src/views.js");
+
+  for (const [tab, view] of [["overview", "book-overview"], ["simulate", "book-simulate"], ["issues", "book-issues"], ["settings", "book-settings"], ["review", "book-review"]]) {
+    assert.deepEqual(parseRoute(`#/book/book_a/${tab}`), { view, id: "book_a" });
+    assert.equal(routeHref(view, "book_a"), `#/book/book_a/${tab}`);
+    assert.equal(isBookView(view), true);
+    assert.equal(isEditorView(view), true);
+  }
+
+  assert.equal(isBookView("card"), false);
+  assert.equal(parseRoute("#/book/book_a/nope").view, "library");
+});

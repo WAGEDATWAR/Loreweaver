@@ -47,13 +47,24 @@ const states = [
     await page.waitFor('document.querySelector("#export-dialog")?.open');
     await page.waitFor('document.querySelector("#storage-usage-backend").textContent !== "—"');
   } },
-  { name: "validation dialog", setup: async (page) => {
+  { name: "issues page", setup: async (page) => {
     await page.click("#validation-btn");
-    await page.waitFor('document.querySelector("#validation-dialog")?.open');
+    await page.waitFor('!document.querySelector("#page-book-issues")?.hidden');
   } },
-  { name: "overview dialog", setup: async (page) => {
+  { name: "overview page", setup: async (page) => {
     await page.click("#overview-btn");
-    await page.waitFor('document.querySelector("#overview-dialog")?.open');
+    await page.waitFor('!document.querySelector("#page-book-overview")?.hidden');
+  } },
+  { name: "simulation page", setup: async (page) => {
+    await page.click("#simulation-btn");
+    await page.waitFor('!document.querySelector("#page-book-simulate")?.hidden');
+    await page.evaluate(`(() => {
+      const input = document.querySelector("#simulation-input");
+      input.value = "Mara Voss walks the harbor at dusk.";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      return true;
+    })()`);
+    await page.waitFor('document.querySelectorAll(".simulation-item").length >= 1');
   } },
   { name: "history dialog", setup: async (page) => {
     await page.click("#history-btn");

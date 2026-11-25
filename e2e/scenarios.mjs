@@ -861,11 +861,10 @@ export const scenarios = [
       await setValue(page, "#entry-token-limit", "1");
       await page.waitFor('document.querySelector("#validation-count")?.textContent !== "0"');
       await page.click("#validation-btn");
-      await page.waitFor('document.querySelector("#validation-dialog")?.open');
+      await page.waitFor('!document.querySelector("#page-book-issues")?.hidden');
       const types = await page.evaluate('[...document.querySelectorAll(".validation-issue-type")].map((node) => node.textContent)');
       assert.ok(types.includes("Broken entry link"));
       assert.ok(types.includes("Token limit"));
-      await page.click("#validation-close");
       assert.deepEqual(page.errors, []);
     }
   },
@@ -1797,9 +1796,8 @@ export const scenarios = [
       assert.match(tokens, /^\d[\d,]*$/);
 
       await page.click("#overview-btn");
-      await page.waitFor('document.querySelector("#overview-dialog")?.open');
+      await page.waitFor('!document.querySelector("#page-book-overview")?.hidden');
       await page.waitFor('!document.querySelector("#overview-tokens").textContent.startsWith("~")');
-      await page.click("#overview-close");
       assert.deepEqual(page.errors, []);
     }
   },
@@ -1813,11 +1811,10 @@ export const scenarios = [
       assert.match(status, /Over budget/);
 
       await page.click("#overview-btn");
-      await page.waitFor('document.querySelector("#overview-dialog")?.open');
+      await page.waitFor('!document.querySelector("#page-book-overview")?.hidden');
       await page.waitFor('document.querySelector("#overview-budget")?.classList.contains("is-over")');
       const budget = await page.evaluate('document.querySelector("#overview-budget").textContent');
       assert.match(budget, /over/);
-      await page.click("#overview-close");
       assert.deepEqual(page.errors, []);
     }
   },
@@ -1826,7 +1823,7 @@ export const scenarios = [
     async run(page) {
       await resetApp(page);
       await page.click("#simulation-btn");
-      await page.waitFor('document.querySelector("#simulation-dialog")?.open');
+      await page.waitFor('!document.querySelector("#page-book-simulate")?.hidden');
 
       await setValue(page, "#simulation-input", "Mara Voss, the harbormaster, walks the harbor at dusk.");
       await page.waitFor('document.querySelectorAll(".simulation-item").length === 2');
@@ -1846,7 +1843,7 @@ export const scenarios = [
       assert.match(legend, /Activated/);
 
       await page.evaluate('document.querySelector(".simulation-item-title").click(); true');
-      await page.waitFor('!document.querySelector("#simulation-dialog")?.open');
+      await page.waitFor('document.querySelector("#page-book-simulate")?.hidden');
       assert.deepEqual(page.errors, []);
     }
   },
@@ -1857,7 +1854,7 @@ export const scenarios = [
       await page.click("#add-entry-btn");
       await page.waitFor('document.querySelectorAll(".entry-card").length === 4');
       await page.click("#validation-btn");
-      await page.waitFor('document.querySelector("#validation-dialog")?.open');
+      await page.waitFor('!document.querySelector("#page-book-issues")?.hidden');
       await page.waitFor('document.querySelectorAll(".validation-issue").length >= 2');
 
       const total = await page.evaluate('document.querySelectorAll(".validation-issue").length');
@@ -1869,7 +1866,6 @@ export const scenarios = [
 
       await page.click("[data-validation-all]");
       await page.waitFor(`document.querySelectorAll(".validation-issue").length === ${total}`);
-      await page.click("#validation-close");
       assert.deepEqual(page.errors, []);
     }
   },
@@ -1932,11 +1928,10 @@ export const scenarios = [
       })()`);
 
       await page.click("#overview-btn");
-      await page.waitFor('document.querySelector("#overview-dialog")?.open');
+      await page.waitFor('!document.querySelector("#page-book-overview")?.hidden');
       await page.waitFor('document.querySelector("#overview-context").textContent.includes("32,768")');
       const tokenizer = await page.evaluate('document.querySelector("#overview-tokenizer").textContent');
       assert.equal(tokenizer, "o200k_base");
-      await page.click("#overview-close");
       assert.deepEqual(page.errors, []);
     }
   },
@@ -2034,9 +2029,8 @@ export const scenarios = [
         input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
         return true;
       })()`);
-      await page.waitFor('document.querySelector("#overview-dialog")?.open');
+      await page.waitFor('!document.querySelector("#page-book-overview")?.hidden');
       await page.waitFor('!document.querySelector("#command-dialog")?.open');
-      await page.click("#overview-close");
       assert.deepEqual(page.errors, []);
     }
   },
@@ -2109,8 +2103,7 @@ export const scenarios = [
       await page.waitFor('!document.querySelector("#page-review")?.hidden');
       await page.waitFor('document.querySelectorAll("#review-body .review-stat").length >= 4');
       await page.click("#review-simulate-btn");
-      await page.waitFor('document.querySelector("#simulation-dialog")?.open');
-      await page.evaluate('document.querySelector("#simulation-dialog").close(); true');
+      await page.waitFor('!document.querySelector("#page-book-simulate")?.hidden');
 
       await openPage(page, "library");
       await page.click("#new-card-btn");

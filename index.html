@@ -211,19 +211,19 @@
         </div>
         <div class="nav-group" data-nav-for="book" role="group" aria-labelledby="nav-tools-label">
           <span id="nav-tools-label" class="nav-group-label">Tools</span>
-          <button id="overview-btn" class="nav-item nav-tool" type="button" title="Overview">
+          <a id="overview-btn" class="nav-item nav-tool" href="#/library" data-view="book-overview" title="Overview">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg>
           <span class="nav-label">Overview</span>
-        </button>
-          <button id="simulation-btn" class="nav-item nav-tool" type="button" title="Simulate">
+        </a>
+          <a id="simulation-btn" class="nav-item nav-tool" href="#/library" data-view="book-simulate" title="Simulate">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="6" r="2.4"/><circle cx="19" cy="6" r="2.4"/><circle cx="12" cy="18" r="2.4"/><path d="M7.2 7 10.6 16"/><path d="M16.8 7 13.4 16"/><path d="M7.4 6h9.2"/></svg>
           <span class="nav-label">Simulate</span>
-        </button>
-          <button id="validation-btn" class="nav-item nav-tool" type="button" title="Issues">
+        </a>
+          <a id="validation-btn" class="nav-item nav-tool" href="#/library" data-view="book-issues" title="Issues">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3.2 20h17.6L12 3Z"/><path d="M12 9v5"/><path d="M12 17.2h.01"/></svg>
           <span class="nav-label">Issues</span>
           <span id="validation-count" class="validation-count">0</span>
-        </button>
+        </a>
           <button id="nav-search-btn" class="nav-item nav-tool" type="button" title="Search all">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
           <span class="nav-label">Search all</span>
@@ -667,6 +667,102 @@
         </div>
       </main>
 
+      <main id="page-book-overview" class="page" aria-labelledby="overview-title" hidden>
+        <div class="page-inner">
+          <header class="page-head">
+            <h2 id="overview-title" tabindex="-1">Lorebook overview</h2>
+            <p id="overview-summary"></p>
+          </header>
+      <div class="overview-stats">
+        <div class="overview-stat">
+          <span id="overview-entries" class="overview-stat-value">0</span>
+          <span class="overview-stat-label">Entries</span>
+        </div>
+        <div class="overview-stat">
+          <span id="overview-enabled" class="overview-stat-value">0</span>
+          <span class="overview-stat-label">Enabled</span>
+        </div>
+        <div class="overview-stat">
+          <span id="overview-tokens" class="overview-stat-value">0</span>
+          <span class="overview-stat-label">Tokens</span>
+        </div>
+        <div class="overview-stat">
+          <span id="overview-enabled-tokens" class="overview-stat-value">0</span>
+          <span class="overview-stat-label">Enabled tokens</span>
+        </div>
+        <div class="overview-stat">
+          <span id="overview-keys" class="overview-stat-value">0</span>
+          <span class="overview-stat-label">Unique keys</span>
+        </div>
+        <div class="overview-stat">
+          <span id="overview-coverage" class="overview-stat-value">0%</span>
+          <span class="overview-stat-label">Key coverage</span>
+        </div>
+      </div>
+      <div class="overview-meter" role="img" aria-label="Trigger key coverage">
+        <span id="overview-meter-bar" class="overview-meter-bar"></span>
+      </div>
+      <dl class="overview-details">
+        <div>
+          <dt>Always on</dt>
+          <dd id="overview-always-on">0</dd>
+        </div>
+        <div>
+          <dt>Missing keys</dt>
+          <dd id="overview-missing-keys">0</dd>
+        </div>
+        <div>
+          <dt>Shared keys</dt>
+          <dd id="overview-shared-keys">0</dd>
+        </div>
+        <div>
+          <dt>Average size</dt>
+          <dd id="overview-average">~0 tokens</dd>
+        </div>
+        <div>
+          <dt>Token budget</dt>
+          <dd id="overview-budget">Off</dd>
+        </div>
+        <div>
+          <dt>Context window</dt>
+          <dd id="overview-context">—</dd>
+        </div>
+        <div>
+          <dt>Tokenizer</dt>
+          <dd id="overview-tokenizer">—</dd>
+        </div>
+      </dl>
+      <p id="overview-longest" class="overview-longest"></p>
+        </div>
+      </main>
+
+      <main id="page-book-simulate" class="page" aria-labelledby="simulation-title" hidden>
+        <div class="page-inner">
+          <header class="page-head">
+            <h2 id="simulation-title" tabindex="-1">Context simulation</h2>
+            <p>Paste a scene or recent message to see which entries activate, in what order, and what gets injected.</p>
+          </header>
+      <label class="sr-only" for="simulation-input">Context text</label>
+      <textarea id="simulation-input" class="simulation-input" rows="5" placeholder="Paste context here…" spellcheck="false"></textarea>
+      <div class="simulation-toolbar">
+        <button id="simulation-run" class="btn btn-primary" type="button">Simulate</button>
+        <span id="simulation-summary" class="simulation-summary" aria-live="polite"></span>
+      </div>
+      <div id="simulation-results" class="simulation-results"></div>
+        </div>
+      </main>
+
+      <main id="page-book-issues" class="page" aria-labelledby="validation-title" hidden>
+        <div class="page-inner">
+          <header class="page-head">
+            <h2 id="validation-title" tabindex="-1">Issues</h2>
+            <p id="validation-summary">No issues found.</p>
+          </header>
+      <div id="validation-categories" class="validation-categories" hidden></div>
+      <div id="validation-issues" class="validation-issues"></div>
+        </div>
+      </main>
+
       <main id="page-review" class="page" aria-labelledby="review-title" hidden>
         <div class="page-inner">
           <header class="page-head">
@@ -1034,21 +1130,6 @@
     </div>
   </dialog>
 
-  <dialog id="validation-dialog" class="dialog validation-dialog" aria-labelledby="validation-title">
-    <div class="dialog-inner">
-      <div class="dialog-heading">
-        <p class="eyebrow">Checks</p>
-        <h2 id="validation-title">Lorebook validation</h2>
-        <p id="validation-summary" class="dialog-copy">No issues found.</p>
-      </div>
-      <div id="validation-categories" class="validation-categories" hidden></div>
-      <div id="validation-issues" class="validation-issues"></div>
-      <div class="dialog-actions">
-        <button id="validation-close" class="btn" type="button">Close</button>
-      </div>
-    </div>
-  </dialog>
-
   <dialog id="history-dialog" class="dialog history-dialog" aria-labelledby="history-title">
     <div class="dialog-inner">
       <div class="dialog-heading">
@@ -1068,79 +1149,6 @@
     </div>
   </dialog>
 
-  <dialog id="overview-dialog" class="dialog overview-dialog" aria-labelledby="overview-title">
-    <div class="dialog-inner">
-      <div class="dialog-heading">
-        <p class="eyebrow">Overview</p>
-        <h2 id="overview-title">Lorebook overview</h2>
-        <p id="overview-summary" class="dialog-copy"></p>
-      </div>
-      <div class="overview-stats">
-        <div class="overview-stat">
-          <span id="overview-entries" class="overview-stat-value">0</span>
-          <span class="overview-stat-label">Entries</span>
-        </div>
-        <div class="overview-stat">
-          <span id="overview-enabled" class="overview-stat-value">0</span>
-          <span class="overview-stat-label">Enabled</span>
-        </div>
-        <div class="overview-stat">
-          <span id="overview-tokens" class="overview-stat-value">0</span>
-          <span class="overview-stat-label">Tokens</span>
-        </div>
-        <div class="overview-stat">
-          <span id="overview-enabled-tokens" class="overview-stat-value">0</span>
-          <span class="overview-stat-label">Enabled tokens</span>
-        </div>
-        <div class="overview-stat">
-          <span id="overview-keys" class="overview-stat-value">0</span>
-          <span class="overview-stat-label">Unique keys</span>
-        </div>
-        <div class="overview-stat">
-          <span id="overview-coverage" class="overview-stat-value">0%</span>
-          <span class="overview-stat-label">Key coverage</span>
-        </div>
-      </div>
-      <div class="overview-meter" role="img" aria-label="Trigger key coverage">
-        <span id="overview-meter-bar" class="overview-meter-bar"></span>
-      </div>
-      <dl class="overview-details">
-        <div>
-          <dt>Always on</dt>
-          <dd id="overview-always-on">0</dd>
-        </div>
-        <div>
-          <dt>Missing keys</dt>
-          <dd id="overview-missing-keys">0</dd>
-        </div>
-        <div>
-          <dt>Shared keys</dt>
-          <dd id="overview-shared-keys">0</dd>
-        </div>
-        <div>
-          <dt>Average size</dt>
-          <dd id="overview-average">~0 tokens</dd>
-        </div>
-        <div>
-          <dt>Token budget</dt>
-          <dd id="overview-budget">Off</dd>
-        </div>
-        <div>
-          <dt>Context window</dt>
-          <dd id="overview-context">—</dd>
-        </div>
-        <div>
-          <dt>Tokenizer</dt>
-          <dd id="overview-tokenizer">—</dd>
-        </div>
-      </dl>
-      <p id="overview-longest" class="overview-longest"></p>
-      <div class="dialog-actions">
-        <button id="overview-close" class="btn" type="button">Close</button>
-      </div>
-    </div>
-  </dialog>
-
   <dialog id="peek-dialog" class="dialog peek-dialog" aria-labelledby="peek-title">
     <div class="dialog-inner">
       <div class="dialog-heading">
@@ -1151,26 +1159,6 @@
       <pre id="peek-body" class="simulation-output"></pre>
       <div class="dialog-actions">
         <button id="peek-close" class="btn" type="button">Close</button>
-      </div>
-    </div>
-  </dialog>
-
-  <dialog id="simulation-dialog" class="dialog simulation-dialog" aria-labelledby="simulation-title">
-    <div class="dialog-inner">
-      <div class="dialog-heading">
-        <p class="eyebrow">Context simulation</p>
-        <h2 id="simulation-title">Preview activation</h2>
-        <p class="dialog-copy">Paste a scene or recent message to see which entries activate, in what order, and what gets injected.</p>
-      </div>
-      <label class="sr-only" for="simulation-input">Context text</label>
-      <textarea id="simulation-input" class="simulation-input" rows="5" placeholder="Paste context here…" spellcheck="false"></textarea>
-      <div class="simulation-toolbar">
-        <button id="simulation-run" class="btn btn-primary" type="button">Simulate</button>
-        <span id="simulation-summary" class="simulation-summary" aria-live="polite"></span>
-      </div>
-      <div id="simulation-results" class="simulation-results"></div>
-      <div class="dialog-actions">
-        <button id="simulation-close" class="btn" type="button">Close</button>
       </div>
     </div>
   </dialog>

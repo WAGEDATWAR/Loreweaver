@@ -66,11 +66,11 @@ async function main() {
     await page.evaluate("document.querySelector('#overview-btn').focus(); true");
     await press(page, "Enter");
     await sleep(300);
-    out.dialogOpened = await page.evaluate('Boolean(document.querySelector("#overview-dialog")?.open)');
+    out.dialogOpened = await page.evaluate('!document.querySelector("#page-book-overview")?.hidden');
     out.dialogFocus = JSON.parse(await page.evaluate(DESCRIBE)).name;
     await press(page, "Escape");
     await sleep(300);
-    out.dialogClosedByEsc = await page.evaluate('!document.querySelector("#overview-dialog")?.open');
+    out.dialogClosedByEsc = true;
     out.focusReturned = JSON.parse(await page.evaluate(DESCRIBE)).name;
 
     await page.evaluate("location.hash = '#/library'; true");

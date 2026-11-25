@@ -53,7 +53,7 @@ index.html
 ## 2.1 Pages and routes
 
 The app is a library hub plus editors. `src/views.js` is the pure route table: `#/library` (home),
-`#/data`, `#/settings`, `#/book/<id>`, `#/book/<id>/settings`, `#/book/<id>/review`, `#/card/<id>` and `#/card/<id>/review`. The location hash is the
+`#/data`, `#/settings`, `#/book/<id>`, `#/book/<id>/settings`, `#/book/<id>/review`, `#/book/<id>/overview`, `#/book/<id>/simulate`, `#/book/<id>/issues`, `#/card/<id>` and `#/card/<id>/review`. The location hash is the
 only view state, so the UI still holds none (A-2). `main.js` parses the hash, resolves it against the project
 (a missing id falls back to the library), shows the matching page, activates the book or card in the store,
 and shows the editor menu only for editor routes. `src/projects.js` is the pure library model: it turns books

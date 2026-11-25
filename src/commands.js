@@ -4,9 +4,9 @@
  */
 export const COMMAND_SCOPES = Object.freeze({
   entries: ["book"],
-  book: ["book", "book-settings", "book-review"],
+  book: ["book", "book-settings", "book-review", "book-overview", "book-simulate", "book-issues"],
   card: ["card", "card-review"],
-  editor: ["book", "book-settings", "book-review", "card", "card-review"]
+  editor: ["book", "book-settings", "book-review", "book-overview", "book-simulate", "book-issues", "card", "card-review"]
 });
 
 const ENTRY_COMMAND = /^(Sort|Filter): /;

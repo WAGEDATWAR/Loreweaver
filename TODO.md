@@ -119,6 +119,7 @@ defect or risk, **S3** improvement.
       Tools (Overview, Simulate, Issues, History) as pages; a card workspace (DEF-124); empty, loading and
       error states (DEF-002, DEF-104).
 - [x] Command palette scoped to the current page, with recent commands (DEF-127).
+- [x] Overview, Simulate and Issues are pages; History stays a dialog (DEF-126, U-13).
 - [x] Settings page with real inline controls for theme, density, tokenizer and context window (DEF-126, part).
 
 ### UI and UX

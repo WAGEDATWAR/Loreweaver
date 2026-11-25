@@ -143,7 +143,7 @@ import { buildCardTokenReport } from "./cardTokens.js";
 import { validateCardRecord } from "./cardValidation.js";
 import { clamp } from "./utils.js";
 import { createTabGuard } from "./tabGuard.js";
-import { VIEWS, getView, isEditorView, parseRoute, routeHref, viewForShortcut } from "./views.js";
+import { VIEWS, getView, isBookView, isEditorView, parseRoute, routeHref, viewForShortcut } from "./views.js";
 import { buildBookReview, buildCardReview, CARD_FIELD_TARGETS } from "./review.js";
 import { buildPromptPreview } from "./promptPreview.js";
 import { buildCardPrint } from "./printView.js";
@@ -375,7 +375,6 @@ const refs = {
   tagFilters: document.querySelector("#tag-filters"),
   entryCount: document.querySelector("#entry-count"),
   overviewBtn: document.querySelector("#overview-btn"),
-  overviewDialog: document.querySelector("#overview-dialog"),
   overviewSummary: document.querySelector("#overview-summary"),
   overviewEntries: document.querySelector("#overview-entries"),
   overviewEnabled: document.querySelector("#overview-enabled"),
@@ -390,21 +389,16 @@ const refs = {
   overviewAverage: document.querySelector("#overview-average"),
   overviewBudget: document.querySelector("#overview-budget"),
   simulationBtn: document.querySelector("#simulation-btn"),
-  simulationDialog: document.querySelector("#simulation-dialog"),
   simulationInput: document.querySelector("#simulation-input"),
   simulationRunBtn: document.querySelector("#simulation-run"),
   simulationSummary: document.querySelector("#simulation-summary"),
   simulationResults: document.querySelector("#simulation-results"),
-  simulationCloseBtn: document.querySelector("#simulation-close"),
   overviewLongest: document.querySelector("#overview-longest"),
-  overviewCloseBtn: document.querySelector("#overview-close"),
   validationBtn: document.querySelector("#validation-btn"),
   validationCount: document.querySelector("#validation-count"),
-  validationDialog: document.querySelector("#validation-dialog"),
   validationSummary: document.querySelector("#validation-summary"),
   validationCategories: document.querySelector("#validation-categories"),
   validationIssues: document.querySelector("#validation-issues"),
-  validationCloseBtn: document.querySelector("#validation-close"),
   entryList: document.querySelector("#entry-list"),
   templateBtn: document.querySelector("#template-btn"),
   templateDialog: document.querySelector("#template-dialog"),
@@ -1052,7 +1046,7 @@ function updateNavContext() {
 function resolveRoute(route) {
   const state = getState();
 
-  if (route.view === "book" || route.view === "book-settings" || route.view === "book-review") {
+  if (isBookView(route.view)) {
     const id = route.id ?? state.activeBookId;
     return state.books.some((book) => book.id === id) ? { view: route.view, id } : { view: "library", id: null };
   }
@@ -1071,6 +1065,9 @@ const HEADING_FOR_VIEW = {
   "book-settings": "#book-settings-title",
   card: "#card-title",
   "book-review": "#review-title",
+  "book-overview": "#overview-title",
+  "book-simulate": "#simulation-title",
+  "book-issues": "#validation-title",
   "card-review": "#review-title"
 };
 
@@ -1109,7 +1106,7 @@ function showRoute(requested, { focusHeading = false } = {}) {
     window.history.replaceState(null, "", target);
   }
 
-  if (route.view === "book" || route.view === "book-settings" || route.view === "book-review") {
+  if (isBookView(route.view)) {
     if (getState().activeBookId !== route.id) {
       setActiveBook(route.id);
       setTagFilters([]);
@@ -1170,6 +1167,13 @@ function showRoute(requested, { focusHeading = false } = {}) {
     refs.aboutAuditLog.textContent = formatAudit(readAuditLog());
   } else if (route.view === "book-review" || route.view === "card-review") {
     renderReview();
+  } else if (route.view === "book-overview") {
+    renderOverviewPage();
+  } else if (route.view === "book-simulate") {
+    renderSimulationResults();
+  } else if (route.view === "book-issues") {
+    validationFilters = new Set();
+    renderIssuesPage();
   } else if (route.view === "settings") {
     syncThemeButton();
     syncDensityButton();
@@ -1184,7 +1188,7 @@ function showRoute(requested, { focusHeading = false } = {}) {
 }
 
 function goToView(view, id = null) {
-  const resolvedId = id ?? (view === "book" || view === "book-settings" || view === "book-review" ? getState().activeBookId : view === "card-review" ? getState().activeCardId : null);
+  const resolvedId = id ?? (isBookView(view) ? getState().activeBookId : view === "card-review" ? getState().activeCardId : null);
   const target = routeHref(view, resolvedId);
 
   if (window.location.hash !== target) {
@@ -1843,11 +1847,11 @@ function handleTokenizerChange() {
   renderTokenSettings();
   renderAll();
 
-  if (refs.overviewDialog.open) {
-    renderOverviewDialog();
+  if (currentView === "book-overview") {
+    renderOverviewPage();
   }
 
-  if (refs.simulationDialog.open) {
+  if (currentView === "book-simulate") {
     renderSimulationResults();
   }
 }
@@ -1856,11 +1860,11 @@ function handleContextWindowChange() {
   tokenSettings.contextWindow = Number(refs.contextWindowPreset.value);
   persistTokenSettings();
 
-  if (refs.overviewDialog.open) {
-    renderOverviewDialog();
+  if (currentView === "book-overview") {
+    renderOverviewPage();
   }
 
-  if (refs.simulationDialog.open) {
+  if (currentView === "book-simulate") {
     renderSimulationResults();
   }
 }
@@ -2304,11 +2308,11 @@ function handleTokenUpdate() {
 
   updateBudgetStatus();
 
-  if (refs.overviewDialog.open) {
-    renderOverviewDialog();
+  if (currentView === "book-overview") {
+    renderOverviewPage();
   }
 
-  if (refs.simulationDialog.open) {
+  if (currentView === "book-simulate") {
     renderSimulationResults();
   }
 }
@@ -2354,7 +2358,7 @@ function createValidationChip(label, count, code) {
   return chip;
 }
 
-function renderValidationDialog() {
+function renderIssuesPage() {
   const issues = validateBook(getActiveBook(), (text) => tokenizer.count(text));
   const entryCount = new Set(issues.map((issue) => issue.entryId)).size;
   const filtered = validationFilters.size
@@ -2418,12 +2422,10 @@ function renderValidationDialog() {
 }
 
 function openValidationDialog() {
-  validationFilters = new Set();
-  renderValidationDialog();
-  refs.validationDialog.showModal();
+  goToView("book-issues");
 }
 
-function renderOverviewDialog() {
+function renderOverviewPage() {
   const book = getActiveBook();
 
   if (book) {
@@ -2487,8 +2489,7 @@ function renderOverviewDialog() {
 }
 
 function openOverviewDialog() {
-  renderOverviewDialog();
-  refs.overviewDialog.showModal();
+  goToView("book-overview");
 }
 
 function createSimulationItem(item) {
@@ -2692,17 +2693,11 @@ function graphRow(item, marker, skipped) {
 }
 
 function openSimulationDialog() {
-  renderSimulationResults();
-
-  if (!refs.simulationDialog.open) {
-    refs.simulationDialog.showModal();
-  }
-
+  goToView("book-simulate");
   refs.simulationInput.focus();
 }
 
 function handleSimulationJump(entryId) {
-  refs.simulationDialog.close();
   ensureEntriesView();
   clearSearch();
   setActiveEntry(entryId);
@@ -2713,7 +2708,6 @@ function handleSimulationJump(entryId) {
 }
 
 function jumpToValidationEntry(entryId, field = "") {
-  refs.validationDialog.close();
   ensureEntriesView();
   clearSearch();
   setActiveEntry(entryId);
@@ -6431,14 +6425,6 @@ refs.exportDialog.addEventListener("click", (event) => {
   }
 });
 
-refs.overviewBtn.addEventListener("click", openOverviewDialog);
-
-refs.overviewCloseBtn.addEventListener("click", () => {
-  refs.overviewDialog.close();
-});
-
-refs.simulationBtn.addEventListener("click", openSimulationDialog);
-
 refs.simulationRunBtn.addEventListener("click", renderSimulationResults);
 
 refs.simulationInput.addEventListener("input", () => {
@@ -6454,32 +6440,10 @@ refs.simulationResults.addEventListener("click", (event) => {
   }
 });
 
-refs.simulationCloseBtn.addEventListener("click", () => {
-  refs.simulationDialog.close();
-});
-
-refs.simulationDialog.addEventListener("click", (event) => {
-  if (event.target === refs.simulationDialog) {
-    refs.simulationDialog.close();
-  }
-});
-
-refs.overviewDialog.addEventListener("click", (event) => {
-  if (event.target === refs.overviewDialog) {
-    refs.overviewDialog.close();
-  }
-});
-
-refs.validationBtn.addEventListener("click", openValidationDialog);
-
-refs.validationCloseBtn.addEventListener("click", () => {
-  refs.validationDialog.close();
-});
-
 refs.validationCategories.addEventListener("click", (event) => {
   if (event.target.closest("[data-validation-all]")) {
     validationFilters = new Set();
-    renderValidationDialog();
+    renderIssuesPage();
     return;
   }
 
@@ -6497,7 +6461,7 @@ refs.validationCategories.addEventListener("click", (event) => {
     validationFilters.add(code);
   }
 
-  renderValidationDialog();
+  renderIssuesPage();
 });
 
 refs.validationIssues.addEventListener("click", (event) => {
@@ -6505,12 +6469,6 @@ refs.validationIssues.addEventListener("click", (event) => {
 
   if (issue) {
     jumpToValidationEntry(issue.dataset.entryId, issue.dataset.field);
-  }
-});
-
-refs.validationDialog.addEventListener("click", (event) => {
-  if (event.target === refs.validationDialog) {
-    refs.validationDialog.close();
   }
 });
 
@@ -6611,7 +6569,7 @@ document.addEventListener("keydown", async (event) => {
     return;
   }
 
-  if (modifier && key === "Enter" && refs.simulationDialog.open) {
+  if (modifier && key === "Enter" && currentView === "book-simulate") {
     event.preventDefault();
     renderSimulationResults();
     return;

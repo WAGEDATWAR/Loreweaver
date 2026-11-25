@@ -48,8 +48,8 @@ editor menu on the left, which carries only what that editor needs:
 ```
 
 - **A lorebook** shows Entries and Lorebook settings (description, tags, token budget, new-entry
-  defaults, duplicate, split, merge, delete), and the Tools: Overview, Simulate, Issues, Search all and
-  Find and replace.
+  defaults, duplicate, split, merge, delete), and the Tools: Overview, Simulate and Issues (pages), Search all and
+  Find and replace (dialogs).
 - **A character card** shows its sections (Identity, Definition, Greetings, Examples and prompts,
   Lorebook link) as jump links. The card page autosaves like a lorebook, with a live token report and
   checks beside the form, and Duplicate, Export and Delete in its header. A card left completely blank
@@ -70,6 +70,9 @@ available everywhere and closes on selection, an outside click or `Escape`.
 | `#/settings` | theme, density, tokenizer, shortcuts, schema reference, guide | `Alt+3` |
 | `#/book/<id>` | the lorebook editor (`#/entries` opens the last-used lorebook) | palette |
 | `#/book/<id>/settings` | lorebook settings | palette |
+| `#/book/<id>/overview` | size, key coverage, budget and context-window use | editor menu, palette |
+| `#/book/<id>/simulate` | paste a scene and see which entries activate | editor menu, palette |
+| `#/book/<id>/issues` | validation issues with category filters; each opens its entry | editor menu, palette |
 | `#/book/<id>/review` | overview, issues and a simulation entry point for a lorebook | editor menu, palette |
 | `#/card/<id>/review` | token buckets and checks for a card, each check jumps to its field | editor menu, palette |
 | `#/card/<id>` | the card editor | palette |
@@ -175,8 +178,8 @@ the About panel and the command palette and persists locally. Both themes are he
 
 ## 8. Known gaps
 
-- The Tools (Overview, Simulate, Issues, History) are still dialogs; promoting them to pages belongs to
-  the UI redesign (DEF-126).
+- History stays a dialog: it is project-wide, opens from the header on every page, and its compare and
+  restore steps open further dialogs. Overview, Simulate and Issues are pages (U-13).
 - A light theme ships opt-in (DEF-031); both themes pass `npm run contrast` (DEF-112).
 - There is no density option or remembered text-area height (DEF-032, DEF-033).
 - Virtualized rows hide tag chips and the matched-field note; the full card returns when the list is

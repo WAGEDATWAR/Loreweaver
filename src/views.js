@@ -13,7 +13,21 @@ export const VIEWS = Object.freeze([
 export const DEFAULT_VIEW = "library";
 
 const HUB_IDS = new Set(VIEWS.map((view) => view.id));
-const EDITOR_VIEWS = new Set(["book", "book-settings", "book-review", "card", "card-review"]);
+const BOOK_TOOL_TABS = Object.freeze({
+  settings: "book-settings",
+  review: "book-review",
+  overview: "book-overview",
+  simulate: "book-simulate",
+  issues: "book-issues"
+});
+
+const BOOK_TOOL_VIEWS = new Set(Object.values(BOOK_TOOL_TABS));
+const EDITOR_VIEWS = new Set(["book", ...BOOK_TOOL_VIEWS, "card", "card-review"]);
+
+/** True for the lorebook editor and every page that belongs to one lorebook. */
+export function isBookView(value) {
+  return value === "book" || BOOK_TOOL_VIEWS.has(value);
+}
 
 export function isHubView(value) {
   return HUB_IDS.has(value);
@@ -51,12 +65,8 @@ export function parseRoute(hash) {
   }
 
   if (head === "book" && ID_PATTERN.test(id ?? "")) {
-    if (tail === "settings" && parts.length === 3) {
-      return { view: "book-settings", id };
-    }
-
-    if (tail === "review" && parts.length === 3) {
-      return { view: "book-review", id };
+    if (BOOK_TOOL_TABS[tail] && parts.length === 3) {
+      return { view: BOOK_TOOL_TABS[tail], id };
     }
 
     if (parts.length === 2) {
@@ -80,12 +90,10 @@ export function routeHref(view, id = null) {
     return `#/book/${id}`;
   }
 
-  if (view === "book-settings" && id) {
-    return `#/book/${id}/settings`;
-  }
 
-  if (view === "book-review" && id) {
-    return `#/book/${id}/review`;
+  if (BOOK_TOOL_VIEWS.has(view) && id) {
+    const tab = Object.keys(BOOK_TOOL_TABS).find((key) => BOOK_TOOL_TABS[key] === view);
+    return `#/book/${id}/${tab}`;
   }
 
   if (view === "card-review" && id) {

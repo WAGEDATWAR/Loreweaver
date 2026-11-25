@@ -6,6 +6,8 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Changed
 
+- Overview, Simulate and Issues are now pages of a lorebook (`#/book/<id>/overview`, `/simulate`, `/issues`) instead of dialogs; the editor menu links to them. History stays a dialog.
+
 - **One interchange model, shared with Synthesis (Y-17).** The canonical entry/book model and the
   SillyTavern, Chub, character-book and interchange adapters now live once in `src/content-format/`;
   `src/formats/*` adapt them to a project. Synthesis vendors the same modules, so a lorebook authored
