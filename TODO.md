@@ -181,7 +181,8 @@ shipped (v0.8.0+). Open parity work: extension editors (DEF-123) and prompt temp
 
 - [x] The Library is the home hub for lorebooks and cards; cards have an autosaving editor page; the left menu is editor-only (DEF-124, U-7 to U-9, U-12).
 - [x] The Library filters by tag and pins projects to the top (DEF-117; pins live in localStorage).
-- [ ] `S` `P5` Library grid/list toggle and kind-specific lorebook thumbnails (DEF-135).
+- [x] Library grid/list toggle, remembered per browser (DEF-135).
+- [ ] `S` `P5` Kind-specific lorebook thumbnails (DEF-135).
 - [x] Card diff and merge on re-import (DEF-118).
 - [x] Card history and card templates (DEF-118, DEF-119).
 - [x] A prompt-assembly preview of card plus book on the card Review page (DEF-120).

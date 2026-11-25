@@ -14,7 +14,8 @@ The app has two modes, and the navigation follows the mode.
 
 **Hub mode: the Library is home.** The Library lists every lorebook and character card as an openable
 tile: kind, name, size, linked lorebook, tags, an issue count and a description excerpt. It has search, a
-kind filter (All, Lorebooks, Cards), a sort (recently edited, name, largest) and the actions New
+kind filter (All, Lorebooks, Cards), a tag filter, a sort (recently edited, name, largest), a Grid or List
+layout (remembered in this browser), a Select mode for bulk tag, export and delete, pinned projects and the actions New
 lorebook, New character card and Import. A tile opens the editor for that project; its hover or focus
 actions duplicate or delete it. Data and Settings are the other hub pages. Hub pages have no side menu.
 
@@ -170,9 +171,9 @@ the About panel and the command palette and persists locally. Both themes are he
   choosing an entry shows the editor full screen, and the list button in the header returns to the list.
   The editor menu is an overlay opened from the header and card pages stack their summary above the form.
 - Hub pages use the full width at every size and never overflow horizontally.
-- 600 px and below: the header drops Open and Save (they stay on the Data page and in the palette).
-- 430 px and below: the header also drops Import (the Library and Data pages carry it), the save label is
-  hidden and dialog padding is compact.
+- The header's File menu holds Open, Save, Import and Export at every width; below 780 px it shows only its
+  icon.
+- 430 px and below: the save label is hidden and dialog padding is compact.
 - Text is never below 12 px, except uppercase micro-labels and count badges (11 px). Touch devices and
   phone widths get 44 px targets; header controls stay at 40 px so 320 px fits.
 

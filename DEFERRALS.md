@@ -123,7 +123,7 @@ never learns a card quirk.
 | DEF-131 | A touch density with 44 px targets and a type scale with a 12 px floor (UI-05, UI-06) | review S2 | P5 | done |
 | DEF-132 | A leaner header: file menu, labelled palette button, skip link, shared focus style (UI-07, UI-12) | skip link, labelled palette button and a File menu shipped | P5 | done |
 | DEF-133 | A Review page combining overview, issues and simulation for a lorebook and a card (UI-08) | review pages for lorebooks and cards | P5 | done |
-| DEF-135 | Library hub follow-ups: grid/list toggle, kind-specific thumbnails for lorebooks | bulk selection, tag filter and pinned projects shipped (pins are per-browser, kept in localStorage) | P5 | scheduled |
+| DEF-135 | Library hub follow-ups: kind-specific thumbnails for lorebooks | bulk selection, tag filter, pinned projects and the grid/list toggle shipped (pins and the layout are per-browser, kept in localStorage) | P5 | scheduled |
 | DEF-134 | Card and lorebook UI parity checklist: destination, workspace, list, tokens, notes, bulk, history (UI-03) | the matrix in the review, section 4; extends DEF-117 to DEF-124 | P5 | scheduled |
 | DEF-038 | A changelog link in the About panel | link to CHANGELOG.md on GitHub in the About dialog | P5 | done |
 

@@ -18,6 +18,8 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- The Library has a Grid or List layout toggle; the choice is remembered in this browser.
+
 - Cards in the schema reference (every card field), global search (the dialog is now "Search lorebooks and cards") and print (Print on the card page).
 
 - Prompt preview on the card Review page: the assembled prompt for a card, its linked lorebook and a pasted chat excerpt, with tokens per part, the context window and the lorebook budget, and a copy button.

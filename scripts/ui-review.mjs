@@ -14,6 +14,7 @@ const hash = (view) => `location.hash = "#/${view}"; true`;
 const STATES = [
   { name: "entries", setup: [hash("entries")] },
   { name: "library-hub", setup: [hash("library")] },
+  { name: "library-list", setup: [hash("library"), click('#hub-layout [data-layout="list"]')], teardown: [click('#hub-layout [data-layout="grid"]')] },
   { name: "book-settings", setup: [hash("entries"), click("#app-nav a[data-view=\"book-settings\"]")] },
   { name: "app-menu", setup: [hash("library"), click("#app-menu-btn")], teardown: [click("#app-menu-btn")] },
   { name: "entries-nav-collapsed", setup: [hash("entries"), click("#nav-collapse")], teardown: [click("#nav-collapse")], desktopOnly: true },

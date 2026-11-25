@@ -632,6 +632,26 @@ export const scenarios = [
     }
   },
   {
+    name: "switches the library between grid and list and remembers it",
+    timeout: 30000,
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "library");
+      assert.equal(await page.evaluate('document.querySelector("#project-list").dataset.layout'), "grid");
+      await page.click('#hub-layout [data-layout="list"]');
+      await page.waitFor('document.querySelector("#project-list").dataset.layout === "list"');
+      assert.equal(await page.evaluate(`document.querySelector('#hub-layout [data-layout="list"]').getAttribute("aria-pressed")`), "true");
+      const columns = await page.evaluate('getComputedStyle(document.querySelector("#project-list")).gridTemplateColumns.split(" ").length');
+      assert.equal(columns, 1);
+
+      await page.reload();
+      await page.waitFor('document.querySelector("#book-name")?.value');
+      await openPage(page, "library");
+      assert.equal(await page.evaluate('document.querySelector("#project-list").dataset.layout'), "list");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "creates, searches, duplicates and deletes projects from the library hub",
     timeout: 40000,
     async run(page) {

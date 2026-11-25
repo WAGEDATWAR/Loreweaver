@@ -189,6 +189,11 @@ const states = [
     await page.click('#app-nav a[data-view="card-review"]');
     await page.waitFor('document.querySelectorAll("#preview-output .preview-segment").length >= 1');
   } },
+  { name: "library list layout", setup: async (page) => {
+    await openPage(page, "library");
+    await page.click('#hub-layout [data-layout="list"]');
+    await page.waitFor('document.querySelector("#project-list").dataset.layout === "list"');
+  } },
   { name: "app menu", setup: async (page) => {
     await page.click("#app-menu-btn");
     await page.waitFor('!document.querySelector("#app-menu")?.hidden');

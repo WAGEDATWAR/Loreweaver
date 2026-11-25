@@ -244,6 +244,7 @@ const refs = {
   hubFilters: document.querySelector("#hub-filters"),
   hubSort: document.querySelector("#hub-sort"),
   hubTag: document.querySelector("#hub-tag"),
+  hubLayout: document.querySelector("#hub-layout"),
   hubSelectBtn: document.querySelector("#hub-select-btn"),
   hubBulkBar: document.querySelector("#hub-bulk-bar"),
   hubBulkCount: document.querySelector("#hub-bulk-count"),
@@ -836,7 +837,17 @@ const NAV_STATE_KEY = storageKey("nav-expanded:v1");
 const MOBILE_NAV_QUERY = window.matchMedia("(max-width: 780px)");
 let currentView = "library";
 let currentRouteId = null;
-const hubState = { query: "", kind: "all", sort: "updated", tag: "", selecting: false };
+const HUB_LAYOUT_KEY = storageKey("hub-layout:v1");
+
+function readHubLayout() {
+  try {
+    return localStorage.getItem(HUB_LAYOUT_KEY) === "list" ? "list" : "grid";
+  } catch {
+    return "grid";
+  }
+}
+
+const hubState = { query: "", kind: "all", sort: "updated", tag: "", selecting: false, layout: readHubLayout() };
 const hubSelected = new Set();
 const PINNED_KEY = storageKey("pinned-projects:v1");
 
@@ -946,6 +957,12 @@ function renderHub() {
     if (!knownIds.has(id)) {
       hubSelected.delete(id);
     }
+  }
+
+  refs.projectList.dataset.layout = hubState.layout;
+
+  for (const button of refs.hubLayout.querySelectorAll("[data-layout]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.layout === hubState.layout));
   }
 
   refs.hubSelectBtn.setAttribute("aria-pressed", String(hubState.selecting));
@@ -6039,6 +6056,24 @@ function describeSelection({ books, cards }) {
 
   return parts.join(" and ");
 }
+
+refs.hubLayout.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-layout]");
+
+  if (!button) {
+    return;
+  }
+
+  hubState.layout = button.dataset.layout === "list" ? "list" : "grid";
+
+  try {
+    localStorage.setItem(HUB_LAYOUT_KEY, hubState.layout);
+  } catch {
+    // The layout still applies for this visit.
+  }
+
+  renderHub();
+});
 
 refs.hubSelectBtn.addEventListener("click", () => {
   hubState.selecting = !hubState.selecting;
