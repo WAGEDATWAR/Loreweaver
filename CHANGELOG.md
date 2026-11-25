@@ -16,6 +16,9 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- The command palette is scoped to the current page (entry commands on the entries page, lorebook commands on lorebook pages) and lists the five most recent commands first. Typing still searches everything.
+- Settings now holds real controls: theme and density choices, and the tokenizer and context window selects, replacing the Token settings dialog.
+
 - Re-importing a character card diffs it against the existing one and, by default, updates it in place instead of adding a duplicate. Cards now appear in the import review, the session summary and revision deltas.
 
 - Library multi-select: pick lorebooks and cards, then add or remove a tag, export the selection as a project file, or delete them with one confirmation.

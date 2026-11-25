@@ -1917,14 +1917,6 @@ body.is-resizing-sidebar {
   color: var(--warning);
 }
 
-.token-settings-dialog {
-  width: min(520px, calc(100vw - 32px));
-}
-
-.token-settings-dialog .field {
-  margin-top: 14px;
-}
-
 .bulk-size-dialog {
   width: min(520px, calc(100vw - 32px));
 }
@@ -6344,4 +6336,19 @@ body:not([data-mode="editor"]) .nav-open-btn {
     right: 8px;
     width: min(280px, calc(100vw - 16px));
   }
+}
+
+/* ---- Settings controls ---- */
+
+.settings-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 6px 0;
+}
+
+.settings-row .field-label {
+  min-width: 90px;
+  color: var(--text-soft);
 }

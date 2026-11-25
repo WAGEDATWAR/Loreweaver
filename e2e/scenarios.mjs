@@ -796,7 +796,7 @@ export const scenarios = [
     async run(page) {
       await resetApp(page);
       await openPage(page, "settings");
-      await page.click("#about-density-btn");
+      await page.click("#density-compact-btn");
       await page.waitFor('document.documentElement.dataset.density === "compact"');
       await openPage(page, "entries");
 
@@ -820,9 +820,9 @@ export const scenarios = [
     async run(page) {
       await resetApp(page);
       await openPage(page, "settings");
-      await page.click("#about-theme-btn");
+      await page.click("#theme-light-btn");
       await page.waitFor('document.documentElement.dataset.theme === "light"');
-      const pressed = await page.evaluate('document.querySelector("#about-theme-btn").getAttribute("aria-pressed")');
+      const pressed = await page.evaluate('document.querySelector("#theme-light-btn").getAttribute("aria-pressed")');
       assert.equal(pressed, "true");
       await page.reload();
       await page.waitFor('document.documentElement.dataset.theme === "light"');
@@ -964,6 +964,7 @@ export const scenarios = [
       await page.waitFor('document.querySelector("#diff-dialog")?.open');
       await page.click("#diff-accept");
       await page.waitFor('!document.querySelector("#diff-dialog")?.open');
+      await page.waitFor('document.querySelector("#import-input").value === ""');
 
       await page.setFileInput("#import-input", [context.fixture("card-mara.png")]);
       await page.waitFor('document.querySelector("#diff-dialog")?.open');
@@ -1797,8 +1798,6 @@ export const scenarios = [
     async run(page) {
       await resetApp(page);
       await openPage(page, "settings");
-      await page.click("#about-token-btn");
-      await page.waitFor('document.querySelector("#token-settings-dialog")?.open');
       await page.waitFor('document.querySelector("#tokenizer-preset")?.options.length === 2');
 
       await page.evaluate(`(() => {
@@ -1816,7 +1815,6 @@ export const scenarios = [
         select.dispatchEvent(new Event("change", { bubbles: true }));
         return true;
       })()`);
-      await page.click("#token-settings-close");
 
       await page.click("#overview-btn");
       await page.waitFor('document.querySelector("#overview-dialog")?.open');
@@ -1924,6 +1922,39 @@ export const scenarios = [
       await page.waitFor('document.querySelector("#overview-dialog")?.open');
       await page.waitFor('!document.querySelector("#command-dialog")?.open');
       await page.click("#overview-close");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "scopes the command palette to the current page and remembers recent commands",
+    timeout: 40000,
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "library");
+      const open = async () => {
+        await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true, cancelable: true })); true');
+        await page.waitFor('document.querySelector("#command-dialog")?.open');
+      };
+      const titles = () => page.evaluate('[...document.querySelectorAll(".command-option-title")].map((n) => n.textContent)');
+
+      await open();
+      assert.equal((await titles()).includes("New entry"), false);
+      await setValue(page, "#command-input", "new entry");
+      await page.waitFor('[...document.querySelectorAll(".command-option-title")].some((n) => n.textContent === "New entry")');
+      await page.evaluate('document.querySelector("#command-dialog").close(); true');
+
+      await openPage(page, "entries");
+      await open();
+      assert.equal((await titles()).includes("New entry"), true);
+      await setValue(page, "#command-input", "keyboard shortcuts");
+      await page.waitFor('document.querySelectorAll(".command-option").length === 1');
+      await page.evaluate('document.querySelector("#command-input").dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true })); true');
+      await page.waitFor('document.querySelector("#shortcuts-dialog")?.open');
+      await page.evaluate('document.querySelector("#shortcuts-dialog").close(); true');
+
+      await open();
+      assert.equal((await titles())[0], "Keyboard shortcuts");
+      await page.evaluate('document.querySelector("#command-dialog").close(); true');
       assert.deepEqual(page.errors, []);
     }
   },

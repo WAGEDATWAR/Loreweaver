@@ -967,16 +967,35 @@
 
           <section class="page-section" aria-labelledby="settings-appearance-heading">
             <div class="page-section-head"><h3 id="settings-appearance-heading">Appearance</h3></div>
-            <div class="page-actions">
-              <button id="about-theme-btn" class="btn" type="button" aria-pressed="false">Light theme</button>
-              <button id="about-density-btn" class="btn" type="button" aria-pressed="false">Compact density</button>
+            <div class="settings-row">
+              <span id="theme-label" class="field-label">Theme</span>
+              <div class="entry-filters" role="group" aria-labelledby="theme-label">
+                <button id="theme-dark-btn" class="filter-chip" type="button" data-theme-choice="dark" aria-pressed="true">Dark</button>
+                <button id="theme-light-btn" class="filter-chip" type="button" data-theme-choice="light" aria-pressed="false">Light</button>
+              </div>
+            </div>
+            <div class="settings-row">
+              <span id="density-label" class="field-label">Density</span>
+              <div class="entry-filters" role="group" aria-labelledby="density-label">
+                <button id="density-cozy-btn" class="filter-chip" type="button" data-density-choice="cozy" aria-pressed="true">Cozy</button>
+                <button id="density-compact-btn" class="filter-chip" type="button" data-density-choice="compact" aria-pressed="false">Compact</button>
+              </div>
             </div>
           </section>
 
           <section class="page-section" aria-labelledby="settings-tokens-heading">
             <div class="page-section-head"><h3 id="settings-tokens-heading">Tokenizer</h3></div>
             <p class="hint">Choose the encoding and context window that token counts and budgets use.</p>
-            <div class="page-actions"><button id="about-token-btn" class="btn" type="button">Token settings</button></div>
+            <div class="field">
+              <label for="tokenizer-preset">Tokenizer</label>
+              <select id="tokenizer-preset"></select>
+              <span id="tokenizer-preset-hint" class="hint"></span>
+            </div>
+            <div class="field">
+              <label for="context-window-preset">Context window</label>
+              <select id="context-window-preset"></select>
+              <span class="hint">Used for context-window usage in the overview, simulation and review.</span>
+            </div>
           </section>
 
           <section class="page-section" aria-labelledby="settings-reference-heading">
@@ -1369,29 +1388,6 @@
   </dialog>
 
 
-
-  <dialog id="token-settings-dialog" class="dialog token-settings-dialog" aria-labelledby="token-settings-title">
-    <div class="dialog-inner">
-      <div class="dialog-heading">
-        <p class="eyebrow">Tokens</p>
-        <h2 id="token-settings-title">Tokenizer and context window</h2>
-        <p class="dialog-copy">Pick the tokenizer that matches your target model and the context window used for budget warnings.</p>
-      </div>
-      <div class="field">
-        <label for="tokenizer-preset">Tokenizer</label>
-        <select id="tokenizer-preset"></select>
-        <span id="tokenizer-preset-hint" class="hint"></span>
-      </div>
-      <div class="field">
-        <label for="context-window-preset">Context window</label>
-        <select id="context-window-preset"></select>
-        <span class="hint">Used for context-window usage in the overview and simulation.</span>
-      </div>
-      <div class="dialog-actions">
-        <button id="token-settings-close" class="btn btn-primary" type="button">Done</button>
-      </div>
-    </div>
-  </dialog>
 
   <dialog id="global-search-dialog" class="dialog global-search-dialog" aria-labelledby="global-search-title">
     <div class="dialog-inner">

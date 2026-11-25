@@ -123,6 +123,7 @@ import { buildActivationGraph } from "./activationGraph.js";
 import { createTokenizer, estimateTokens } from "./tokenizer/client.js";
 import { buildBookOverview } from "./overview.js";
 import { ENTRY_TEMPLATES, buildTemplatePatch, getEntryTemplate } from "./templates.js";import { showDiffDialog } from "./ui/diff.js";
+import { applyScopes, orderByRecent, pushRecent } from "./commands.js";
 import { openCommandPalette } from "./ui/commandPalette.js";
 import { renderEditor, syncEntryStats } from "./ui/editor.js";
 import { createKeyChips } from "./ui/keyChips.js";
@@ -319,8 +320,8 @@ const refs = {
   aboutExportFormats: document.querySelector("#about-export-formats"),
   aboutStorage: document.querySelector("#about-storage"),
   aboutGuideBtn: document.querySelector("#about-guide-btn"),
-  aboutThemeBtn: document.querySelector("#about-theme-btn"),
-  aboutDensityBtn: document.querySelector("#about-density-btn"),
+  themeButtons: [...document.querySelectorAll("[data-theme-choice]")],
+  densityButtons: [...document.querySelectorAll("[data-density-choice]")],
   aboutAuditLog: document.querySelector("#about-audit"),
   shortcutsDialog: document.querySelector("#shortcuts-dialog"),
   shortcutsList: document.querySelector("#shortcuts-list"),
@@ -333,13 +334,10 @@ const refs = {
   aboutSchemaBtn: document.querySelector("#about-schema-btn"),
   printRoot: document.querySelector("#print-root"),
   drawerToggle: document.querySelector("#drawer-toggle"),
-  aboutTokenBtn: document.querySelector("#about-token-btn"),
   aboutIntegrityBtn: document.querySelector("#about-integrity-btn"),
-  tokenSettingsDialog: document.querySelector("#token-settings-dialog"),
   tokenizerPreset: document.querySelector("#tokenizer-preset"),
   tokenizerPresetHint: document.querySelector("#tokenizer-preset-hint"),
   contextWindowPreset: document.querySelector("#context-window-preset"),
-  tokenSettingsCloseBtn: document.querySelector("#token-settings-close"),
   overviewContext: document.querySelector("#overview-context"),
   overviewTokenizer: document.querySelector("#overview-tokenizer"),
   aboutCloseBtn: document.querySelector("#about-close"),
@@ -1129,6 +1127,7 @@ function showRoute(requested, { focusHeading = false } = {}) {
   } else if (route.view === "settings") {
     syncThemeButton();
     syncDensityButton();
+    renderTokenSettings();
   }
 
   updateDocumentTitle();
@@ -1504,17 +1503,19 @@ function applyTheme(theme) {
 }
 
 function syncThemeButton() {
-  if (!refs.aboutThemeBtn) {
-    return;
-  }
+  const current = document.documentElement.dataset.theme === "light" ? "light" : "dark";
 
-  const light = document.documentElement.dataset.theme === "light";
-  refs.aboutThemeBtn.setAttribute("aria-pressed", String(light));
-  refs.aboutThemeBtn.textContent = light ? "Dark theme" : "Light theme";
+  for (const button of refs.themeButtons) {
+    button.setAttribute("aria-pressed", String(button.dataset.themeChoice === current));
+  }
 }
 
 function toggleTheme() {
-  applyTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light");
+  chooseTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light");
+}
+
+function chooseTheme(theme) {
+  applyTheme(theme);
   syncThemeButton();
   const meta = document.querySelector('meta[name="theme-color"]');
 
@@ -1550,13 +1551,11 @@ function applyDensity(density) {
 }
 
 function syncDensityButton() {
-  if (!refs.aboutDensityBtn) {
-    return;
-  }
+  const current = document.documentElement.dataset.density === "compact" ? "compact" : "cozy";
 
-  const compact = document.documentElement.dataset.density === "compact";
-  refs.aboutDensityBtn.setAttribute("aria-pressed", String(compact));
-  refs.aboutDensityBtn.textContent = compact ? "Cozy density" : "Compact density";
+  for (const button of refs.densityButtons) {
+    button.setAttribute("aria-pressed", String(button.dataset.densityChoice === current));
+  }
 }
 
 function toggleDensity() {
@@ -1719,7 +1718,7 @@ function applyTokenSettings() {
   tokenizer.setEncoding(getTokenizerPreset(tokenSettings.tokenizer).encoding);
 }
 
-function renderTokenSettingsDialog() {
+function renderTokenSettings() {
   const tokenizerOptions = TOKENIZER_PRESETS.map((preset) => {
     const option = document.createElement("option");
     option.value = preset.id;
@@ -1742,19 +1741,16 @@ function renderTokenSettingsDialog() {
   refs.contextWindowPreset.value = String(tokenSettings.contextWindow);
 }
 
-function openTokenSettingsDialog() {
-  renderTokenSettingsDialog();
-
-  if (!refs.tokenSettingsDialog.open) {
-    refs.tokenSettingsDialog.showModal();
-  }
+function openTokenSettings() {
+  goToView("settings");
+  refs.tokenizerPreset.focus();
 }
 
 function handleTokenizerChange() {
   tokenSettings.tokenizer = refs.tokenizerPreset.value;
   persistTokenSettings();
   applyTokenSettings();
-  renderTokenSettingsDialog();
+  renderTokenSettings();
   renderAll();
 
   if (refs.overviewDialog.open) {
@@ -1926,7 +1922,7 @@ function buildCommands() {
     { title: "Show welcome", keywords: ["onboarding", "start"], run: openOnboardingDialog },
     { title: "Start empty lorebook", keywords: ["new", "blank", "reset"], run: startEmptyProject },
     { title: "Search all lorebooks", hint: "Ctrl+Shift+F", keywords: ["global", "find", "everywhere"], run: openGlobalSearchDialog },
-    { title: "Token settings", keywords: ["tokenizer", "model", "context window"], run: openTokenSettingsDialog },
+    { title: "Token settings", keywords: ["tokenizer", "model", "context window"], run: openTokenSettings },
     { title: "Check data integrity", keywords: ["repair", "diagnostics", "snapshots"], run: () => openIntegrityDialog() },
     { title: "About Loreweaver", keywords: ["version", "privacy", "info"], run: () => openAboutDialog() }
   ];
@@ -1967,7 +1963,36 @@ function buildCommands() {
     );
   }
 
-  return commands;
+  return orderByRecent(applyScopes(commands, currentView), readRecentCommands()).map((command) => ({
+    ...command,
+    run: () => {
+      rememberCommand(command.title);
+      return command.run();
+    }
+  }));
+}
+
+const RECENT_COMMANDS_KEY = storageKey("recent-commands:v1");
+
+function readRecentCommands() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(RECENT_COMMANDS_KEY) ?? "[]");
+    return Array.isArray(parsed) ? parsed.filter((title) => typeof title === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function rememberCommand(title) {
+  if (/^Open (lorebook|card): /.test(title)) {
+    return;
+  }
+
+  try {
+    localStorage.setItem(RECENT_COMMANDS_KEY, JSON.stringify(pushRecent(readRecentCommands(), title)));
+  } catch {
+    return;
+  }
 }
 
 function supportsFileSystemAccess() {
@@ -5873,18 +5898,13 @@ refs.shortcutsDialog.addEventListener("click", (event) => {
   }
 });
 
-refs.aboutThemeBtn.addEventListener("click", () => {
-  toggleTheme();
-});
+for (const button of refs.themeButtons) {
+  button.addEventListener("click", () => chooseTheme(button.dataset.themeChoice));
+}
 
-refs.aboutDensityBtn.addEventListener("click", () => {
-  toggleDensity();
-});
-
-refs.aboutTokenBtn.addEventListener("click", () => {
-  refs.aboutDialog.close();
-  openTokenSettingsDialog();
-});
+for (const button of refs.densityButtons) {
+  button.addEventListener("click", () => applyDensity(button.dataset.densityChoice));
+}
 
 refs.aboutIntegrityBtn.addEventListener("click", () => {
   refs.aboutDialog.close();
@@ -5893,16 +5913,6 @@ refs.aboutIntegrityBtn.addEventListener("click", () => {
 
 refs.tokenizerPreset.addEventListener("change", handleTokenizerChange);
 refs.contextWindowPreset.addEventListener("change", handleContextWindowChange);
-
-refs.tokenSettingsCloseBtn.addEventListener("click", () => {
-  refs.tokenSettingsDialog.close();
-});
-
-refs.tokenSettingsDialog.addEventListener("click", (event) => {
-  if (event.target === refs.tokenSettingsDialog) {
-    refs.tokenSettingsDialog.close();
-  }
-});
 
 refs.integrityRepairBtn.addEventListener("click", () => {
   handleIntegrityRepair();

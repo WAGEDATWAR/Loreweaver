@@ -72,10 +72,8 @@ const states = [
     await page.click("#book-actions-btn");
     await page.waitFor('document.querySelector("#book-actions-dialog")?.open');
   } },
-  { name: "token settings dialog", setup: async (page) => {
+  { name: "settings page controls", setup: async (page) => {
     await openPage(page, "settings");
-    await page.click("#about-token-btn");
-    await page.waitFor('document.querySelector("#token-settings-dialog")?.open');
     await page.waitFor('document.querySelector("#tokenizer-preset")?.options.length === 2');
   } },
   { name: "global search dialog", setup: async (page) => {

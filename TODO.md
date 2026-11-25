@@ -118,7 +118,8 @@ defect or risk, **S3** improvement.
 - [ ] `VH` Redesign (DEF-126): type scale, density, colour roles, icon set; a consistent component set;
       Tools (Overview, Simulate, Issues, History) as pages; a card workspace (DEF-124); empty, loading and
       error states (DEF-002, DEF-104).
-- [ ] `L` Command palette scoped to the current page, with recent pages (DEF-127).
+- [x] Command palette scoped to the current page, with recent commands (DEF-127).
+- [x] Settings page with real inline controls for theme, density, tokenizer and context window (DEF-126, part).
 
 ### UI and UX
 - [x] **S1** The entry list, the core navigation, is buried: at 1440x900 it starts at y=919 and is 16px

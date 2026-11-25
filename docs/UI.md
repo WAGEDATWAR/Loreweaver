@@ -74,6 +74,12 @@ available everywhere and closes on selection, an outside click or `Escape`.
 | `#/card/<id>/review` | token buckets and checks for a card, each check jumps to its field | editor menu, palette |
 | `#/card/<id>` | the card editor | palette |
 
+The palette is scoped to the page: entry commands (new entry, sort, filters, entry actions) appear on the
+entries page, lorebook commands (overview, issues, history, print) on lorebook pages, and review and menu
+commands on editor pages. Typing searches every command, listing the ones that apply first, and the last five
+commands run lead the empty list. Settings holds real controls: theme and density as segmented choices, and
+the tokenizer and context window as inline selects.
+
 The palette has a `Go to` command for every hub page and an `Open lorebook:` or `Open card:` command
 for every project. The window title names the project or page.
 

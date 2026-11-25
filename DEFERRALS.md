@@ -113,8 +113,7 @@ never learns a card quirk.
 | DEF-036 | Hover hint popups for long field explanations | CSS `::after` popups on `data-hint`, hover and focus-visible, no JS | P5 | done |
 | DEF-037 | `aria-keyshortcuts` on shortcut buttons | undo, redo, export, add entry | P5 | done |
 | DEF-125 | A UI evaluation: heuristic review, task walk-throughs at four widths, keyboard and screen-reader pass, screenshots | done: `docs/reference/ui-review/REVIEW.md`; the real screen-reader pass stays DEF-043 | P5 | done |
-| DEF-126 | A UI redesign from the evaluation: visual language, information architecture, Tools as pages, component set | acts on DEF-125; layout and style only | P5 | scheduled |
-| DEF-127 | Per-page command palette scoping and recent pages | the palette lists every command on every page | P5 | scheduled |
+| DEF-126 | A UI redesign from the evaluation: visual language, Tools as pages, component set (Settings controls and the Review page shipped) | acts on DEF-125; layout and style only | P5 | scheduled |
 | DEF-128 | Phone layout as master-detail: list, entry and details as separate screens (UI-01) | review S1 | P5 | done |
 | DEF-129 | Mid-width layout: details as a drawer and the menu as a rail below about 1200 px (UI-02) | review S1 | P5 | done |
 | DEF-130 | Finish the light theme: details panel, chip inputs and a light screenshot check (UI-04) | review S2 | P5 | done |

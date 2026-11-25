@@ -31,7 +31,6 @@ const STATES = [
   { name: "dialog-replace", setup: [hash("entries"), click("#nav-replace-btn")], dialog: "#replace-dialog" },
   { name: "dialog-shortcuts", setup: [hash("settings"), click("#about-shortcuts-btn")], dialog: "#shortcuts-dialog" },
   { name: "dialog-schema", setup: [hash("settings"), click("#about-schema-btn")], dialog: "#schema-dialog" },
-  { name: "dialog-tokens", setup: [hash("settings"), click("#about-token-btn")], dialog: "#token-settings-dialog" },
   { name: "dialog-about", setup: [hash("entries"), click("#about-btn")], dialog: "#about-dialog" },
   { name: "dialog-guide", setup: [hash("settings"), click("#settings-guide-btn")], dialog: "#guide-dialog" },
   { name: "dialog-bookactions", setup: [hash("entries"), click("#app-nav a[data-view=\"book-settings\"]"), click("#book-actions-btn")], dialog: "#book-actions-dialog" },
