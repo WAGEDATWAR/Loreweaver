@@ -53,7 +53,7 @@ index.html
 ## 2.1 Pages and routes
 
 The app is a library hub plus editors. `src/views.js` is the pure route table: `#/library` (home),
-`#/data`, `#/settings`, `#/book/<id>`, `#/book/<id>/settings` and `#/card/<id>`. The location hash is the
+`#/data`, `#/settings`, `#/book/<id>`, `#/book/<id>/settings`, `#/book/<id>/review`, `#/card/<id>` and `#/card/<id>/review`. The location hash is the
 only view state, so the UI still holds none (A-2). `main.js` parses the hash, resolves it against the project
 (a missing id falls back to the library), shows the matching page, activates the book or card in the store,
 and shows the editor menu only for editor routes. `src/projects.js` is the pure library model: it turns books
@@ -225,6 +225,7 @@ ids (see `DECISIONS.md` I-4).
 | `src/keys.js` | Regex-key detection and parsing with plain-text fallback |
 | `src/commands.js` | Pure command-palette filtering |
 | `src/search.js` | Entry query analysis and cross-lorebook search |
+| `src/review.js` | Pure Review page models for books and cards |
 | `src/settings.js` | Tokenizer and context window presets |
 | `src/simulation.js` | Pure context activation simulation |
 | `src/migrations.js` | Append-only project schema migrations |

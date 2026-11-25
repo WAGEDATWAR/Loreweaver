@@ -1928,6 +1928,32 @@ export const scenarios = [
     }
   },
   {
+    name: "reviews a lorebook and a card on the Review page",
+    timeout: 40000,
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "entries");
+      await page.click('#app-nav a[data-view="book-review"]');
+      await page.waitFor('!document.querySelector("#page-review")?.hidden');
+      await page.waitFor('document.querySelectorAll("#review-body .review-stat").length >= 4');
+      await page.click("#review-simulate-btn");
+      await page.waitFor('document.querySelector("#simulation-dialog")?.open');
+      await page.evaluate('document.querySelector("#simulation-dialog").close(); true');
+
+      await openPage(page, "library");
+      await page.click("#new-card-btn");
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      await setValue(page, "#card-name", "Reviewed");
+      await page.click('#app-nav a[data-view="card-review"]');
+      await page.waitFor('!document.querySelector("#page-review")?.hidden');
+      await page.waitFor('document.querySelectorAll("#review-body [data-review-field]").length > 0');
+      await page.click('#review-body [data-review-field="description"]');
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      assert.equal(await page.evaluate('document.activeElement?.id'), "card-description");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "keeps the layout inside the viewport",
     async run(page, context) {
       await resetApp(page);

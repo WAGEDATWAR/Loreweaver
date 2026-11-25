@@ -195,6 +195,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10"/><path d="M18 7h2"/><circle cx="16" cy="7" r="2"/><path d="M4 17h2"/><path d="M10 17h10"/><circle cx="8" cy="17" r="2"/></svg>
           <span class="nav-label">Lorebook settings</span>
         </a>
+          <a class="nav-item" href="#/library" data-view="book-review">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7H4V5h11"/></svg>
+          <span class="nav-label">Review</span>
+        </a>
         </div>
         <div class="nav-group" data-nav-for="book" role="group" aria-labelledby="nav-tools-label">
           <span id="nav-tools-label" class="nav-group-label">Tools</span>
@@ -219,6 +223,16 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10"/><path d="m11 4 3 3-3 3"/><path d="M20 17H10"/><path d="m13 14-3 3 3 3"/></svg>
           <span class="nav-label">Find and replace</span>
         </button>
+        </div>
+        <div class="nav-group" data-nav-for="card">
+          <a class="nav-item" href="#/library" data-view="card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5V4Z"/><path d="M8 11h8"/><path d="M8 15h8"/></svg>
+          <span class="nav-label">Edit card</span>
+        </a>
+          <a class="nav-item" href="#/library" data-view="card-review">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7H4V5h11"/></svg>
+          <span class="nav-label">Review</span>
+        </a>
         </div>
         <div class="nav-group" data-nav-for="card" role="group" aria-labelledby="nav-card-label">
           <span id="nav-card-label" class="nav-group-label">Sections</span>
@@ -625,6 +639,16 @@
               <button id="hub-empty-clear" class="btn" type="button" hidden>Clear search and filters</button>
             </div>
           </div>
+        </div>
+      </main>
+
+      <main id="page-review" class="page" aria-labelledby="review-title" hidden>
+        <div class="page-inner">
+          <header class="page-head">
+            <h2 id="review-title" tabindex="-1">Review</h2>
+            <p id="review-subtitle">Size, checks and activation in one place.</p>
+          </header>
+          <div id="review-body"></div>
         </div>
       </main>
 

@@ -16,6 +16,8 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- A Review page for lorebooks and cards (`#/book/<id>/review`, `#/card/<id>/review`): size, checks that jump to the entry or field, and a simulation shortcut.
+
 - Library: a tag filter and pinned projects (pins stay in this browser and lead every sort).
 
 - The Library is now the home page and a hub of projects. Lorebooks and character cards appear as tiles

@@ -70,6 +70,8 @@ available everywhere and closes on selection, an outside click or `Escape`.
 | `#/settings` | theme, density, tokenizer, shortcuts, schema reference, guide | `Alt+3` |
 | `#/book/<id>` | the lorebook editor (`#/entries` opens the last-used lorebook) | palette |
 | `#/book/<id>/settings` | lorebook settings | palette |
+| `#/book/<id>/review` | overview, issues and a simulation entry point for a lorebook | editor menu, palette |
+| `#/card/<id>/review` | token buckets and checks for a card, each check jumps to its field | editor menu, palette |
 | `#/card/<id>` | the card editor | palette |
 
 The palette has a `Go to` command for every hub page and an `Open lorebook:` or `Open card:` command

@@ -6236,3 +6236,42 @@ body:not([data-mode="editor"]) .nav-open-btn {
 .project-tile.is-pinned [data-project-action="pin"] svg {
   fill: currentColor;
 }
+
+/* ---- Review page ---- */
+
+.review-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.review-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.review-stat-value {
+  font-size: 16px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.review-stat-label {
+  font-size: var(--text-small);
+  color: var(--muted);
+}
+
+.review-stat.is-over .review-stat-value {
+  color: var(--danger, #e5484d);
+}
+
+.review-issues {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

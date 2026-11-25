@@ -13,7 +13,7 @@ export const VIEWS = Object.freeze([
 export const DEFAULT_VIEW = "library";
 
 const HUB_IDS = new Set(VIEWS.map((view) => view.id));
-const EDITOR_VIEWS = new Set(["book", "book-settings", "card"]);
+const EDITOR_VIEWS = new Set(["book", "book-settings", "book-review", "card", "card-review"]);
 
 export function isHubView(value) {
   return HUB_IDS.has(value);
@@ -55,6 +55,10 @@ export function parseRoute(hash) {
       return { view: "book-settings", id };
     }
 
+    if (tail === "review" && parts.length === 3) {
+      return { view: "book-review", id };
+    }
+
     if (parts.length === 2) {
       return { view: "book", id };
     }
@@ -62,6 +66,10 @@ export function parseRoute(hash) {
 
   if (head === "card" && ID_PATTERN.test(id ?? "") && parts.length === 2) {
     return { view: "card", id };
+  }
+
+  if (head === "card" && ID_PATTERN.test(id ?? "") && tail === "review" && parts.length === 3) {
+    return { view: "card-review", id };
   }
 
   return { view: DEFAULT_VIEW, id: null };
@@ -74,6 +82,14 @@ export function routeHref(view, id = null) {
 
   if (view === "book-settings" && id) {
     return `#/book/${id}/settings`;
+  }
+
+  if (view === "book-review" && id) {
+    return `#/book/${id}/review`;
+  }
+
+  if (view === "card-review" && id) {
+    return `#/card/${id}/review`;
   }
 
   if (view === "card" && id) {

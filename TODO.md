@@ -114,7 +114,7 @@ defect or risk, **S3** improvement.
 - [x] Responsive model: phone list-then-editor screens and a details overlay at mid widths (DEF-128, DEF-129).
 - [ ] `H` Card and lorebook parity in the interface: a card workspace built from the shared page anatomy,
       list, tokens, notes, bulk and history (DEF-134, DEF-117 to DEF-124).
-- [ ] `M` A Review page for books and cards (DEF-133).
+- [x] A Review page for books and cards: overview, checks and a simulation entry point (DEF-133).
 - [ ] `VH` Redesign (DEF-126): type scale, density, colour roles, icon set; a consistent component set;
       Tools (Overview, Simulate, Issues, History) as pages; a card workspace (DEF-124); empty, loading and
       error states (DEF-002, DEF-104).

@@ -54,3 +54,14 @@ test("hub shortcuts are unique and resolve", () => {
   assert.equal(getView("bogus").id, "library");
   assert.equal(DEFAULT_VIEW, "library");
 });
+
+test("routes the review pages for books and cards", async () => {
+  const { parseRoute, routeHref, isEditorView } = await import("../src/views.js");
+
+  assert.deepEqual(parseRoute("#/book/book_a/review"), { view: "book-review", id: "book_a" });
+  assert.deepEqual(parseRoute("#/card/card_a/review"), { view: "card-review", id: "card_a" });
+  assert.equal(routeHref("book-review", "book_a"), "#/book/book_a/review");
+  assert.equal(routeHref("card-review", "card_a"), "#/card/card_a/review");
+  assert.equal(isEditorView("card-review"), true);
+  assert.equal(parseRoute("#/card/card_a/other").view, "library");
+});

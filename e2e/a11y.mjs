@@ -146,6 +146,11 @@ const states = [
     await page.click("#app-nav a[data-view=\"book-settings\"]");
     await page.waitFor('!document.querySelector("#page-book-settings")?.hidden');
   } },
+  { name: "review page", setup: async (page) => {
+    await page.click("#app-nav a[data-view=\"book-review\"]");
+    await page.waitFor('!document.querySelector("#page-review")?.hidden');
+    await page.waitFor('document.querySelectorAll("#review-body .review-stat").length >= 4');
+  } },
   { name: "app menu", setup: async (page) => {
     await page.click("#app-menu-btn");
     await page.waitFor('!document.querySelector("#app-menu")?.hidden');

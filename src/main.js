@@ -142,6 +142,8 @@ import { validateCardRecord } from "./cardValidation.js";
 import { clamp } from "./utils.js";
 import { createTabGuard } from "./tabGuard.js";
 import { VIEWS, getView, isEditorView, parseRoute, routeHref, viewForShortcut } from "./views.js";
+import { buildBookReview, buildCardReview, CARD_FIELD_TARGETS } from "./review.js";
+import { renderBookReview, renderCardReview } from "./ui/review.js";
 import { buildProjectItems, collectTags, filterProjects, sortProjects } from "./projects.js";
 import { renderProjectList } from "./ui/projects.js";
 import { selectEntriesByTokenSize } from "./bulk.js";
@@ -232,6 +234,8 @@ const refs = {
   navViewLinks: [...document.querySelectorAll("#app-nav a[data-view]")],
   navGroups: [...document.querySelectorAll("#app-nav [data-nav-for]")],
   navAnchors: [...document.querySelectorAll("#app-nav [data-scroll-to]")],
+  reviewBody: document.querySelector("#review-body"),
+  reviewSubtitle: document.querySelector("#review-subtitle"),
   hubSearch: document.querySelector("#hub-search"),
   hubFilters: document.querySelector("#hub-filters"),
   hubSort: document.querySelector("#hub-sort"),
@@ -929,13 +933,47 @@ function renderHub() {
   });
 }
 
+function reviewCount(text) {
+  const measured = tokenizer.count(text);
+  return Number.isFinite(measured) ? measured : hubEstimate(text);
+}
+
+function renderReview() {
+  const state = getState();
+
+  if (currentView === "card-review") {
+    const card = getCards().find((item) => item.id === currentRouteId);
+
+    if (!card) {
+      return;
+    }
+
+    refs.reviewSubtitle.textContent = "What a frontend sends for this card, and what to fix first.";
+    renderCardReview(refs.reviewBody, buildCardReview(card, { count: reviewCount, bookExists: (id) => state.books.some((book) => book.id === id) }), { name: card.name.trim() || "Untitled card", approximate: !tokenizer.isReady() });
+    return;
+  }
+
+  const book = getActiveBook();
+
+  if (!book) {
+    return;
+  }
+
+  for (const entry of book.entries) {
+    tokenizer.request(entry.content);
+  }
+
+  refs.reviewSubtitle.textContent = "Size, checks and activation for this lorebook before you export it.";
+  renderBookReview(refs.reviewBody, buildBookReview(book, { count: reviewCount, contextWindow: tokenSettings.contextWindow }), { name: book.name.trim() || "Untitled Lorebook", approximate: !tokenizer.isReady() });
+}
+
 function currentCardName() {
   const card = getCards().find((item) => item.id === currentRouteId);
   return card?.name.trim() || "Untitled card";
 }
 
 function updateNavContext() {
-  const onCard = currentView === "card";
+  const onCard = currentView === "card" || currentView === "card-review";
   const book = getActiveBook();
 
   refs.navContextKind.textContent = onCard ? "Character card" : "Lorebook";
@@ -945,12 +983,12 @@ function updateNavContext() {
 function resolveRoute(route) {
   const state = getState();
 
-  if (route.view === "book" || route.view === "book-settings") {
+  if (route.view === "book" || route.view === "book-settings" || route.view === "book-review") {
     const id = route.id ?? state.activeBookId;
     return state.books.some((book) => book.id === id) ? { view: route.view, id } : { view: "library", id: null };
   }
 
-  if (route.view === "card") {
+  if (route.view === "card" || route.view === "card-review") {
     return getCards().some((card) => card.id === route.id) ? route : { view: "library", id: null };
   }
 
@@ -962,8 +1000,14 @@ const HEADING_FOR_VIEW = {
   data: "#data-title",
   settings: "#settings-title",
   "book-settings": "#book-settings-title",
-  card: "#card-title"
+  card: "#card-title",
+  "book-review": "#review-title",
+  "card-review": "#review-title"
 };
+
+function pageIdFor(view) {
+  return view === "book-review" || view === "card-review" ? "page-review" : `page-${view}`;
+}
 
 function showRoute(requested, { focusHeading = false } = {}) {
   const previousView = currentView;
@@ -987,7 +1031,7 @@ function showRoute(requested, { focusHeading = false } = {}) {
   refs.appNav.hidden = !editor;
 
   for (const page of refs.pages) {
-    page.hidden = page.id !== `page-${route.view}`;
+    page.hidden = page.id !== pageIdFor(route.view);
   }
 
   const target = routeHref(route.view, route.id);
@@ -996,7 +1040,7 @@ function showRoute(requested, { focusHeading = false } = {}) {
     window.history.replaceState(null, "", target);
   }
 
-  if (route.view === "book" || route.view === "book-settings") {
+  if (route.view === "book" || route.view === "book-settings" || route.view === "book-review") {
     if (getState().activeBookId !== route.id) {
       setActiveBook(route.id);
       setTagFilters([]);
@@ -1020,9 +1064,10 @@ function showRoute(requested, { focusHeading = false } = {}) {
   }
 
   const bookId = getState().activeBookId;
+  const cardId = route.view === "card" || route.view === "card-review" ? route.id : getState().activeCardId;
 
   for (const link of refs.navViewLinks) {
-    link.href = routeHref(link.dataset.view, bookId);
+    link.href = routeHref(link.dataset.view, link.dataset.view.startsWith("card") ? cardId : bookId);
 
     if (link.dataset.view === route.view) {
       link.setAttribute("aria-current", "page");
@@ -1031,7 +1076,7 @@ function showRoute(requested, { focusHeading = false } = {}) {
     }
   }
 
-  const group = route.view === "card" ? "card" : "book";
+  const group = route.view === "card" || route.view === "card-review" ? "card" : "book";
 
   for (const element of refs.navGroups) {
     element.hidden = element.dataset.navFor !== group;
@@ -1054,6 +1099,8 @@ function showRoute(requested, { focusHeading = false } = {}) {
     refreshBackupStatus();
     refreshStorageUsage();
     refs.aboutAuditLog.textContent = formatAudit(readAuditLog());
+  } else if (route.view === "book-review" || route.view === "card-review") {
+    renderReview();
   } else if (route.view === "settings") {
     syncThemeButton();
     syncDensityButton();
@@ -1067,7 +1114,7 @@ function showRoute(requested, { focusHeading = false } = {}) {
 }
 
 function goToView(view, id = null) {
-  const resolvedId = id ?? (view === "book" || view === "book-settings" ? getState().activeBookId : null);
+  const resolvedId = id ?? (view === "book" || view === "book-settings" || view === "book-review" ? getState().activeBookId : view === "card-review" ? getState().activeCardId : null);
   const target = routeHref(view, resolvedId);
 
   if (window.location.hash !== target) {
@@ -1794,6 +1841,7 @@ function buildCommands() {
       keywords: ["open", "edit", "character"],
       run: () => goToView("card", card.id)
     })),
+    { title: "Review", keywords: ["check", "validate", "audit"], run: () => goToView(currentView === "card" || currentView === "card-review" ? "card-review" : "book-review") },
     { title: "Toggle editor menu", keywords: ["menu", "sidebar", "collapse", "layout"], run: toggleNav },
     { title: "New entry", hint: "Alt+N", keywords: ["add", "create"], run: handleAddEntry },
     { title: "New entry from template", keywords: ["add", "create", "starter"], run: openTemplateDialog },
@@ -2000,6 +2048,10 @@ function updateDocumentTitle() {
     ? currentCardName()
     : currentView === "book-settings"
       ? `Settings · ${bookName}`
+      : currentView === "book-review"
+        ? `Review · ${bookName}`
+        : currentView === "card-review"
+          ? `Review · ${currentCardName()}`
       : currentView === "book"
         ? bookName
         : getView(currentView).label;
@@ -2497,6 +2549,7 @@ function openSimulationDialog() {
 
 function handleSimulationJump(entryId) {
   refs.simulationDialog.close();
+  ensureEntriesView();
   clearSearch();
   setActiveEntry(entryId);
   renderAll();
@@ -2507,6 +2560,7 @@ function handleSimulationJump(entryId) {
 
 function jumpToValidationEntry(entryId, field = "") {
   refs.validationDialog.close();
+  ensureEntriesView();
   clearSearch();
   setActiveEntry(entryId);
   renderAll();
@@ -5392,6 +5446,35 @@ refs.menuShortcutsBtn.addEventListener("click", openShortcutsDialog);
 
 refs.navCollapse.addEventListener("click", toggleNav);
 refs.navOpenBtn.addEventListener("click", () => setMobileNavOpen(!refs.shell.classList.contains("is-nav-open")));
+
+refs.reviewBody.addEventListener("click", (event) => {
+  if (event.target.closest("#review-simulate-btn")) {
+    openSimulationDialog();
+    return;
+  }
+
+  const entry = event.target.closest("[data-review-entry]");
+
+  if (entry) {
+    goToView("book", getState().activeBookId);
+    clearSearch();
+    setActiveEntry(entry.dataset.reviewEntry);
+    renderAll();
+    scrollEntryCardIntoView(entry.dataset.reviewEntry);
+    focusEntryCard(entry.dataset.reviewEntry);
+    scheduleSave();
+    return;
+  }
+
+  const field = event.target.closest("[data-review-field]");
+
+  if (field) {
+    goToView("card", currentRouteId);
+    const target = document.getElementById(CARD_FIELD_TARGETS[field.dataset.reviewField] ?? "card-name");
+    target?.scrollIntoView({ block: "center" });
+    target?.focus();
+  }
+});
 
 refs.appNav.addEventListener("click", (event) => {
   const anchor = event.target.closest("[data-scroll-to]");
