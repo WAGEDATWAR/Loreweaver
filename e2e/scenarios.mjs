@@ -741,13 +741,13 @@ export const scenarios = [
       await page.setViewport(1024, 768);
       await sleep(150);
       assert.equal(await page.evaluate('document.querySelector("#details-panel").classList.contains("is-collapsed")'), true);
-      assert.ok(await page.evaluate('document.querySelector(".editor-scroll").getBoundingClientRect().width') >= 560);
+      await page.waitFor('document.querySelector(".editor-scroll").getBoundingClientRect().width >= 560');
 
       await page.click("#details-open-btn");
       await page.waitFor('!document.querySelector("#details-panel").classList.contains("is-collapsed")');
       assert.equal(await page.evaluate('document.querySelector("#details-open-btn").getAttribute("aria-expanded")'), "true");
       assert.ok(await page.evaluate('document.querySelector("#entry-order").getBoundingClientRect().width') > 0);
-      assert.ok(await page.evaluate('document.querySelector(".editor-scroll").getBoundingClientRect().width') >= 560);
+      await page.waitFor('document.querySelector(".editor-scroll").getBoundingClientRect().width >= 560');
 
       await page.click("#details-toggle");
       await page.waitFor('document.querySelector("#details-panel").classList.contains("is-collapsed")');
