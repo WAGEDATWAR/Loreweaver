@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { mergeProject } from "../src/merge.js";
-import { createEntry, createProject } from "../src/schema.js";
+import { createCard, createEntry, createProject } from "../src/schema.js";
 
 function book(name, entries = [], extra = {}) {
   return {
@@ -52,6 +52,7 @@ test("replace returns the imported project and counts every book and entry", () 
     booksMatched: 0,
     entriesAdded: 3,
     entriesUpdated: 0,
+    cardsUpdated: 0,
     cardsAdded: 0
   });
 });
@@ -158,4 +159,33 @@ test("falls back to replace for an unknown strategy", () => {
 
   assert.equal(result.project.books.length, 1);
   assert.equal(result.project.books[0].name, "Beta");
+});
+
+test("merge updates a card with the same name and keeps its identity", () => {
+  const current = createProject({ books: [book("Lore", [])], cards: [createCard({ id: "card_old", name: "Mara", description: "old", createdAt: 5 })] });
+  const incoming = createProject({ books: [book("Lore", [])], cards: [createCard({ id: "card_new", name: "mara", description: "new" }), createCard({ id: "card_other", name: "Kest" })] });
+  const result = mergeProject(current, incoming, "merge");
+
+  assert.equal(result.project.cards.length, 2);
+  assert.equal(result.project.cards[0].id, "card_old");
+  assert.equal(result.project.cards[0].description, "new");
+  assert.equal(result.project.cards[0].createdAt, 5);
+  assert.deepEqual([result.stats.cardsUpdated, result.stats.cardsAdded], [1, 1]);
+});
+
+test("append adds cards as new records and never reuses an id", () => {
+  const current = createProject({ cards: [createCard({ id: "card_x", name: "Mara" })] });
+  const incoming = createProject({ cards: [createCard({ id: "card_x", name: "Mara" })] });
+  const result = mergeProject(current, incoming, "append");
+
+  assert.equal(result.project.cards.length, 2);
+  assert.notEqual(result.project.cards[0].id, result.project.cards[1].id);
+});
+
+test("an imported card follows its lorebook when that lorebook merges into an existing one", () => {
+  const current = createProject({ books: [book("Lore", [], { id: "book_existing" })] });
+  const incoming = createProject({ books: [book("Lore", [], { id: "book_incoming" })], cards: [createCard({ name: "Mara", bookId: "book_incoming" })] });
+  const result = mergeProject(current, incoming, "merge");
+
+  assert.equal(result.project.cards[0].bookId, "book_existing");
 });

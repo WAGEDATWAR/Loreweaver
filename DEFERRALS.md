@@ -61,7 +61,7 @@ never learns a card quirk.
 | DEF-089 | Bind a lorebook to a card and export them together | card dialog book select; PNG and CHARX write the book | P5 | done |
 | DEF-090 | A card library with preview and avatar | sidebar card list, avatar thumbnails, editor dialog | P5 | done |
 | DEF-091 | Card field parity checklist | `docs/reference/PARITY.md` C section | P5 | done |
-| DEF-118 | Card diff and merge on re-import, and card revisions in History | books diff and merge by title; a re-imported card replaces nothing today | P5 | scheduled |
+| DEF-118 | Card revisions in History | cards now diff and merge on re-import; History snapshots still show lorebooks only | P5 | scheduled |
 | DEF-119 | Card templates and duplicate as template | mirrors DEF-004 for books | P5 | scheduled |
 | DEF-120 | A prompt-assembly preview: card plus linked book against a context budget | extends the simulation (C-5) so authors see what a frontend would send | P5 | scheduled |
 | DEF-122 | Cards in the schema reference page, print export and global search | the schema page and print view cover books only | P5 | scheduled |

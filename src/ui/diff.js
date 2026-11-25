@@ -98,6 +98,18 @@ function renderSummary(diff) {
     chips.push(summaryChip("changed", `~${plural(summary.entriesChanged, "entry", "entries")}`));
   }
 
+  if (summary.cardsAdded) {
+    chips.push(summaryChip("added", `+${plural(summary.cardsAdded, "card")}`));
+  }
+
+  if (summary.cardsRemoved) {
+    chips.push(summaryChip("removed", `-${plural(summary.cardsRemoved, "card")}`));
+  }
+
+  if (summary.cardsChanged) {
+    chips.push(summaryChip("changed", `~${plural(summary.cardsChanged, "card")}`));
+  }
+
   if (!chips.length) {
     chips.push(summaryChip("unchanged", "No changes"));
   }
@@ -363,6 +375,75 @@ function renderEntry(entry, bookStatus) {
   return details;
 }
 
+function snapshotLines(text, type) {
+  return String(text).split("\n").map((line, index) => ({
+    type,
+    text: line,
+    beforeLine: type === "remove" ? index + 1 : null,
+    afterLine: type === "add" ? index + 1 : null
+  }));
+}
+
+function renderCardSnapshot(card, status) {
+  const fragment = document.createDocumentFragment();
+  const type = status === "added" ? "add" : "remove";
+
+  for (const [label, value] of [["Description", card.description], ["First message", card.firstMessage], ["Scenario", card.scenario], ["Personality", card.personality]]) {
+    if (value) {
+      fragment.append(renderField({ label, kind: "long", lines: snapshotLines(value, type) }));
+    }
+  }
+
+  return fragment;
+}
+
+function renderCard(card) {
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  const title = document.createElement("span");
+  const meta = document.createElement("span");
+  const body = document.createElement("div");
+
+  details.className = `diff-entry diff-entry-${card.status}`;
+  summary.className = "diff-entry-summary";
+  title.className = "diff-entry-title";
+  meta.className = "diff-entry-summary-meta";
+  body.className = "diff-entry-body";
+  title.textContent = card.title;
+
+  if (card.status === "changed") {
+    meta.textContent = card.changes.map((change) => change.label).join(", ");
+    body.append(...card.changes.map(renderField));
+  } else {
+    meta.textContent = card.status === "added" ? "New card" : "Removed card";
+    body.append(renderCardSnapshot(card.status === "added" ? card.after : card.before, card.status));
+  }
+
+  summary.append(statusBadge(card.status), title, meta);
+  details.append(summary, body);
+  return details;
+}
+
+function renderCardsSection(cards) {
+  const article = document.createElement("article");
+  const header = document.createElement("header");
+  const title = document.createElement("h3");
+  const meta = document.createElement("span");
+  const list = document.createElement("div");
+
+  article.className = "diff-book diff-book-changed";
+  header.className = "diff-book-head";
+  title.className = "diff-book-title";
+  meta.className = "diff-book-meta";
+  list.className = "diff-book-body diff-entries";
+  title.textContent = "Character cards";
+  meta.textContent = plural(cards.length, "card");
+  header.append(title, meta);
+  list.append(...cards.map(renderCard));
+  article.append(header, list);
+  return article;
+}
+
 function renderBook(book) {
   const article = document.createElement("article");
   const header = document.createElement("header");
@@ -403,8 +484,9 @@ function renderBook(book) {
 
 function renderDiff(diff) {
   const changedBooks = diff.books.filter((book) => book.status !== "unchanged");
+  const changedCards = (diff.cards ?? []).filter((card) => card.status !== "unchanged");
 
-  if (!changedBooks.length) {
+  if (!changedBooks.length && !changedCards.length) {
     const empty = document.createElement("p");
     empty.className = "diff-empty";
     empty.textContent = "No differences found between these states.";
@@ -412,7 +494,7 @@ function renderDiff(diff) {
     return;
   }
 
-  bodyElement.replaceChildren(...changedBooks.map(renderBook));
+  bodyElement.replaceChildren(...changedBooks.map(renderBook), ...(changedCards.length ? [renderCardsSection(changedCards)] : []));
 
   const firstChangedEntry = bodyElement.querySelector(".diff-entry-changed");
 

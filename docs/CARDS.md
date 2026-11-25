@@ -101,7 +101,11 @@ lorebook gets:
 - `zTXt`/`iTXt` card chunks are read only when uncompressed; a compressed chunk falls back to `tEXt`
   or reports the card unreadable.
 - CHARX entries are written uncompressed (stored) rather than deflated.
-- Card templates, diff on re-import, bulk operations, a prompt-assembly preview and extension editors are
+- Re-importing a card: the import review diffs cards by id, then by unique name, field by field (greetings
+  and long text line by line). "Merge by title" updates the card with the same name in place (identity and
+  creation date kept) and is the default when a card file matches an existing card; "Append" always adds a new
+  card with a fresh id. A card follows its lorebook when that lorebook merges into an existing one.
+- Card templates, card revisions in History, a prompt-assembly preview and extension editors are
   scheduled (DEF-118 to DEF-123). Search, filter and sort come from the shared Library hub (DEF-117).
 
 ## 8. Definition of done

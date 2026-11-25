@@ -1326,6 +1326,18 @@ function sessionSummaryText(diff) {
     parts.push(`${summary.booksRemoved} ${summary.booksRemoved === 1 ? "lorebook removed" : "lorebooks removed"}`);
   }
 
+  if (summary.cardsAdded) {
+    parts.push(`${summary.cardsAdded} ${summary.cardsAdded === 1 ? "card added" : "cards added"}`);
+  }
+
+  if (summary.cardsRemoved) {
+    parts.push(`${summary.cardsRemoved} ${summary.cardsRemoved === 1 ? "card removed" : "cards removed"}`);
+  }
+
+  if (summary.cardsChanged) {
+    parts.push(`${summary.cardsChanged} ${summary.cardsChanged === 1 ? "card edited" : "cards edited"}`);
+  }
+
   return parts.join(", ");
 }
 
@@ -2857,9 +2869,9 @@ async function getRevisionComparison(id, knownRevisions = null) {
 
 function renderRevisionDelta(diff) {
   const { summary } = diff;
-  const additions = summary.booksAdded + summary.entriesAdded;
-  const removals = summary.booksRemoved + summary.entriesRemoved;
-  const changes = summary.booksMetadataChanged + summary.entriesChanged;
+  const additions = summary.booksAdded + summary.entriesAdded + summary.cardsAdded;
+  const removals = summary.booksRemoved + summary.entriesRemoved + summary.cardsRemoved;
+  const changes = summary.booksMetadataChanged + summary.entriesChanged + summary.cardsChanged;
   const delta = document.createElement("span");
   const parts = [];
 
@@ -3963,7 +3975,11 @@ async function handleBulkDelete() {
 
 function importStrategyMessage(strategy, fileName, isCard = false) {
   if (isCard) {
-    return `"${fileName}" is a character card and is added to the project; an embedded lorebook is extracted with it. The current project is saved as a local backup first.`;
+    if (strategy === "merge") {
+      return `"${fileName}" is a character card. A card with the same name is updated in place and keeps its identity; an embedded lorebook merges into the lorebook of the same name. The current project is saved as a local backup first.`;
+    }
+
+    return `"${fileName}" is a character card and is added to the project as a new card; an embedded lorebook is extracted with it. The current project is saved as a local backup first.`;
   }
 
   if (strategy === "append") {
@@ -4004,6 +4020,10 @@ function importResultMessage(strategy, parsed, stats, entryCount) {
 
     if (stats.entriesAdded) {
       parts.push(`${stats.entriesAdded} added`);
+    }
+
+    if (stats.cardsUpdated) {
+      parts.push(`${stats.cardsUpdated} ${stats.cardsUpdated === 1 ? "card" : "cards"} updated`);
     }
 
     return `Merged ${parsed.format}: ${parts.join(", ") || "no entry changes"}`;
@@ -4292,7 +4312,8 @@ async function handleImport(file, { fileHandle = null } = {}) {
   const entryCount = parsed.project.books.reduce((total, book) => total + book.entries.length, 0);
   const cardCount = parsed.project.cards?.length ?? 0;
   const cardName = parsed.project.cards?.[0]?.name?.trim() ?? "";
-  let strategy = parsed.formatId === "card" ? "append" : "replace";
+  const reimport = parsed.formatId === "card" && (parsed.project.cards ?? []).some((card) => getCards().some((existing) => existing.name.trim().toLowerCase() === card.name.trim().toLowerCase() && card.name.trim()));
+  let strategy = parsed.formatId === "card" ? (reimport ? "merge" : "append") : "replace";
   const buildImportReview = (value) => {
     const merged = mergeProject(getState(), parsed.project, value);
     const details = [

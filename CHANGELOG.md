@@ -16,6 +16,8 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- Re-importing a character card diffs it against the existing one and, by default, updates it in place instead of adding a duplicate. Cards now appear in the import review, the session summary and revision deltas.
+
 - Library multi-select: pick lorebooks and cards, then add or remove a tag, export the selection as a project file, or delete them with one confirmation.
 - A header File menu groups Open, Save, Import and Export; Open and Save still appear only where the browser supports them.
 

@@ -956,6 +956,28 @@ export const scenarios = [
     }
   },
   {
+    name: "re-importing a card updates it in place and shows a card diff",
+    timeout: 40000,
+    async run(page, context) {
+      await resetApp(page);
+      await page.setFileInput("#import-input", [context.fixture("card-mara.png")]);
+      await page.waitFor('document.querySelector("#diff-dialog")?.open');
+      await page.click("#diff-accept");
+      await page.waitFor('!document.querySelector("#diff-dialog")?.open');
+
+      await page.setFileInput("#import-input", [context.fixture("card-mara.png")]);
+      await page.waitFor('document.querySelector("#diff-dialog")?.open');
+      assert.equal(await page.evaluate('document.querySelector("#diff-controls select")?.value ?? ""'), "merge");
+      assert.match(await page.evaluate('document.querySelector("#diff-message").textContent'), /updated in place/i);
+      await page.click("#diff-accept");
+      await page.waitFor('!document.querySelector("#diff-dialog")?.open');
+
+      await openPage(page, "library");
+      await page.waitFor('document.querySelectorAll("#project-list .project-tile[data-kind=card]").length === 1');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "creates, links and exports a character card",
     async run(page) {
       await resetApp(page);

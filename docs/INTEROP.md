@@ -101,6 +101,8 @@ Native export stays silent because it drops nothing.
 - Size and schema limits (25 MB, 1000 lorebooks, 50,000 entries) reject oversized files before parsing.
 - The preview lists detected format, file name, counts, adapter warnings and a diff of added, removed
   and changed books and entries.
+- Cards take part in the same strategies: merge updates a card of the same name in place, append adds a new
+  card, and the import diff lists card changes.
 - Merge strategies: replace the project, append to lorebooks matched by name, or merge entries matched
   by title. The diff and confirm label update live when the strategy changes.
 - Duplicate source UIDs are remapped on import.

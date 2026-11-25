@@ -175,14 +175,15 @@ defect or risk, **S3** improvement.
 
 Cards are a first-class record (G-16); the container is an adapter (A-8). Record, PNG/CHARX/JSON
 adapters, extraction, linking, the library, the full field set, token report, checks and V2/V3 export have
-shipped (v0.8.0+). Open parity work: diff on re-import (DEF-118),
+shipped (v0.8.0+). Open parity work: card revisions (DEF-118),
 templates (DEF-119), a prompt-assembly preview (DEF-120), schema/print/search
 coverage (DEF-122), extension editors (DEF-123) and a full-page workspace (DEF-124).
 
 - [x] The Library is the home hub for lorebooks and cards; cards have an autosaving editor page; the left menu is editor-only (DEF-124, U-7 to U-9, U-12).
 - [x] The Library filters by tag and pins projects to the top (DEF-117; pins live in localStorage).
 - [ ] `S` `P5` Library grid/list toggle and kind-specific lorebook thumbnails (DEF-135).
-- [ ] `M` `P5` Card diff and merge on re-import, card revisions (DEF-118).
+- [x] Card diff and merge on re-import (DEF-118).
+- [ ] `S` `P5` Card revisions in History (DEF-118).
 - [ ] `M` `P5` Card templates (DEF-119).
 - [ ] `H` `P5` A prompt-assembly preview of card plus book (DEF-120).
 - [x] Library multi-select with bulk tag, export and delete for lorebooks and cards (DEF-121).

@@ -25,6 +25,33 @@ const ENTRY_FIELDS = [
   { key: "probability", label: "Trigger chance", kind: "percent" }
 ];
 
+const CARD_FIELDS = [
+  { key: "name", label: "Name", kind: "text" },
+  { key: "nickname", label: "Nickname", kind: "text" },
+  { key: "description", label: "Description", kind: "long" },
+  { key: "personality", label: "Personality", kind: "long" },
+  { key: "scenario", label: "Scenario", kind: "long" },
+  { key: "firstMessage", label: "First message", kind: "long" },
+  { key: "alternateGreetings", label: "Alternate greetings", kind: "blocks" },
+  { key: "groupOnlyGreetings", label: "Group-only greetings", kind: "blocks" },
+  { key: "exampleMessages", label: "Example messages", kind: "long" },
+  { key: "systemPrompt", label: "System prompt", kind: "long" },
+  { key: "postHistoryInstructions", label: "Post-history instructions", kind: "long" },
+  { key: "depthPrompt", label: "Depth prompt", kind: "long", read: (card) => card?.depthPrompt?.prompt ?? "" },
+  { key: "creator", label: "Creator", kind: "text" },
+  { key: "creatorNotes", label: "Creator notes", kind: "long" },
+  { key: "characterVersion", label: "Character version", kind: "text" },
+  { key: "tags", label: "Tags", kind: "list" },
+  { key: "talkativeness", label: "Talkativeness", kind: "number" },
+  { key: "avatarDataUrl", label: "Avatar", kind: "avatar" }
+];
+
+function readField(field, record) {
+  return field.read ? field.read(record) : record?.[field.key];
+}
+
+const BLOCK_SEPARATOR = "\n\n---\n\n";
+
 function normalizeName(value) {
   return String(value ?? "").trim().toLocaleLowerCase();
 }
@@ -60,6 +87,14 @@ function formatValue(field, value) {
     return value ? "On" : "Off";
   }
 
+  if (field.kind === "avatar") {
+    return value ? "Image set" : "None";
+  }
+
+  if (field.kind === "blocks") {
+    return Array.isArray(value) ? value.join(BLOCK_SEPARATOR) : "";
+  }
+
   if (field.kind === "position") {
     return POSITION_LABELS.get(value) ?? String(value ?? "Before character");
   }
@@ -80,7 +115,7 @@ function createFieldChange(field, before, after) {
     after,
     beforeLabel: formatValue(field, before),
     afterLabel: formatValue(field, after),
-    lines: field.kind === "long" ? diffText(before, after) : null
+    lines: field.kind === "long" ? diffText(before, after) : field.kind === "blocks" ? diffText(formatValue(field, before), formatValue(field, after)) : null
   };
 }
 
@@ -88,8 +123,8 @@ function diffFields(before, after, fields) {
   const changes = [];
 
   for (const field of fields) {
-    if (!sameValue(before?.[field.key], after?.[field.key])) {
-      changes.push(createFieldChange(field, before?.[field.key], after?.[field.key]));
+    if (!sameValue(readField(field, before), readField(field, after))) {
+      changes.push(createFieldChange(field, readField(field, before), readField(field, after)));
     }
   }
 
@@ -286,7 +321,7 @@ function matchBooks(beforeBooks, afterBooks) {
   return matches;
 }
 
-function matchEntries(beforeEntries, afterEntries) {
+function matchRecords(beforeEntries, afterEntries, readers) {
   const matches = new Map();
   const usedBefore = new Set();
 
@@ -316,11 +351,48 @@ function matchEntries(beforeEntries, afterEntries) {
     }
   }
 
-  matchBy((entry) => (entry?.id ? String(entry.id) : ""));
-  matchBy(normalizeSourceId);
-  matchBy((entry) => normalizeName(entry?.title));
+  readers.forEach(matchBy);
 
   return matches;
+}
+
+const readId = (record) => (record?.id ? String(record.id) : "");
+
+function matchEntries(beforeEntries, afterEntries) {
+  return matchRecords(beforeEntries, afterEntries, [readId, normalizeSourceId, (entry) => normalizeName(entry?.title)]);
+}
+
+function matchCards(beforeCards, afterCards) {
+  return matchRecords(beforeCards, afterCards, [readId, (card) => normalizeName(card?.name)]);
+}
+
+function createCardDiff(beforeCard, afterCard) {
+  const title = (afterCard?.name ?? beforeCard?.name ?? "").trim() || "Untitled card";
+
+  if (!beforeCard) {
+    return { status: "added", title, before: null, after: afterCard, changes: [] };
+  }
+
+  if (!afterCard) {
+    return { status: "removed", title, before: beforeCard, after: null, changes: [] };
+  }
+
+  const changes = diffFields(beforeCard, afterCard, CARD_FIELDS);
+  return { status: changes.length ? "changed" : "unchanged", title, before: beforeCard, after: afterCard, changes };
+}
+
+function diffCards(beforeCards, afterCards) {
+  const matches = matchCards(beforeCards, afterCards);
+  const usedBefore = new Set(matches.values());
+  const cards = afterCards.map((card, index) => createCardDiff(matches.has(index) ? beforeCards[matches.get(index)] : null, card));
+
+  beforeCards.forEach((card, index) => {
+    if (!usedBefore.has(index)) {
+      cards.push(createCardDiff(card, null));
+    }
+  });
+
+  return cards;
 }
 
 function createEntryDiff(beforeEntry, afterEntry) {
@@ -420,7 +492,11 @@ function createSummary() {
     entriesRemoved: 0,
     entriesChanged: 0,
     entriesUnchanged: 0,
-    fieldsChanged: 0
+    fieldsChanged: 0,
+    cardsAdded: 0,
+    cardsRemoved: 0,
+    cardsChanged: 0,
+    cardsUnchanged: 0
   };
 }
 
@@ -480,8 +556,22 @@ export function diffProjects(beforeProject, afterProject) {
     }
   }
 
+  const cards = diffCards(
+    Array.isArray(beforeProject?.cards) ? beforeProject.cards : [],
+    Array.isArray(afterProject?.cards) ? afterProject.cards : []
+  );
+  const cardKeys = { added: "cardsAdded", removed: "cardsRemoved", changed: "cardsChanged", unchanged: "cardsUnchanged" };
+
+  for (const card of cards) {
+    summary[cardKeys[card.status]] += 1;
+    summary.fieldsChanged += card.changes.length;
+  }
+
   const hasChanges = (
-    summary.booksAdded
+    summary.cardsAdded
+    + summary.cardsRemoved
+    + summary.cardsChanged
+    + summary.booksAdded
     + summary.booksRemoved
     + summary.booksChanged
     + summary.entriesAdded
@@ -492,6 +582,7 @@ export function diffProjects(beforeProject, afterProject) {
   return {
     summary,
     books,
+    cards,
     hasChanges
   };
 }

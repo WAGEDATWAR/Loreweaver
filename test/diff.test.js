@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { diffProjects, diffText } from "../src/diff.js";
-import { createEntry, createProject } from "../src/schema.js";
+import { createCard, createEntry, createProject } from "../src/schema.js";
 
 function book(name, entries = [], extra = {}) {
   return {
@@ -74,6 +74,10 @@ test("reports added, removed, and changed books and entries", () => {
     entriesRemoved: 2,
     entriesChanged: 1,
     entriesUnchanged: 0,
+    cardsAdded: 0,
+    cardsRemoved: 0,
+    cardsChanged: 0,
+    cardsUnchanged: 0,
     fieldsChanged: 1
   });
 
@@ -139,4 +143,24 @@ test("returns no changes for equivalent projects", () => {
   assert.equal(diff.summary.booksUnchanged, 1);
   assert.equal(diff.summary.entriesUnchanged, 1);
   assert.equal(diff.summary.fieldsChanged, 0);
+});
+
+test("diffs cards by id then by name", () => {
+  const before = createProject({ cards: [createCard({ id: "card_a", name: "Mara", description: "one\ntwo", alternateGreetings: ["hi"] }), createCard({ id: "card_gone", name: "Gone" })] });
+  const after = createProject({ cards: [createCard({ id: "card_b", name: "Mara", description: "one\nthree", alternateGreetings: ["hi", "yo"] }), createCard({ id: "card_new", name: "Fresh" })] });
+  const diff = diffProjects(before, after);
+
+  assert.equal(diff.hasChanges, true);
+  assert.deepEqual([diff.summary.cardsAdded, diff.summary.cardsRemoved, diff.summary.cardsChanged], [1, 1, 1]);
+  const changed = diff.cards.find((card) => card.status === "changed");
+  assert.deepEqual(changed.changes.map((change) => change.key), ["description", "alternateGreetings"]);
+  assert.ok(changed.changes[0].lines.some((line) => line.type === "add" && line.text === "three"));
+});
+
+test("identical cards report no changes", () => {
+  const card = createCard({ id: "card_a", name: "Mara" });
+  const diff = diffProjects(createProject({ cards: [card] }), createProject({ cards: [{ ...card }] }));
+
+  assert.equal(diff.hasChanges, false);
+  assert.equal(diff.summary.cardsUnchanged, 1);
 });

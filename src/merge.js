@@ -1,4 +1,4 @@
-import { createBook, createEntry, createProject } from "./schema.js";
+import { createBook, createCard, createEntry, createProject } from "./schema.js";
 import { createId } from "./utils.js";
 
 export const IMPORT_STRATEGIES = [
@@ -115,7 +115,53 @@ function countEntries(books) {
   return (books ?? []).reduce((total, book) => total + (book?.entries?.length ?? 0), 0);
 }
 
-function finalizeProject(books, current, incoming, strategy) {
+function findMatchingCard(cards, name, matched) {
+  const target = normalizeName(name);
+
+  if (!target) {
+    return -1;
+  }
+
+  const hits = cards
+    .map((card, index) => ({ card, index }))
+    .filter((item) => !matched.has(item.index) && normalizeName(item.card.name) === target);
+
+  return hits.length === 1 ? hits[0].index : -1;
+}
+
+function mergeCards(current, incoming, strategy, bookIdMap, stats) {
+  const cards = clone(current?.cards ?? []);
+  const usedIds = new Set(cards.map((card) => card.id));
+  const allocateCardId = createIdAllocator("card", usedIds);
+  const matched = new Set();
+
+  for (const card of incoming?.cards ?? []) {
+    const remapped = card.bookId ? (bookIdMap.get(card.bookId) ?? card.bookId) : null;
+    const matchIndex = strategy === "merge" ? findMatchingCard(cards, card.name, matched) : -1;
+
+    if (matchIndex === -1) {
+      cards.push(createCard({ ...clone(card), id: allocateCardId(card.id), bookId: remapped }));
+      stats.cardsAdded += 1;
+      continue;
+    }
+
+    matched.add(matchIndex);
+    const existing = cards[matchIndex];
+    cards[matchIndex] = createCard({
+      ...clone(card),
+      id: existing.id,
+      createdAt: existing.createdAt,
+      bookId: remapped ?? existing.bookId,
+      extensions: { ...existing.extensions, ...clone(card.extensions) },
+      updatedAt: Date.now()
+    });
+    stats.cardsUpdated += 1;
+  }
+
+  return cards;
+}
+
+function finalizeProject(books, current, incoming, strategy, cards = null) {
   const activeBookId = strategy === "replace"
     ? incoming.activeBookId
     : current.activeBookId;
@@ -127,20 +173,18 @@ function finalizeProject(books, current, incoming, strategy) {
   const activeEntryId = activeBook?.entries.some((entry) => entry.id === requestedEntryId)
     ? requestedEntryId
     : activeBook?.entries[0]?.id ?? null;
-  const cards = strategy === "replace"
-    ? clone(incoming?.cards ?? [])
-    : [...clone(current?.cards ?? []), ...clone(incoming?.cards ?? [])];
+  const resultCards = cards ?? clone(incoming?.cards ?? []);
 
   return createProject({
     books,
-    cards,
+    cards: resultCards,
     activeBookId: resolvedBookId,
     activeEntryId
   });
 }
 
 function cardStats(cards) {
-  return { cardsAdded: cards.length };
+  return { cardsAdded: cards.length, cardsUpdated: 0 };
 }
 
 export function mergeProject(current, incoming, strategy = "replace") {
@@ -177,12 +221,16 @@ export function mergeProject(current, incoming, strategy = "replace") {
   const allocateBookId = createIdAllocator("book", usedBookIds);
   const allocateEntryId = createIdAllocator("entry", usedEntryIds);
   const matchedBooks = new Set();
+  const bookIdMap = new Map();
+  stats.cardsAdded = 0;
 
   for (const incomingBook of incomingBooks) {
     const matchIndex = findMatchingBook(books, incomingBook.name, matchedBooks);
 
     if (matchIndex === -1) {
-      books.push(copyBook(incomingBook, allocateBookId, allocateEntryId));
+      const copy = copyBook(incomingBook, allocateBookId, allocateEntryId);
+      books.push(copy);
+      bookIdMap.set(incomingBook.id, copy.id);
       stats.booksAdded += 1;
       stats.entriesAdded += incomingBook.entries?.length ?? 0;
       continue;
@@ -191,6 +239,7 @@ export function mergeProject(current, incoming, strategy = "replace") {
     matchedBooks.add(matchIndex);
     stats.booksMatched += 1;
     const target = books[matchIndex];
+    bookIdMap.set(incomingBook.id, target.id);
 
     if (selected === "append") {
       for (const entry of incomingBook.entries ?? []) {
@@ -218,7 +267,7 @@ export function mergeProject(current, incoming, strategy = "replace") {
   }
 
   return {
-    project: finalizeProject(books, current, incoming, selected),
+    project: finalizeProject(books, current, incoming, selected, mergeCards(current, incoming, selected, bookIdMap, stats)),
     stats
   };
 }
