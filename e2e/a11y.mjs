@@ -312,6 +312,8 @@ async function main() {
       }
 
       await state.setup(page);
+      // A toast that is still fading in has a blended colour; audit it once it has settled.
+      await page.waitFor('[...document.querySelectorAll(".toast")].every((node) => getComputedStyle(node).opacity === "1")');
 
       const violations = await page.evaluate(AXE_RUN);
       let count = 0;
