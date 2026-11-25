@@ -169,6 +169,15 @@ const states = [
     await page.waitFor('document.querySelector("#card-history-dialog")?.open');
     await page.waitFor('!document.querySelector("#card-history-summary").textContent.startsWith("Looking")');
   } },
+  { name: "card review with prompt preview", setup: async (page) => {
+    await openPage(page, "library");
+    await page.click("#new-card-template-btn");
+    await page.waitFor('document.querySelector("#card-template-dialog")?.open');
+    await page.click("#card-template-list [data-template-id=card-character]");
+    await page.waitFor('!document.querySelector("#page-card")?.hidden');
+    await page.click('#app-nav a[data-view="card-review"]');
+    await page.waitFor('document.querySelectorAll("#preview-output .preview-segment").length >= 1');
+  } },
   { name: "app menu", setup: async (page) => {
     await page.click("#app-menu-btn");
     await page.waitFor('!document.querySelector("#app-menu")?.hidden');

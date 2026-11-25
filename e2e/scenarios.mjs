@@ -1033,6 +1033,36 @@ export const scenarios = [
     }
   },
   {
+    name: "previews the assembled prompt for a card and its linked lorebook",
+    timeout: 40000,
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "library");
+      await page.click("#new-card-btn");
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      await setValue(page, "#card-name", "Mara");
+      await setValue(page, "#card-description", "{{char}} is a smuggler.");
+      await page.evaluate(`(() => {
+        const select = document.querySelector("#card-link-book");
+        select.value = select.options[1].value;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        return true;
+      })()`);
+      await sleep(500);
+
+      await page.click('#app-nav a[data-view="card-review"]');
+      await page.waitFor('!document.querySelector("#page-review")?.hidden');
+      await page.waitFor('document.querySelectorAll("#preview-output .preview-segment").length >= 1');
+      assert.match(await page.evaluate('document.querySelector("#preview-output").textContent'), /Mara is a smuggler/);
+      const before = await page.evaluate('document.querySelectorAll("#preview-output .preview-segment").length');
+
+      await setValue(page, "#preview-scene", "Sam: We sail past the harbour and meet Aurora.");
+      await page.waitFor(`document.querySelectorAll("#preview-output .preview-segment").length > ${before}`);
+      assert.match(await page.evaluate('document.querySelector("#preview-output").textContent'), /Chat so far/);
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "creates, links and exports a character card",
     async run(page) {
       await resetApp(page);

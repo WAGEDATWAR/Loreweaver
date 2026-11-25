@@ -61,7 +61,6 @@ never learns a card quirk.
 | DEF-089 | Bind a lorebook to a card and export them together | card dialog book select; PNG and CHARX write the book | P5 | done |
 | DEF-090 | A card library with preview and avatar | sidebar card list, avatar thumbnails, editor dialog | P5 | done |
 | DEF-091 | Card field parity checklist | `docs/reference/PARITY.md` C section | P5 | done |
-| DEF-120 | A prompt-assembly preview: card plus linked book against a context budget | extends the simulation (C-5) so authors see what a frontend would send | P5 | scheduled |
 | DEF-122 | Cards in the schema reference page, print export and global search | the schema page and print view cover books only | P5 | scheduled |
 | DEF-123 | Editors for other card extensions: world, regex scripts, V3 assets | preserved verbatim today, not editable | post-v1 | scheduled |
 | DEF-124 | A full-page card workspace instead of a dialog | the card page (`#/card/<id>`) with autosave, section menu, token and checks panel | P5 | done |

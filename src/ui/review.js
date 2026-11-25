@@ -1,5 +1,6 @@
 import { VALIDATION_LABELS } from "../validation.js";
 import { CARD_ISSUE_LABELS } from "../cardValidation.js";
+import { PREVIEW_SECTIONS } from "../promptPreview.js";
 
 const number = new Intl.NumberFormat();
 
@@ -112,7 +113,101 @@ export function renderBookReview(root, review, { name, approximate }) {
   root.replaceChildren(overviewSection, issuesSection, simulateSection);
 }
 
-export function renderCardReview(root, review, { name, approximate }) {
+function previewSection({ scene, user, linkedBook }) {
+  const node = section("Prompt preview", "review-preview-title");
+  const intro = el("p", "hint", linkedBook
+    ? `What a frontend would send for this card and "${linkedBook}". Paste a few recent chat messages to see which lorebook entries activate.`
+    : "What a frontend would send for this card. Link a lorebook on the card to include its entries. Paste a few recent chat messages to see the chat part.");
+  const sceneField = el("div", "field");
+  const sceneLabel = el("label", "", "Chat so far");
+  const sceneInput = el("textarea");
+  const userField = el("div", "field");
+  const userLabel = el("label", "", "Your name in the chat");
+  const userInput = el("input");
+
+  sceneLabel.htmlFor = "preview-scene";
+  sceneInput.id = "preview-scene";
+  sceneInput.rows = 4;
+  sceneInput.value = scene;
+  sceneInput.placeholder = "Sam: We reach the harbour at dusk...";
+  userLabel.htmlFor = "preview-user";
+  userInput.id = "preview-user";
+  userInput.type = "text";
+  userInput.autocomplete = "off";
+  userInput.value = user;
+  sceneField.append(sceneLabel, sceneInput);
+  userField.append(userLabel, userInput);
+
+  const output = el("div", "preview-output");
+  output.id = "preview-output";
+  node.append(intro, userField, sceneField, output);
+  return node;
+}
+
+export function renderPromptPreview(root, preview, { approximate }) {
+  const prefix = approximate ? "~" : "";
+  const summary = el("p", "preview-summary");
+  const parts = [`${prefix}${number.format(preview.total)} tokens`];
+
+  if (preview.window) {
+    parts.push(`${preview.window.percent}% of ${number.format(preview.window.limit)}${preview.window.over ? " (over)" : ""}`);
+  }
+
+  for (const [key, label] of Object.entries(PREVIEW_SECTIONS)) {
+    if (preview.sections[key]) {
+      parts.push(`${label.toLowerCase()} ${prefix}${number.format(preview.sections[key])}`);
+    }
+  }
+
+  summary.textContent = parts.join(" · ");
+  summary.classList.toggle("is-over", Boolean(preview.window?.over));
+
+  const list = el("div", "preview-segments");
+
+  for (const segment of preview.segments) {
+    const details = el("details", `preview-segment preview-${segment.section}`);
+    const head = el("summary", "preview-segment-head");
+    const bar = el("span", "preview-bar");
+    const fill = el("span", "preview-bar-fill");
+
+    fill.style.width = `${preview.total ? Math.max(2, Math.round((segment.tokens / preview.total) * 100)) : 0}%`;
+    bar.append(fill);
+    bar.setAttribute("aria-hidden", "true");
+    head.append(
+      el("span", "preview-segment-label", segment.label),
+      el("span", "preview-segment-tokens", `${prefix}${number.format(segment.tokens)} tokens`),
+      bar
+    );
+    details.append(head);
+
+    if (segment.entries?.length) {
+      details.append(el("p", "hint", `Entries: ${segment.entries.join(", ")}`));
+    }
+
+    details.append(el("pre", "simulation-output", segment.text));
+    list.append(details);
+  }
+
+  const children = [summary];
+
+  if (preview.lore) {
+    const note = `${preview.lore.activated} lorebook ${preview.lore.activated === 1 ? "entry activates" : "entries activate"}${preview.lore.budget ? ` (${prefix}${number.format(preview.lore.tokens)} of a ${number.format(preview.lore.budget)} token budget${preview.lore.overBudget ? ", over" : ""})` : ""}.`;
+    children.push(el("p", preview.lore.overBudget ? "hint is-over" : "hint", note));
+  }
+
+  if (!preview.segments.length) {
+    children.push(el("p", "validation-empty", "The card has no text yet."));
+  } else {
+    const copy = el("button", "btn", "Copy assembled prompt");
+    copy.type = "button";
+    copy.id = "preview-copy-btn";
+    children.push(list, copy);
+  }
+
+  root.replaceChildren(...children);
+}
+
+export function renderCardReview(root, review, { name, approximate, preview }) {
   const { tokens } = review;
   const prefix = approximate ? "~" : "";
   const stats = el("div", "review-stats");
@@ -134,5 +229,5 @@ export function renderCardReview(root, review, { name, approximate }) {
     dataset: { reviewField: issue.field }
   })));
 
-  root.replaceChildren(overviewSection, issuesSection);
+  root.replaceChildren(overviewSection, issuesSection, previewSection(preview));
 }

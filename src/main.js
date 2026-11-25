@@ -145,7 +145,8 @@ import { clamp } from "./utils.js";
 import { createTabGuard } from "./tabGuard.js";
 import { VIEWS, getView, isEditorView, parseRoute, routeHref, viewForShortcut } from "./views.js";
 import { buildBookReview, buildCardReview, CARD_FIELD_TARGETS } from "./review.js";
-import { renderBookReview, renderCardReview } from "./ui/review.js";
+import { buildPromptPreview } from "./promptPreview.js";
+import { renderBookReview, renderCardReview, renderPromptPreview } from "./ui/review.js";
 import { buildProjectItems, collectTags, filterProjects, sortProjects } from "./projects.js";
 import { renderProjectList } from "./ui/projects.js";
 import { selectEntriesByTokenSize } from "./bulk.js";
@@ -972,6 +973,31 @@ function reviewCount(text) {
   return Number.isFinite(measured) ? measured : hubEstimate(text);
 }
 
+let previewScene = "";
+let previewUser = "You";
+let previewPrompt = "";
+
+function renderPreviewOutput() {
+  const output = document.querySelector("#preview-output");
+  const card = getCards().find((item) => item.id === currentRouteId);
+
+  if (!output || !card) {
+    return;
+  }
+
+  const book = getState().books.find((item) => item.id === card.bookId) ?? null;
+
+  if (book) {
+    for (const entry of book.entries) {
+      tokenizer.request(entry.content);
+    }
+  }
+
+  const preview = buildPromptPreview(card, book, { scene: previewScene, user: previewUser, count: reviewCount, contextWindow: tokenSettings.contextWindow });
+  previewPrompt = preview.text;
+  renderPromptPreview(output, preview, { approximate: !tokenizer.isReady() });
+}
+
 function renderReview() {
   const state = getState();
 
@@ -982,8 +1008,15 @@ function renderReview() {
       return;
     }
 
-    refs.reviewSubtitle.textContent = "What a frontend sends for this card, and what to fix first.";
-    renderCardReview(refs.reviewBody, buildCardReview(card, { count: reviewCount, bookExists: (id) => state.books.some((book) => book.id === id) }), { name: card.name.trim() || "Untitled card", approximate: !tokenizer.isReady() });
+    const linked = state.books.find((book) => book.id === card.bookId) ?? null;
+
+    refs.reviewSubtitle.textContent = "What a frontend sends for this card, what it would assemble, and what to fix first.";
+    renderCardReview(refs.reviewBody, buildCardReview(card, { count: reviewCount, bookExists: (id) => state.books.some((book) => book.id === id) }), {
+      name: card.name.trim() || "Untitled card",
+      approximate: !tokenizer.isReady(),
+      preview: { scene: previewScene, user: previewUser, linkedBook: linked ? linked.name.trim() || "Untitled Lorebook" : "" }
+    });
+    renderPreviewOutput();
     return;
   }
 
@@ -5808,7 +5841,28 @@ refs.menuShortcutsBtn.addEventListener("click", openShortcutsDialog);
 refs.navCollapse.addEventListener("click", toggleNav);
 refs.navOpenBtn.addEventListener("click", () => setMobileNavOpen(!refs.shell.classList.contains("is-nav-open")));
 
-refs.reviewBody.addEventListener("click", (event) => {
+refs.reviewBody.addEventListener("input", (event) => {
+  if (event.target.id === "preview-scene") {
+    previewScene = event.target.value;
+    renderPreviewOutput();
+  } else if (event.target.id === "preview-user") {
+    previewUser = event.target.value;
+    renderPreviewOutput();
+  }
+});
+
+refs.reviewBody.addEventListener("click", async (event) => {
+  if (event.target.closest("#preview-copy-btn")) {
+    try {
+      await navigator.clipboard.writeText(previewPrompt);
+      toast("Assembled prompt copied", "success");
+    } catch {
+      toast("Couldn't copy to the clipboard.", "error");
+    }
+
+    return;
+  }
+
   if (event.target.closest("#review-simulate-btn")) {
     openSimulationDialog();
     return;

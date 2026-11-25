@@ -16,6 +16,8 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- Prompt preview on the card Review page: the assembled prompt for a card, its linked lorebook and a pasted chat excerpt, with tokens per part, the context window and the lorebook budget, and a copy button.
+
 - Card history: a History dialog on the card page lists earlier versions from your snapshots, shows what differs, compares and restores one. Snapshots now also count cards.
 - Card templates: three built-in starters and your own, from the Library, the card page and the palette; "Save this card as a template" keeps its text and settings.
 

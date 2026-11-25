@@ -43,6 +43,18 @@ the entry.
 The simulation is a preview, not a runtime: it does not emulate recursion, groups, cooldowns or scan
 depth. Those stay preserved settings the consumer applies.
 
+### 4.1 Prompt preview
+
+The card Review page assembles what a frontend would send for one card, its linked lorebook and a pasted
+chat excerpt (`src/promptPreview.js`). Segments follow the common order: system prompt, lorebook before the
+character, description, personality, scenario, lorebook after the character, example messages, the opening
+message, the chat, lorebook at the author's note and at depth, the depth prompt and the post-history
+instructions. `{{char}}`, `{{user}}`, `<BOT>` and `<USER>` are filled. Lorebook entries activate through the
+same `simulateContext` (C-4), scanning the opening message and the chat. The preview shows tokens per segment,
+the running total against the context window, and the lorebook against its own budget, and copies the
+assembled text. Like the simulation it is a preview (C-5): each frontend's template, recursion, groups and
+scan depth stay with the frontend.
+
 ## 5. Validation overlap
 
 `src/validation.js` shares matching rules with the simulation so a key the simulator can hit is the same
