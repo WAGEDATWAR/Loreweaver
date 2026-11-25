@@ -122,7 +122,8 @@ import { SIMULATION_REASONS, simulateContext } from "./simulation.js";
 import { buildActivationGraph } from "./activationGraph.js";
 import { createTokenizer, estimateTokens } from "./tokenizer/client.js";
 import { buildBookOverview } from "./overview.js";
-import { ENTRY_TEMPLATES, buildTemplatePatch, getEntryTemplate } from "./templates.js";import { showDiffDialog } from "./ui/diff.js";
+import { CARD_TEMPLATES, ENTRY_TEMPLATES, buildTemplatePatch, getCardTemplate, getEntryTemplate } from "./templates.js";
+import { cardRestorePatch, cardTemplateFromCard, compareCardVersion, matchCardInProject } from "./cardHistory.js";import { showDiffDialog } from "./ui/diff.js";
 import { applyScopes, orderByRecent, pushRecent } from "./commands.js";
 import { openCommandPalette } from "./ui/commandPalette.js";
 import { renderEditor, syncEntryStats } from "./ui/editor.js";
@@ -407,6 +408,16 @@ const refs = {
   templateDialog: document.querySelector("#template-dialog"),
   templateList: document.querySelector("#template-list"),
   templateCloseBtn: document.querySelector("#template-close"),
+  cardTemplateBtn: document.querySelector("#card-template-btn"),
+  cardHistoryBtn: document.querySelector("#card-history-btn"),
+  newCardTemplateBtn: document.querySelector("#new-card-template-btn"),
+  cardTemplateDialog: document.querySelector("#card-template-dialog"),
+  cardTemplateList: document.querySelector("#card-template-list"),
+  cardTemplateCloseBtn: document.querySelector("#card-template-close"),
+  cardHistoryDialog: document.querySelector("#card-history-dialog"),
+  cardHistoryList: document.querySelector("#card-history-list"),
+  cardHistorySummary: document.querySelector("#card-history-summary"),
+  cardHistoryCloseBtn: document.querySelector("#card-history-close"),
   bulkBar: document.querySelector("#bulk-bar"),
   bulkCount: document.querySelector("#bulk-count"),
   bulkEnableBtn: document.querySelector("#bulk-enable-btn"),
@@ -1890,6 +1901,8 @@ function buildCommands() {
     { title: "Select entries by token size", keywords: ["bulk", "select", "tokens", "size"], run: openBulkSizeDialog },
     { title: "Bulk find and replace", hint: "Ctrl+H", keywords: ["replace", "bulk", "find"], run: openReplaceDialog },
     { title: "New character card", keywords: ["card", "character", "avatar"], run: handleNewCard },
+    { title: "New character card from template", keywords: ["card", "character", "starter"], run: openCardTemplateDialog },
+    ...(currentView === "card" ? [{ title: "Card history", keywords: ["card", "snapshots", "restore", "versions"], run: () => refs.cardHistoryBtn.click() }] : []),
     { title: "Toggle light theme", keywords: ["theme", "colour", "dark"], run: toggleTheme },
     { title: "Keyboard shortcuts", keywords: ["keys", "help"], run: openShortcutsDialog },
     { title: "Schema reference", keywords: ["schema", "docs", "fields"], run: openSchemaDialog },
@@ -2970,7 +2983,7 @@ async function renderHistoryDialog() {
     reason.className = "history-item-reason";
     reason.textContent = revision.reason;
     meta.className = "history-item-meta";
-    meta.textContent = `${createdAt} · ${revision.books} ${revision.books === 1 ? "lorebook" : "lorebooks"} · ${revision.entries} ${revision.entries === 1 ? "entry" : "entries"}`;
+    meta.textContent = `${createdAt} · ${revision.books} ${revision.books === 1 ? "lorebook" : "lorebooks"} · ${revision.entries} ${revision.entries === 1 ? "entry" : "entries"}${revision.cards ? ` · ${revision.cards} ${revision.cards === 1 ? "card" : "cards"}` : ""}`;
     actions.className = "history-item-actions";
     compare.type = "button";
     compare.className = "btn";
@@ -4164,6 +4177,217 @@ function openCardEditor(cardId) {
   refreshCardSummary();
 }
 
+function openCardTemplateDialog() {
+  renderCardTemplateDialog();
+  refs.cardTemplateDialog.showModal();
+}
+
+function renderCardTemplateDialog() {
+  const fragment = document.createDocumentFragment();
+
+  for (const template of CARD_TEMPLATES) {
+    fragment.append(templateOption(template, "Use"));
+  }
+
+  for (const template of getCustomTemplates("card")) {
+    const option = templateOption(template, "Use");
+    const remove = document.createElement("span");
+
+    remove.className = "template-option-remove";
+    remove.dataset.removeTemplateId = template.id;
+    remove.textContent = "Delete";
+    remove.setAttribute("role", "button");
+    remove.tabIndex = 0;
+    option.append(remove);
+    fragment.append(option);
+  }
+
+  if (currentView === "card" && editingCardId) {
+    const save = document.createElement("button");
+    save.type = "button";
+    save.className = "btn btn-block";
+    save.dataset.saveCardTemplate = "1";
+    save.textContent = "Save this card as a template";
+    fragment.append(save);
+  }
+
+  refs.cardTemplateList.replaceChildren(fragment);
+}
+
+function handleCardTemplatePick(templateId) {
+  const custom = getCustomTemplates("card").find((template) => template.id === templateId);
+  const template = custom ?? getCardTemplate(templateId);
+
+  if (!template) {
+    return;
+  }
+
+  refs.cardTemplateDialog.close();
+  const card = addCard(createCard({ ...structuredClone(template.patch), name: "" }));
+
+  if (!card) {
+    return;
+  }
+
+  renderAll();
+  scheduleSave();
+  goToView("card", card.id);
+  refs.cardName.focus();
+  toast(`${template.name} card started`, "success");
+}
+
+async function handleSaveCardAsTemplate() {
+  const draft = currentCardDraft();
+  const accepted = await confirmAction({
+    title: "Save as template?",
+    message: `The text fields, greetings and settings of "${draft.name.trim() || "Untitled card"}" are saved as a reusable template. The name, picture and lorebook link are not.`,
+    confirmLabel: "Save template",
+    tone: "primary"
+  });
+
+  if (!accepted) {
+    return;
+  }
+
+  saveCustomTemplate({ name: draft.name.trim() || "Untitled card template", patch: cardTemplateFromCard(draft), kind: "card" });
+  scheduleSave();
+  renderCardTemplateDialog();
+  toast("Card template saved", "success");
+}
+
+let cardHistoryContext = null;
+
+async function openCardHistory() {
+  commitCard();
+  const card = getCards().find((item) => item.id === editingCardId);
+
+  if (!card) {
+    return;
+  }
+
+  cardHistoryContext = { cardId: card.id, versions: new Map() };
+  refs.cardHistorySummary.textContent = "Looking through your snapshots…";
+  refs.cardHistoryList.replaceChildren();
+
+  if (!refs.cardHistoryDialog.open) {
+    refs.cardHistoryDialog.showModal();
+  }
+
+  const revisions = (await getRevisions()).revisions;
+  const fragment = document.createDocumentFragment();
+  let identical = 0;
+
+  for (const revision of revisions) {
+    const loaded = await loadRevision(revision.id);
+    const past = loaded.ok ? matchCardInProject(loaded.project, card) : null;
+
+    if (!past) {
+      continue;
+    }
+
+    const comparison = compareCardVersion(card, past);
+
+    if (comparison.same) {
+      identical += 1;
+      continue;
+    }
+
+    cardHistoryContext.versions.set(revision.id, { past, comparison, revision });
+    fragment.append(createCardVersionRow(revision, comparison));
+  }
+
+  refs.cardHistoryList.replaceChildren(fragment);
+  const shown = cardHistoryContext.versions.size;
+  refs.cardHistorySummary.textContent = shown
+    ? `${shown} earlier ${shown === 1 ? "version differs" : "versions differ"} from the current card.`
+    : identical
+      ? "Every snapshot that has this card matches the current version."
+      : "No snapshot contains this card yet. Save a snapshot from the lorebook History to keep one.";
+}
+
+function createCardVersionRow(revision, comparison) {
+  const item = document.createElement("article");
+  const info = document.createElement("div");
+  const reason = document.createElement("span");
+  const meta = document.createElement("span");
+  const fields = document.createElement("span");
+  const actions = document.createElement("div");
+  const createdAt = formatBackupDate(revision.createdAt);
+  const labels = comparison.labels.length > 4 ? `${comparison.labels.slice(0, 4).join(", ")} and ${comparison.labels.length - 4} more` : comparison.labels.join(", ");
+
+  item.className = "history-item";
+  info.className = "history-item-info";
+  reason.className = "history-item-reason";
+  reason.textContent = revision.reason;
+  meta.className = "history-item-meta";
+  meta.textContent = createdAt;
+  fields.className = "history-item-meta";
+  fields.textContent = `Differs in: ${labels}`;
+  actions.className = "history-item-actions";
+
+  for (const [action, label] of [["compare", "Compare"], ["restore", "Restore"]]) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn";
+    button.dataset.cardRevisionAction = action;
+    button.dataset.revisionId = revision.id;
+    button.setAttribute("aria-label", `${label} card version: ${revision.reason}, ${createdAt}`);
+    button.textContent = label;
+    actions.append(button);
+  }
+
+  info.append(reason, meta, fields);
+  item.append(info, actions);
+  return item;
+}
+
+async function handleCardVersionAction(action, revisionId) {
+  const version = cardHistoryContext?.versions.get(revisionId);
+  const card = getCards().find((item) => item.id === cardHistoryContext?.cardId);
+
+  if (!version || !card) {
+    return;
+  }
+
+  if (action === "compare") {
+    await showDiffDialog({
+      eyebrow: "Card history",
+      title: version.revision.reason,
+      message: "What changed in this card since that snapshot.",
+      details: [
+        { label: "Snapshot", value: version.revision.reason },
+        { label: "Created", value: formatBackupDate(version.revision.createdAt) }
+      ],
+      diff: version.comparison.diff,
+      confirmLabel: "Close"
+    });
+    return;
+  }
+
+  refs.cardHistoryDialog.close();
+  const accepted = await confirmAction({
+    title: "Restore this version of the card?",
+    message: `The text fields, name and settings of "${card.name.trim() || "Untitled card"}" return to the snapshot. The lorebook link stays. The current state is saved as a snapshot first.`,
+    details: [
+      { label: "Snapshot", value: version.revision.reason },
+      { label: "Differs in", value: version.comparison.labels.join(", ") }
+    ],
+    confirmLabel: "Restore card",
+    tone: "primary"
+  });
+
+  if (!accepted) {
+    return;
+  }
+
+  await recordRevision("Before restoring a card version");
+  updateCard(card.id, cardRestorePatch(version.past));
+  openCardEditor(card.id);
+  renderAll();
+  scheduleSave();
+  toast("Card version restored", "success");
+}
+
 function handleNewCard() {
   const card = addCard(createCard());
 
@@ -4524,6 +4748,54 @@ refs.cardDialog.addEventListener("change", (event) => {
 });
 
 refs.cardDelete.addEventListener("click", handleDeleteCard);
+refs.cardTemplateBtn.addEventListener("click", openCardTemplateDialog);
+refs.newCardTemplateBtn.addEventListener("click", openCardTemplateDialog);
+refs.cardHistoryBtn.addEventListener("click", () => {
+  openCardHistory().catch(() => {
+    refs.cardHistorySummary.textContent = "Couldn't read local snapshots.";
+  });
+});
+refs.cardTemplateCloseBtn.addEventListener("click", () => refs.cardTemplateDialog.close());
+refs.cardHistoryCloseBtn.addEventListener("click", () => refs.cardHistoryDialog.close());
+
+refs.cardTemplateList.addEventListener("click", (event) => {
+  const remove = event.target.closest("[data-remove-template-id]");
+
+  if (remove) {
+    deleteCustomTemplate(remove.dataset.removeTemplateId);
+    renderCardTemplateDialog();
+    scheduleSave();
+    toast("Template deleted");
+    return;
+  }
+
+  if (event.target.closest("[data-save-card-template]")) {
+    handleSaveCardAsTemplate();
+    return;
+  }
+
+  const option = event.target.closest("[data-template-id]");
+
+  if (option) {
+    handleCardTemplatePick(option.dataset.templateId);
+  }
+});
+
+refs.cardHistoryList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-card-revision-action]");
+
+  if (button) {
+    handleCardVersionAction(button.dataset.cardRevisionAction, button.dataset.revisionId);
+  }
+});
+
+for (const dialog of [refs.cardTemplateDialog, refs.cardHistoryDialog]) {
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) {
+      dialog.close();
+    }
+  });
+}
 refs.cardDuplicate.addEventListener("click", handleDuplicateCard);
 refs.cardExport.addEventListener("click", handleExportCard);
 

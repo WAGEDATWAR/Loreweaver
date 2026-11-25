@@ -1087,11 +1087,11 @@ export function linkCardBook(cardId, bookId) {
   return true;
 }
 
-export function getCustomTemplates() {
-  return state?.customTemplates ?? [];
+export function getCustomTemplates(kind = "entry") {
+  return (state?.customTemplates ?? []).filter((template) => (template.kind ?? "entry") === kind);
 }
 
-export function saveCustomTemplate({ name, patch }) {
+export function saveCustomTemplate({ name, patch, kind = "entry" }) {
   if (!state) {
     return null;
   }
@@ -1102,6 +1102,7 @@ export function saveCustomTemplate({ name, patch }) {
   state.customTemplates.push({
     id: `template_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
     name: label,
+    ...(kind === "entry" ? {} : { kind }),
     patch: clone(patch)
   });
   return state.customTemplates.at(-1);

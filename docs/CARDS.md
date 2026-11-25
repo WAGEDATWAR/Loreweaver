@@ -105,8 +105,14 @@ lorebook gets:
   and long text line by line). "Merge by title" updates the card with the same name in place (identity and
   creation date kept) and is the default when a card file matches an existing card; "Append" always adds a new
   card with a fresh id. A card follows its lorebook when that lorebook merges into an existing one.
-- Card templates, card revisions in History, a prompt-assembly preview and extension editors are
-  scheduled (DEF-118 to DEF-123). Search, filter and sort come from the shared Library hub (DEF-117).
+- Card history: snapshots already store cards. The card page's History dialog lists the snapshots whose
+  version of the card differs from the current one (matched by id, then unique name), shows the fields that
+  differ, compares them in the diff view and restores a version after saving a snapshot of the current state.
+  The lorebook link, id and dates stay with the live card. The lorebook History list also counts cards.
+- Card templates: three built-in starters (roleplay character, narrator, companion) plus your own. "Save this
+  card as a template" keeps the text fields, greetings and settings, never the name, picture or link. Custom
+  templates live with the project beside entry templates, told apart by a `kind` of `card`.
+- A prompt-assembly preview and extension editors are scheduled (DEF-120, DEF-123). Search, filter and sort come from the shared Library hub (DEF-117).
 
 ## 8. Definition of done
 

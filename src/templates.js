@@ -56,3 +56,45 @@ export function buildTemplatePatch(template) {
     content: template.content
   };
 }
+
+export const CARD_TEMPLATES = [
+  {
+    id: "card-character",
+    name: "Roleplay character",
+    description: "A character with a description, personality, scenario and opening message.",
+    patch: {
+      description: "{{char}} is a ...\n\nAppearance: \nBackground: \nGoals: ",
+      personality: "",
+      scenario: "{{char}} and {{user}} meet at ...",
+      firstMessage: "*{{char}} looks up as {{user}} approaches.* \"...\"",
+      exampleMessages: "<START>\n{{user}}: Hello.\n{{char}}: \"...\""
+    }
+  },
+  {
+    id: "card-narrator",
+    name: "Narrator / game master",
+    description: "A narrator that runs the scene instead of speaking as one character.",
+    patch: {
+      description: "{{char}} is the narrator and game master of an interactive story. {{char}} describes the world, plays every non-player character and never acts for {{user}}.",
+      scenario: "The story begins in ...",
+      firstMessage: "*The scene opens on ...*",
+      systemPrompt: "Narrate in the second person. Keep replies to a few paragraphs and end on a choice or a question for {{user}}.",
+      talkativeness: 0.7
+    }
+  },
+  {
+    id: "card-companion",
+    name: "Companion",
+    description: "A conversational companion with a stable voice and short replies.",
+    patch: {
+      description: "{{char}} is a warm, curious companion who remembers what {{user}} shares.",
+      personality: "friendly, attentive, a little playful",
+      firstMessage: "Hi {{user}}! How was your day?",
+      exampleMessages: "<START>\n{{user}}: I had a rough day.\n{{char}}: That sounds hard. Want to talk about it?"
+    }
+  }
+];
+
+export function getCardTemplate(id) {
+  return CARD_TEMPLATES.find((template) => template.id === id) ?? null;
+}

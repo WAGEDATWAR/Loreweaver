@@ -154,6 +154,21 @@ const states = [
     await page.click("#file-menu-btn");
     await page.waitFor('!document.querySelector("#file-menu")?.hidden');
   } },
+  { name: "card template dialog", setup: async (page) => {
+    await openPage(page, "library");
+    await page.click("#new-card-template-btn");
+    await page.waitFor('document.querySelector("#card-template-dialog")?.open');
+  } },
+  { name: "card history dialog", setup: async (page) => {
+    await openPage(page, "library");
+    await page.click("#new-card-template-btn");
+    await page.waitFor('document.querySelector("#card-template-dialog")?.open');
+    await page.click("#card-template-list [data-template-id=card-character]");
+    await page.waitFor('!document.querySelector("#page-card")?.hidden');
+    await page.click("#card-history-btn");
+    await page.waitFor('document.querySelector("#card-history-dialog")?.open');
+    await page.waitFor('!document.querySelector("#card-history-summary").textContent.startsWith("Looking")');
+  } },
   { name: "app menu", setup: async (page) => {
     await page.click("#app-menu-btn");
     await page.waitFor('!document.querySelector("#app-menu")?.hidden');

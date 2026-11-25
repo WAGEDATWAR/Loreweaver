@@ -55,7 +55,8 @@ function countProject(project) {
     books: project.books.length,
     entries: project.books.reduce((total, book) => (
       total + (Array.isArray(book.entries) ? book.entries.length : 0)
-    ), 0)
+    ), 0),
+    cards: Array.isArray(project.cards) ? project.cards.length : 0
   };
 }
 
@@ -424,6 +425,7 @@ export async function saveRevision(state, reason = "Manual snapshot") {
       reason: String(reason).trim().slice(0, 120) || "Snapshot",
       books: counts.books,
       entries: counts.entries,
+      cards: counts.cards,
       signature,
       bytes: serialized.length
     };

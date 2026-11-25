@@ -606,6 +606,9 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
                 <span>New character card</span>
               </button>
+              <button id="new-card-template-btn" class="btn" type="button" title="Create a character card from a template">
+                <span>Card from template</span>
+              </button>
               <button id="hub-import-btn" class="btn" type="button" title="Import a lorebook, project or card">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
                 <span>Import</span>
@@ -754,6 +757,8 @@
             </div>
             <div class="page-actions">
               <button id="card-duplicate" class="btn" type="button">Duplicate</button>
+              <button id="card-template-btn" class="btn" type="button">Templates</button>
+              <button id="card-history-btn" class="btn" type="button">History</button>
               <label class="sr-only" for="card-export-format">Export format</label>
               <select id="card-export-format" class="card-export-format">
                 <option value="png">PNG card (V3 + V2)</option>
@@ -1179,6 +1184,34 @@
       <div id="template-list" class="template-list"></div>
       <div class="dialog-actions">
         <button id="template-close" class="btn" type="button">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="card-template-dialog" class="dialog template-dialog" aria-labelledby="card-template-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading">
+        <p class="eyebrow">Templates</p>
+        <h2 id="card-template-title">Start a new character card</h2>
+        <p class="dialog-copy">Pick a starting point, then replace the placeholders with your character.</p>
+      </div>
+      <div id="card-template-list" class="template-list"></div>
+      <div class="dialog-actions">
+        <button id="card-template-close" class="btn" type="button">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="card-history-dialog" class="dialog history-dialog" aria-labelledby="card-history-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading">
+        <p class="eyebrow">History</p>
+        <h2 id="card-history-title">Card history</h2>
+        <p id="card-history-summary" class="dialog-copy" aria-live="polite">Earlier versions of this card from your snapshots.</p>
+      </div>
+      <div id="card-history-list" class="history-list"></div>
+      <div class="dialog-actions">
+        <button id="card-history-close" class="btn" type="button">Close</button>
       </div>
     </div>
   </dialog>

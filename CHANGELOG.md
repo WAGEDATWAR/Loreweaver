@@ -16,6 +16,9 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- Card history: a History dialog on the card page lists earlier versions from your snapshots, shows what differs, compares and restores one. Snapshots now also count cards.
+- Card templates: three built-in starters and your own, from the Library, the card page and the palette; "Save this card as a template" keeps its text and settings.
+
 - The command palette is scoped to the current page (entry commands on the entries page, lorebook commands on lorebook pages) and lists the five most recent commands first. Typing still searches everything.
 - Settings now holds real controls: theme and density choices, and the tokenizer and context window selects, replacing the Token settings dialog.
 

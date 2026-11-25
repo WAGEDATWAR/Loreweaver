@@ -979,6 +979,60 @@ export const scenarios = [
     }
   },
   {
+    name: "starts a card from a template and saves a card as a template",
+    timeout: 40000,
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "library");
+      await page.click("#new-card-template-btn");
+      await page.waitFor('document.querySelector("#card-template-dialog")?.open');
+      await page.click("#card-template-list [data-template-id=card-character]");
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      assert.match(await page.evaluate('document.querySelector("#card-description").value'), /{{char}}/);
+
+      await setValue(page, "#card-name", "Templated");
+      await page.click("#card-template-btn");
+      await page.waitFor('document.querySelector("#card-template-dialog")?.open');
+      await page.click("#card-template-list [data-save-card-template]");
+      await page.waitFor('document.querySelector("#confirm-dialog")?.open');
+      await page.click("#confirm-accept");
+      await page.waitFor('document.querySelectorAll("#card-template-list [data-remove-template-id]").length === 1');
+      await page.click("#card-template-close");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
+    name: "shows earlier versions of a card and restores one",
+    timeout: 50000,
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "library");
+      await page.click("#new-card-btn");
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      await setValue(page, "#card-name", "Aria");
+      await setValue(page, "#card-description", "first version");
+      await sleep(500);
+
+      await page.click("#history-btn");
+      await page.waitFor('document.querySelector("#history-dialog")?.open');
+      await page.click("#history-save-btn");
+      await page.waitFor('document.querySelectorAll("#history-list .history-item").length >= 1');
+      await page.click("#history-close");
+
+      await setValue(page, "#card-description", "second version");
+      await sleep(500);
+      await page.click("#card-history-btn");
+      await page.waitFor('document.querySelectorAll("#card-history-list .history-item").length >= 1');
+      assert.match(await page.evaluate('document.querySelector("#card-history-list").textContent'), /Description/);
+
+      await page.click('#card-history-list [data-card-revision-action="restore"]');
+      await page.waitFor('document.querySelector("#confirm-dialog")?.open');
+      await page.click("#confirm-accept");
+      await page.waitFor('document.querySelector("#card-description").value === "first version"');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "creates, links and exports a character card",
     async run(page) {
       await resetApp(page);
