@@ -52,8 +52,9 @@ message, the chat, lorebook at the author's note and at depth, the depth prompt 
 instructions. `{{char}}`, `{{user}}`, `<BOT>` and `<USER>` are filled. Lorebook entries activate through the
 same `simulateContext` (C-4), scanning the opening message and the chat. The preview shows tokens per segment,
 the running total against the context window, and the lorebook against its own budget, and copies the
-assembled text. Like the simulation it is a preview (C-5): each frontend's template, recursion, groups and
-scan depth stay with the frontend.
+assembled text. Like the simulation it is a preview (C-5): recursion, groups and scan depth stay with the frontend, and
+each frontend's own prompt template and instruct format (ChatML, Alpaca, Llama, Mistral, SillyTavern story
+strings) is not reproduced yet (DEF-136).
 
 ## 5. Validation overlap
 

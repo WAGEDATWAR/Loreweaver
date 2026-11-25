@@ -176,8 +176,7 @@ defect or risk, **S3** improvement.
 
 Cards are a first-class record (G-16); the container is an adapter (A-8). Record, PNG/CHARX/JSON
 adapters, extraction, linking, the library, the full field set, token report, checks and V2/V3 export have
-shipped (v0.8.0+). Open parity work: schema/print/search
-coverage (DEF-122), extension editors (DEF-123) and a full-page workspace (DEF-124).
+shipped (v0.8.0+). Open parity work: extension editors (DEF-123) and prompt template formats (DEF-136).
 
 - [x] The Library is the home hub for lorebooks and cards; cards have an autosaving editor page; the left menu is editor-only (DEF-124, U-7 to U-9, U-12).
 - [x] The Library filters by tag and pins projects to the top (DEF-117; pins live in localStorage).
@@ -186,7 +185,8 @@ coverage (DEF-122), extension editors (DEF-123) and a full-page workspace (DEF-1
 - [x] Card history and card templates (DEF-118, DEF-119).
 - [x] A prompt-assembly preview of card plus book on the card Review page (DEF-120).
 - [x] Library multi-select with bulk tag, export and delete for lorebooks and cards (DEF-121).
-- [ ] `L` `P5` Cards in the schema page, print export and global search (DEF-122).
+- [x] Cards in the schema page, print export and global search (DEF-122).
+- [ ] `H` `post-v1` Frontend prompt template formats in the prompt preview (DEF-136).
 
 ## Known gaps
 

@@ -61,7 +61,12 @@ never learns a card quirk.
 | DEF-089 | Bind a lorebook to a card and export them together | card dialog book select; PNG and CHARX write the book | P5 | done |
 | DEF-090 | A card library with preview and avatar | sidebar card list, avatar thumbnails, editor dialog | P5 | done |
 | DEF-091 | Card field parity checklist | `docs/reference/PARITY.md` C section | P5 | done |
-| DEF-122 | Cards in the schema reference page, print export and global search | the schema page and print view cover books only | P5 | scheduled |
+| DEF-117 | Card library search, tag filter and sort | the Library hub searches, filters by kind and tag, and sorts lorebooks and cards together | P5 | done |
+| DEF-118 | Card diff and merge on re-import, and card revisions in History | cards diff and merge by name on re-import; the card page History dialog compares and restores earlier versions | P5 | done |
+| DEF-119 | Card templates and duplicate as template | three built-in starters plus custom templates saved from the card page (kind `card`) | P5 | done |
+| DEF-120 | A prompt-assembly preview: card plus linked book against a context budget | card Review page, CONTEXT section 4.1; extends the simulation (C-5) | P5 | done |
+| DEF-121 | Card bulk operations: multi-select, bulk tags, export all cards | Library multi-select with bulk tag, export and delete | P5 | done |
+| DEF-122 | Cards in the schema reference page, print export and global search | the schema page lists every card field; a card prints from its page; global search finds cards (global replace stays lorebook-only) | P5 | done |
 | DEF-123 | Editors for other card extensions: world, regex scripts, V3 assets | preserved verbatim today, not editable | post-v1 | scheduled |
 | DEF-124 | A full-page card workspace instead of a dialog | the card page (`#/card/<id>`) with autosave, section menu, token and checks panel | P5 | done |
 
@@ -111,10 +116,13 @@ never learns a card quirk.
 | DEF-037 | `aria-keyshortcuts` on shortcut buttons | undo, redo, export, add entry | P5 | done |
 | DEF-125 | A UI evaluation: heuristic review, task walk-throughs at four widths, keyboard and screen-reader pass, screenshots | done: `docs/reference/ui-review/REVIEW.md`; the real screen-reader pass stays DEF-043 | P5 | done |
 | DEF-126 | A UI redesign from the evaluation: visual language, Tools as pages, component set (Settings controls and the Review page shipped) | acts on DEF-125; layout and style only | P5 | scheduled |
+| DEF-127 | Per-page command palette scoping and recent pages | scoped palette; the five most recent commands lead | P5 | done |
 | DEF-128 | Phone layout as master-detail: list, entry and details as separate screens (UI-01) | review S1 | P5 | done |
 | DEF-129 | Mid-width layout: details as a drawer and the menu as a rail below about 1200 px (UI-02) | review S1 | P5 | done |
 | DEF-130 | Finish the light theme: details panel, chip inputs and a light screenshot check (UI-04) | review S2 | P5 | done |
 | DEF-131 | A touch density with 44 px targets and a type scale with a 12 px floor (UI-05, UI-06) | review S2 | P5 | done |
+| DEF-132 | A leaner header: file menu, labelled palette button, skip link, shared focus style (UI-07, UI-12) | skip link, labelled palette button and a File menu shipped | P5 | done |
+| DEF-133 | A Review page combining overview, issues and simulation for a lorebook and a card (UI-08) | review pages for lorebooks and cards | P5 | done |
 | DEF-135 | Library hub follow-ups: grid/list toggle, kind-specific thumbnails for lorebooks | bulk selection, tag filter and pinned projects shipped (pins are per-browser, kept in localStorage) | P5 | scheduled |
 | DEF-134 | Card and lorebook UI parity checklist: destination, workspace, list, tokens, notes, bulk, history (UI-03) | the matrix in the review, section 4; extends DEF-117 to DEF-124 | P5 | scheduled |
 | DEF-038 | A changelog link in the About panel | link to CHANGELOG.md on GitHub in the About dialog | P5 | done |
@@ -198,6 +206,7 @@ may delay a v1 phase.
 | DEF-062 | An embedding and vendoring guide with the licence note | asks A-1/C-3 | post-v1 | scheduled |
 | DEF-063 | Extract the pure core into a new component repository | asks A-1 to A-6; the v1 tag is the precondition | post-v1 | scheduled |
 | DEF-065 | Run-level budget arbitration across attached books | ask B-9; the run budget is the outer bound | post-v1 | scheduled |
+| DEF-136 | Frontend prompt template formats in the prompt preview | the preview uses a common order; per-frontend story strings and instruct formats (ChatML, Alpaca, Llama, Mistral, SillyTavern templates) are not reproduced; extends DEF-120 and C-5 | post-v1 | scheduled |
 
 
 

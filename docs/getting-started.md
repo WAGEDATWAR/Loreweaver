@@ -33,7 +33,7 @@ Loreweaver is a local-first editor for lorebooks used in LLM roleplay frontends.
 | Shortcut | Action |
 | --- | --- |
 | `/` | Focus search |
-| `Ctrl/Cmd+Shift+F` | Search all lorebooks |
+| `Ctrl/Cmd+Shift+F` | Search lorebooks and cards |
 | `Alt+N` | New entry |
 | `Ctrl/Cmd+K` | Command palette |
 | `Ctrl/Cmd+S` | Save project |

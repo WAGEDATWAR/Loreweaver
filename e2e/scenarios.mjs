@@ -1063,6 +1063,37 @@ export const scenarios = [
     }
   },
   {
+    name: "finds and prints a character card",
+    timeout: 40000,
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "library");
+      await page.click("#new-card-btn");
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      await setValue(page, "#card-name", "Zephyra");
+      await setValue(page, "#card-description", "A wandering cartographer of drowned cities.");
+      await sleep(500);
+
+      await page.evaluate('window.__printed = 0; window.print = () => { window.__printed += 1; }; true');
+      await page.click("#card-print-btn");
+      await page.waitFor('window.__printed === 1');
+      const printed = await page.evaluate('document.querySelector("#print-root").textContent');
+      assert.match(printed, /Zephyra/);
+      assert.match(printed, /cartographer/);
+
+      await page.click("#nav-back");
+      await page.waitFor('!document.querySelector("#page-library")?.hidden');
+      await page.evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "f", ctrlKey: true, shiftKey: true, bubbles: true, cancelable: true })); true');
+      await page.waitFor('document.querySelector("#global-search-dialog")?.open');
+      await setValue(page, "#global-search-input", "cartographer");
+      await page.waitFor('document.querySelectorAll("#global-search-results [data-card-id]").length === 1');
+      await page.click("#global-search-results [data-card-id]");
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      assert.equal(await page.evaluate('document.querySelector("#card-name").value'), "Zephyra");
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "creates, links and exports a character card",
     async run(page) {
       await resetApp(page);

@@ -112,7 +112,10 @@ lorebook gets:
 - Card templates: three built-in starters (roleplay character, narrator, companion) plus your own. "Save this
   card as a template" keeps the text fields, greetings and settings, never the name, picture or link. Custom
   templates live with the project beside entry templates, told apart by a `kind` of `card`.
-- The card Review page previews the assembled prompt with the linked lorebook (CONTEXT section 4.1). Extension editors are scheduled (DEF-123). Search, filter and sort come from the shared Library hub (DEF-117).
+- Cards appear in the schema reference, global search (name, text fields, greetings, tags) and print (a
+  card prints from its page; global replace and the lorebook print stay lorebook-only).
+- The card Review page previews the assembled prompt with the linked lorebook (CONTEXT section 4.1; frontend
+  prompt template formats are DEF-136). Extension editors are scheduled (DEF-123). Search, filter and sort come from the shared Library hub (DEF-117).
 
 ## 8. Definition of done
 

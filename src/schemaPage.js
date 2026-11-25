@@ -11,7 +11,7 @@ const PROJECT_FIELDS = [
   { name: "ui", type: "object", note: "Session state; never exported to interchange formats." },
   { name: "books", type: "Book[]", note: "Every lorebook in the project." },
   { name: "cards", type: "Card[]", note: "Character cards; a sibling record to books (G-16)." },
-  { name: "customTemplates", type: "object[]", note: "Saved entry templates with name and patch." }
+  { name: "customTemplates", type: "object[]", note: "Saved entry and card templates with name and patch; card templates have kind `card`." }
 ];
 
 const BOOK_FIELDS = [
@@ -49,15 +49,21 @@ const ENTRY_FIELDS = [
 
 const CARD_FIELDS = [
   { name: "id", type: "string", note: "Stable `card_` id, never reused (A-5)." },
-  { name: "name / personality / scenario", type: "string", note: "Core character fields." },
+  { name: "name / nickname", type: "string", note: "The card name and the optional nickname used by some frontends." },
+  { name: "description / personality / scenario", type: "string", note: "The character definition frontends send every turn." },
   { name: "firstMessage", type: "string", note: "Maps to card `first_mes`." },
   { name: "alternateGreetings", type: "string[]", note: "Maps to `alternate_greetings`." },
+  { name: "groupOnlyGreetings", type: "string[]", note: "Greetings used only in group chats (V3)." },
   { name: "exampleMessages", type: "string", note: "Maps to `mes_example`." },
   { name: "systemPrompt / postHistoryInstructions", type: "string", note: "Prompt overrides." },
   { name: "creator / creatorNotes / characterVersion", type: "string", note: "Credit fields." },
   { name: "tags", type: "string[]", note: "Card tags; round-trip through containers." },
+  { name: "talkativeness", type: "number", note: "0 to 1; used by group chats." },
+  { name: "depthPrompt", type: "object", note: "Text, depth and role inserted into the chat at a fixed depth." },
   { name: "avatarDataUrl", type: "string", note: "Imported image bytes; never painted (G-16)." },
-  { name: "bookId", type: "string | null", note: "A linked lorebook; optional." }
+  { name: "bookId", type: "string | null", note: "A linked lorebook; optional." },
+  { name: "extensions", type: "object", note: "Preserved unknown card fields and source fields (I-2)." },
+  { name: "createdAt / updatedAt", type: "number", note: "Epoch milliseconds." }
 ];
 
 const SECTIONS = [

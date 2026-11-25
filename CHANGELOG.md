@@ -16,6 +16,8 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ### Added
 
+- Cards in the schema reference (every card field), global search (the dialog is now "Search lorebooks and cards") and print (Print on the card page).
+
 - Prompt preview on the card Review page: the assembled prompt for a card, its linked lorebook and a pasted chat excerpt, with tokens per part, the context window and the lorebook budget, and a copy button.
 
 - Card history: a History dialog on the card page lists earlier versions from your snapshots, shows what differs, compares and restores one. Snapshots now also count cards.

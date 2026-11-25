@@ -72,3 +72,13 @@ function createSampleEntry() {
     updatedAt: 0
   };
 }
+
+import { createCard } from "../src/schema.js";
+
+test("card rows cover every canonical card field", () => {
+  const documented = new Set(schemaPageFieldNames().find((section) => section.id === "card").fields.flatMap((name) => name.split(" / ")));
+
+  for (const key of Object.keys(createCard())) {
+    assert.ok(documented.has(key), `${key} is documented`);
+  }
+});

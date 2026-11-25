@@ -759,6 +759,7 @@
               <button id="card-duplicate" class="btn" type="button">Duplicate</button>
               <button id="card-template-btn" class="btn" type="button">Templates</button>
               <button id="card-history-btn" class="btn" type="button">History</button>
+              <button id="card-print-btn" class="btn" type="button">Print</button>
               <label class="sr-only" for="card-export-format">Export format</label>
               <select id="card-export-format" class="card-export-format">
                 <option value="png">PNG card (V3 + V2)</option>
@@ -1426,10 +1427,10 @@
     <div class="dialog-inner">
       <div class="dialog-heading">
         <p class="eyebrow">Global search</p>
-        <h2 id="global-search-title">Search all lorebooks</h2>
-        <p id="global-search-summary" class="dialog-copy" aria-live="polite">Type to search every lorebook.</p>
+        <h2 id="global-search-title">Search lorebooks and cards</h2>
+        <p id="global-search-summary" class="dialog-copy" aria-live="polite">Type to search every lorebook and character card.</p>
       </div>
-      <label class="sr-only" for="global-search-input">Search all lorebooks</label>
+      <label class="sr-only" for="global-search-input">Search lorebooks and cards</label>
       <input id="global-search-input" class="global-search-input" type="search" placeholder="Search titles, content, keys, notes, and tags…" autocomplete="off" spellcheck="false">
       <button id="global-regex-toggle" class="icon-btn search-regex-toggle" type="button" aria-pressed="false" aria-label="Treat search as a regular expression" title="Treat search as a regular expression">.*</button>
       <div id="global-search-results" class="global-search-results"></div>

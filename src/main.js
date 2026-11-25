@@ -146,6 +146,7 @@ import { createTabGuard } from "./tabGuard.js";
 import { VIEWS, getView, isEditorView, parseRoute, routeHref, viewForShortcut } from "./views.js";
 import { buildBookReview, buildCardReview, CARD_FIELD_TARGETS } from "./review.js";
 import { buildPromptPreview } from "./promptPreview.js";
+import { buildCardPrint } from "./printView.js";
 import { renderBookReview, renderCardReview, renderPromptPreview } from "./ui/review.js";
 import { buildProjectItems, collectTags, filterProjects, sortProjects } from "./projects.js";
 import { renderProjectList } from "./ui/projects.js";
@@ -411,6 +412,7 @@ const refs = {
   templateCloseBtn: document.querySelector("#template-close"),
   cardTemplateBtn: document.querySelector("#card-template-btn"),
   cardHistoryBtn: document.querySelector("#card-history-btn"),
+  cardPrintBtn: document.querySelector("#card-print-btn"),
   newCardTemplateBtn: document.querySelector("#new-card-template-btn"),
   cardTemplateDialog: document.querySelector("#card-template-dialog"),
   cardTemplateList: document.querySelector("#card-template-list"),
@@ -1686,18 +1688,62 @@ function renderGlobalSearch() {
   refs.globalSearchResults.replaceChildren();
 
   if (!result.query) {
-    refs.globalSearchSummary.textContent = "Type to search every lorebook.";
+    refs.globalSearchSummary.textContent = "Type to search every lorebook and character card.";
     return;
   }
 
-  if (regex && !result.total) {
-    refs.globalSearchSummary.textContent = "No entries match this pattern.";
+  const found = result.total + result.cards.length;
+
+  if (!found) {
+    refs.globalSearchSummary.textContent = regex ? "Nothing matches this pattern." : `Nothing matches "${query.trim()}".`;
     return;
   }
 
-  refs.globalSearchSummary.textContent = result.total
-    ? `${result.total} ${result.total === 1 ? "entry" : "entries"} in ${result.groups.length} ${result.groups.length === 1 ? "lorebook" : "lorebooks"}.`
-    : `No entries match "${query.trim()}".`;
+  const parts = [];
+
+  if (result.total) {
+    parts.push(`${result.total} ${result.total === 1 ? "entry" : "entries"} in ${result.groups.length} ${result.groups.length === 1 ? "lorebook" : "lorebooks"}`);
+  }
+
+  if (result.cards.length) {
+    parts.push(`${result.cards.length} ${result.cards.length === 1 ? "card" : "cards"}`);
+  }
+
+  refs.globalSearchSummary.textContent = `${parts.join(" and ")}.`;
+
+  if (result.cards.length) {
+    const section = document.createElement("section");
+    const heading = document.createElement("h3");
+    const count = document.createElement("span");
+    const list = document.createElement("div");
+
+    section.className = "global-search-group";
+    heading.className = "global-search-group-title";
+    heading.textContent = "Character cards";
+    count.className = "global-search-group-count";
+    count.textContent = String(result.cards.length);
+    heading.append(count);
+    list.className = "global-search-list";
+
+    for (const item of result.cards) {
+      const button = document.createElement("button");
+      const title = document.createElement("span");
+      const meta = document.createElement("span");
+
+      button.type = "button";
+      button.className = "global-search-item";
+      button.dataset.cardId = item.card.id;
+      title.className = "global-search-item-title";
+      title.textContent = item.card.name.trim() || "Untitled card";
+      meta.className = "global-search-item-meta";
+      meta.textContent = `Matched: ${item.fields.join(", ")}`;
+      button.append(title, meta);
+      list.append(button);
+    }
+
+    section.append(heading, list);
+    refs.globalSearchResults.append(section);
+  }
 
   for (const group of result.groups) {
     const section = document.createElement("section");
@@ -1935,7 +1981,7 @@ function buildCommands() {
     { title: "Bulk find and replace", hint: "Ctrl+H", keywords: ["replace", "bulk", "find"], run: openReplaceDialog },
     { title: "New character card", keywords: ["card", "character", "avatar"], run: handleNewCard },
     { title: "New character card from template", keywords: ["card", "character", "starter"], run: openCardTemplateDialog },
-    ...(currentView === "card" ? [{ title: "Card history", keywords: ["card", "snapshots", "restore", "versions"], run: () => refs.cardHistoryBtn.click() }] : []),
+    ...(currentView === "card" ? [{ title: "Print character card", keywords: ["print", "pdf", "paper"], run: printCard }, { title: "Card history", keywords: ["card", "snapshots", "restore", "versions"], run: () => refs.cardHistoryBtn.click() }] : []),
     { title: "Toggle light theme", keywords: ["theme", "colour", "dark"], run: toggleTheme },
     { title: "Keyboard shortcuts", keywords: ["keys", "help"], run: openShortcutsDialog },
     { title: "Schema reference", keywords: ["schema", "docs", "fields"], run: openSchemaDialog },
@@ -1967,7 +2013,7 @@ function buildCommands() {
     { title: "Getting started", keywords: ["guide", "help", "docs"], run: openGuideDialog },
     { title: "Show welcome", keywords: ["onboarding", "start"], run: openOnboardingDialog },
     { title: "Start empty lorebook", keywords: ["new", "blank", "reset"], run: startEmptyProject },
-    { title: "Search all lorebooks", hint: "Ctrl+Shift+F", keywords: ["global", "find", "everywhere"], run: openGlobalSearchDialog },
+    { title: "Search lorebooks and cards", hint: "Ctrl+Shift+F", keywords: ["global", "find", "everywhere"], run: openGlobalSearchDialog },
     { title: "Token settings", keywords: ["tokenizer", "model", "context window"], run: openTokenSettings },
     { title: "Check data integrity", keywords: ["repair", "diagnostics", "snapshots"], run: () => openIntegrityDialog() },
     { title: "About Loreweaver", keywords: ["version", "privacy", "info"], run: () => openAboutDialog() }
@@ -4782,6 +4828,7 @@ refs.cardDialog.addEventListener("change", (event) => {
 
 refs.cardDelete.addEventListener("click", handleDeleteCard);
 refs.cardTemplateBtn.addEventListener("click", openCardTemplateDialog);
+refs.cardPrintBtn.addEventListener("click", printCard);
 refs.newCardTemplateBtn.addEventListener("click", openCardTemplateDialog);
 refs.cardHistoryBtn.addEventListener("click", () => {
   openCardHistory().catch(() => {
@@ -6257,6 +6304,14 @@ refs.integrityDialog.addEventListener("click", (event) => {
 refs.globalSearchInput.addEventListener("input", renderGlobalSearch);
 
 refs.globalSearchResults.addEventListener("click", (event) => {
+  const cardItem = event.target.closest("[data-card-id]");
+
+  if (cardItem) {
+    refs.globalSearchDialog.close();
+    goToView("card", cardItem.dataset.cardId);
+    return;
+  }
+
   const item = event.target.closest("[data-entry-id]");
 
   if (item) {
@@ -6803,7 +6858,7 @@ const KEYBOARD_SHORTCUTS = [
   { keys: "Ctrl+Z", label: "Undo" },
   { keys: "Ctrl+Shift+Z", label: "Redo" },
   { keys: "/", label: "Search entries" },
-  { keys: "Ctrl+Shift+F", label: "Search all lorebooks" },
+  { keys: "Ctrl+Shift+F", label: "Search lorebooks and cards" },
   { keys: "Ctrl+H", label: "Bulk find and replace" },
   { keys: "Ctrl+Shift+E", label: "Export" },
   { keys: "Ctrl+S", label: "Save the project locally" },
@@ -6925,6 +6980,62 @@ function renderPrintView() {
   }
 
   refs.printRoot.append(head, fragment);
+}
+
+function renderCardPrintView() {
+  const card = getCards().find((item) => item.id === editingCardId);
+
+  if (!card) {
+    return false;
+  }
+
+  const book = getState().books.find((item) => item.id === card.bookId);
+  const view = buildCardPrint({ ...card, ...readCardForm(refs) }, { tokenCount: (text) => tokenizer.count(text), bookName: book?.name.trim() ?? "" });
+  const head = document.createElement("header");
+  const title = document.createElement("h1");
+  const meta = document.createElement("p");
+
+  head.className = "print-head";
+  title.textContent = view.nickname ? `${view.name} (${view.nickname})` : view.name;
+  meta.textContent = [
+    "Character card",
+    view.creator,
+    view.tags.length ? `Tags: ${view.tags.join(", ")}` : "",
+    view.linkedBook ? `Lorebook: ${view.linkedBook}` : "",
+    `~${numberFormatter.format(view.totalTokens)} tokens`
+  ].filter(Boolean).join(" \u00b7 ");
+  head.append(title, meta);
+
+  const fragment = document.createDocumentFragment();
+
+  for (const section of view.sections) {
+    const article = document.createElement("article");
+    const heading = document.createElement("h2");
+    const info = document.createElement("p");
+    const content = document.createElement("div");
+
+    article.className = "print-entry";
+    heading.className = "print-entry-title";
+    heading.textContent = section.label;
+    info.className = "print-entry-meta";
+    info.textContent = `~${numberFormatter.format(section.tokens)} tokens`;
+    content.className = "print-entry-content";
+    content.textContent = section.text;
+    article.append(heading, info, content);
+    fragment.append(article);
+  }
+
+  refs.printRoot.replaceChildren(head, fragment);
+  return true;
+}
+
+function printCard() {
+  if (!renderCardPrintView()) {
+    toast("There is no card to print.", "error");
+    return;
+  }
+
+  window.print();
 }
 
 function printActiveBook() {

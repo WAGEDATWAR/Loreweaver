@@ -50,3 +50,25 @@ test("returns no groups for an empty query", () => {
   assert.equal(result.total, 0);
   assert.deepEqual(result.groups, []);
 });
+
+import { analyzeCardQuery } from "../src/search.js";
+import { createCard } from "../src/schema.js";
+
+test("finds character cards by their text fields", () => {
+  const card = createCard({ id: "card_a", name: "Mara", description: "A smuggler from the harbor.", alternateGreetings: ["Ahoy"], tags: ["npc"] });
+
+  assert.deepEqual(analyzeCardQuery(card, "harbor").fields, ["description"]);
+  assert.deepEqual(analyzeCardQuery(card, "ahoy").fields, ["greetings"]);
+  assert.deepEqual(analyzeCardQuery(card, "^mara$", { regex: true }).fields, ["name"]);
+  assert.equal(analyzeCardQuery(card, "(", { regex: true }).invalid, true);
+});
+
+test("project search returns matching cards beside entry groups", () => {
+  const withCards = createProject({ books: project().books, cards: [createCard({ id: "card_a", name: "Mara", description: "Watches the harbor." }), createCard({ id: "card_b", name: "Kest" })] });
+  const result = searchProject(withCards, "harbor");
+
+  assert.equal(result.cards.length, 1);
+  assert.equal(result.cards[0].card.id, "card_a");
+  assert.equal(result.total, 2);
+  assert.deepEqual(searchProject(withCards, "").cards, []);
+});
