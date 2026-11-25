@@ -4,6 +4,12 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-11-25
+
+### Fixed
+
+- The entries sidebar no longer squeezes the editor at mid widths: its maximum width now leaves at least 640 px of the window for the editor, so wide fonts cannot push the editor below a usable width at about 1024 px. This was caught by CI on the v0.8.0 push.
+
 ## [0.8.0] - 2026-11-25
 
 Mobile preview builds, bulk authoring tools and the completed scale phase, plus the Library hub, character-card parity and the UI redesign.

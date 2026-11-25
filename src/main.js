@@ -751,7 +751,7 @@ function persistSidebarWidth(width) {
 }
 
 function getSidebarMaxWidth() {
-  return Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, window.innerWidth - 360));
+  return Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, window.innerWidth - 640));
 }
 
 function applySidebarWidth(width, persist = false) {
