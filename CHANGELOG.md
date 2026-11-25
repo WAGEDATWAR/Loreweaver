@@ -4,6 +4,13 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-11-25
+
+### Fixed
+
+- The GitHub Pages deploy now builds the bundle in one job and publishes it from another, which fixes the "no artifacts named github-pages" failure; it also reads workflow artifacts (`actions: read`). The deploy runs on `v*` tags and can be started by hand.
+- Two CI-only test races: the editor-width check waits for the sidebar to settle after a resize, and the accessibility audit waits for toasts to finish fading in before it measures contrast.
+
 ## [0.8.1] - 2026-11-25
 
 ### Fixed
