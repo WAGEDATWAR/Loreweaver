@@ -80,3 +80,21 @@ test("pinned projects lead every sort order", () => {
   assert.equal(sortProjects(items, "name", pinned)[0].id, "card_b");
   assert.equal(sortProjects(items, "updated")[0].id, "card_a");
 });
+
+import { thumbHue, thumbInitial } from "../src/projects.js";
+
+test("thumbnail hues are stable, in range and ignore case and padding", () => {
+  assert.equal(thumbHue("Aurora Vale"), thumbHue("  aurora vale "));
+  assert.notEqual(thumbHue("Aurora Vale"), thumbHue("Mara Voss"));
+
+  for (const name of ["", "A", "日本語", "x".repeat(500)]) {
+    const hue = thumbHue(name);
+    assert.ok(Number.isInteger(hue) && hue >= 0 && hue < 360);
+  }
+});
+
+test("thumbnail initials use the first letter, upper-cased", () => {
+  assert.equal(thumbInitial("  mara voss"), "M");
+  assert.equal(thumbInitial("élan"), "É");
+  assert.equal(thumbInitial(""), "?");
+});

@@ -67,7 +67,7 @@ never learns a card quirk.
 | DEF-120 | A prompt-assembly preview: card plus linked book against a context budget | card Review page, CONTEXT section 4.1; extends the simulation (C-5) | P5 | done |
 | DEF-121 | Card bulk operations: multi-select, bulk tags, export all cards | Library multi-select with bulk tag, export and delete | P5 | done |
 | DEF-122 | Cards in the schema reference page, print export and global search | the schema page lists every card field; a card prints from its page; global search finds cards (global replace stays lorebook-only) | P5 | done |
-| DEF-123 | Editors for other card extensions: world, regex scripts, V3 assets | preserved verbatim today, not editable | post-v1 | scheduled |
+| DEF-123 | Editors for other card extensions: world, regex scripts, V3 assets | the card page's Frontend extensions section edits the world name, favourite flag, regex scripts, assets, source links and multilingual creator notes (`src/cardExtensions.js`); unseen fields are kept | post-v1 | done |
 | DEF-124 | A full-page card workspace instead of a dialog | the card page (`#/card/<id>`) with autosave, section menu, token and checks panel | P5 | done |
 
 
@@ -123,7 +123,7 @@ never learns a card quirk.
 | DEF-131 | A touch density with 44 px targets and a type scale with a 12 px floor (UI-05, UI-06) | review S2 | P5 | done |
 | DEF-132 | A leaner header: file menu, labelled palette button, skip link, shared focus style (UI-07, UI-12) | skip link, labelled palette button and a File menu shipped | P5 | done |
 | DEF-133 | A Review page combining overview, issues and simulation for a lorebook and a card (UI-08) | review pages for lorebooks and cards | P5 | done |
-| DEF-135 | Library hub follow-ups: kind-specific thumbnails for lorebooks | bulk selection, tag filter, pinned projects and the grid/list toggle shipped (pins and the layout are per-browser, kept in localStorage) | P5 | scheduled |
+| DEF-135 | Library hub follow-ups: kind-specific thumbnails for lorebooks | lorebooks get a book glyph tinted by a stable hue from their name; cards without art show their initial; bulk selection, tag filter, pinned projects and the grid/list toggle shipped | P5 | done |
 | DEF-134 | Card and lorebook UI parity checklist: destination, workspace, list, tokens, notes, bulk, history (UI-03) | the matrix in the review, section 4; extends DEF-117 to DEF-124 | P5 | scheduled |
 | DEF-038 | A changelog link in the About panel | link to CHANGELOG.md on GitHub in the About dialog | P5 | done |
 

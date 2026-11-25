@@ -123,6 +123,8 @@ import { buildActivationGraph } from "./activationGraph.js";
 import { createTokenizer, estimateTokens } from "./tokenizer/client.js";
 import { buildBookOverview } from "./overview.js";
 import { CARD_TEMPLATES, ENTRY_TEMPLATES, buildTemplatePatch, getCardTemplate, getEntryTemplate } from "./templates.js";
+import { applyCardExtras } from "./cardExtensions.js";
+import { handleCardExtrasClick, readCardExtrasForm } from "./ui/cardExtras.js";
 import { cardRestorePatch, cardTemplateFromCard, compareCardVersion, matchCardInProject } from "./cardHistory.js";import { showDiffDialog } from "./ui/diff.js";
 import { applyScopes, orderByRecent, pushRecent } from "./commands.js";
 import { openCommandPalette } from "./ui/commandPalette.js";
@@ -189,6 +191,8 @@ const refs = {
   cardTagsContainer: document.querySelector("#card-tags"),
   cardTagsInput: document.querySelector("#card-tags-input"),
   cardAdvanced: document.querySelector(".card-advanced"),
+  cardExtras: document.querySelector("#card-extras"),
+  cardExtrasDetails: document.querySelector("#card-extras-details"),
   cardDepthPrompt: document.querySelector("#card-depth-prompt"),
   cardDepthDepth: document.querySelector("#card-depth-depth"),
   cardDepthRole: document.querySelector("#card-depth-role"),
@@ -4193,6 +4197,17 @@ function markCardDirty() {
   refreshCardSummary();
 }
 
+function cardFormPatch() {
+  const base = getCards().find((item) => item.id === editingCardId);
+  const patch = readCardForm(refs);
+
+  if (base) {
+    patch.extensions = applyCardExtras(base.extensions, readCardExtrasForm(refs.cardExtras));
+  }
+
+  return patch;
+}
+
 function commitCard() {
   window.clearTimeout(cardCommitTimer);
   cardCommitTimer = 0;
@@ -4201,7 +4216,7 @@ function commitCard() {
     return;
   }
 
-  updateCard(editingCardId, { ...readCardForm(refs), avatarDataUrl: editingAvatarDataUrl });
+  updateCard(editingCardId, { ...cardFormPatch(), avatarDataUrl: editingAvatarDataUrl });
   refs.cardTitle.textContent = currentCardName();
   scheduleSave();
   renderHub();
@@ -4222,7 +4237,7 @@ function leaveCard(id) {
 
 function currentCardDraft() {
   const base = editingCardId ? getCards().find((item) => item.id === editingCardId) : null;
-  return { ...(base ?? createCard()), ...readCardForm(refs), avatarDataUrl: editingAvatarDataUrl };
+  return { ...(base ?? createCard()), ...cardFormPatch(), avatarDataUrl: editingAvatarDataUrl };
 }
 
 function refreshCardSummary() {
@@ -4822,6 +4837,26 @@ for (const container of [refs.cardAltGreetings, refs.cardGroupGreetings]) {
     }
   });
 }
+
+refs.cardExtras.addEventListener("click", (event) => {
+  if (event.target.closest("#card-ext-world-from-book")) {
+    const option = refs.cardLinkBook.selectedOptions[0];
+    const world = refs.cardExtras.querySelector('[data-ext="world"]');
+
+    if (option?.value && world) {
+      world.value = option.textContent;
+      markCardDirty();
+    } else {
+      toast("Link a lorebook to this card first.");
+    }
+
+    return;
+  }
+
+  if (handleCardExtrasClick(refs.cardExtras, event.target)) {
+    markCardDirty();
+  }
+});
 
 refs.cardDialog.addEventListener("input", (event) => {
   if (event.target === refs.cardTalkativeness) {
@@ -6983,7 +7018,7 @@ function renderCardPrintView() {
   }
 
   const book = getState().books.find((item) => item.id === card.bookId);
-  const view = buildCardPrint({ ...card, ...readCardForm(refs) }, { tokenCount: (text) => tokenizer.count(text), bookName: book?.name.trim() ?? "" });
+  const view = buildCardPrint({ ...card, ...cardFormPatch() }, { tokenCount: (text) => tokenizer.count(text), bookName: book?.name.trim() ?? "" });
   const head = document.createElement("header");
   const title = document.createElement("h1");
   const meta = document.createElement("p");

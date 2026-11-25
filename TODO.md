@@ -165,7 +165,7 @@ defect or risk, **S3** improvement.
 
 ## Post-v1
 
-- [ ] `M` Editors for world, regex scripts and V3 assets on cards (DEF-123).
+- [x] Editors for world, regex scripts, assets, sources and multilingual notes on cards (DEF-123).
 - [ ] `VH` `post-v1` Opt-in cloud sync, only if private and simple (DEF-011).
 - [ ] `M` Collect round-trip failures as fixtures (DEF-053).
 - [ ] `M` Share-sheet import and export on Android (DEF-066).
@@ -177,12 +177,12 @@ defect or risk, **S3** improvement.
 
 Cards are a first-class record (G-16); the container is an adapter (A-8). Record, PNG/CHARX/JSON
 adapters, extraction, linking, the library, the full field set, token report, checks and V2/V3 export have
-shipped (v0.8.0+). Open parity work: extension editors (DEF-123) and prompt template formats (DEF-136).
+shipped (v0.8.0+). Open parity work: prompt template formats (DEF-136).
 
 - [x] The Library is the home hub for lorebooks and cards; cards have an autosaving editor page; the left menu is editor-only (DEF-124, U-7 to U-9, U-12).
 - [x] The Library filters by tag and pins projects to the top (DEF-117; pins live in localStorage).
 - [x] Library grid/list toggle, remembered per browser (DEF-135).
-- [ ] `S` `P5` Kind-specific lorebook thumbnails (DEF-135).
+- [x] Kind-specific thumbnails: tinted book glyphs and card initials (DEF-135).
 - [x] Card diff and merge on re-import (DEF-118).
 - [x] Card history and card templates (DEF-118, DEF-119).
 - [x] A prompt-assembly preview of card plus book on the card Review page (DEF-120).

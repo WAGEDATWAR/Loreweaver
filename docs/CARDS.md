@@ -114,8 +114,15 @@ lorebook gets:
   templates live with the project beside entry templates, told apart by a `kind` of `card`.
 - Cards appear in the schema reference, global search (name, text fields, greetings, tags) and print (a
   card prints from its page; global replace and the lorebook print stay lorebook-only).
+- **Frontend extensions** (`cardExtensions.js`, `ui/cardExtras.js`): a section on the card page edits the
+  attached world name, the favourite flag, regex scripts (name, find, replace, trim strings, placements,
+  options, depth range), V3 assets, source links and creator notes per language. They live in the preserved
+  buckets (`extensions.cardExtensions`, `extensions.sourceFields`); each regex script and asset keeps the
+  fields the editor does not show, an untouched section round-trips byte for byte, and clearing a field
+  removes its key. Checks flag an invalid or empty regex pattern, a script with no placement, and an asset
+  with no or a script URI. The world name is the name a frontend loads, not a link to the linked lorebook.
 - The card Review page previews the assembled prompt with the linked lorebook (CONTEXT section 4.1; frontend
-  prompt template formats are DEF-136). Extension editors are scheduled (DEF-123). Search, filter and sort come from the shared Library hub (DEF-117).
+  prompt template formats are DEF-136). Search, filter and sort come from the shared Library hub (DEF-117).
 
 ## 8. Definition of done
 

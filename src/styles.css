@@ -6495,3 +6495,102 @@ body:not([data-mode="editor"]) .nav-open-btn {
     flex-basis: 100%;
   }
 }
+
+/* ---- Card extension editors ---- */
+
+.card-extras-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ext-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.ext-group h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.ext-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ext-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.ext-item legend {
+  padding: 0 6px;
+  font-weight: 600;
+}
+
+.ext-item > .btn {
+  align-self: flex-start;
+}
+
+.ext-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.ext-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.card-extras-body .field-label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ---- Library thumbnails ---- */
+
+.project-tile[data-kind="book"] .project-thumb {
+  color: hsl(var(--thumb-hue) 80% 74%);
+  background: hsl(var(--thumb-hue) 55% 50% / 0.16);
+  border-color: hsl(var(--thumb-hue) 60% 60% / 0.45);
+}
+
+:root[data-theme="light"] .project-tile[data-kind="book"] .project-thumb {
+  color: hsl(var(--thumb-hue) 65% 32%);
+  background: hsl(var(--thumb-hue) 70% 55% / 0.16);
+}
+
+.project-thumb.is-initial {
+  color: hsl(var(--thumb-hue) 80% 78%);
+  background: hsl(var(--thumb-hue) 45% 45% / 0.2);
+  border-color: hsl(var(--thumb-hue) 55% 60% / 0.45);
+}
+
+:root[data-theme="light"] .project-thumb.is-initial {
+  color: hsl(var(--thumb-hue) 65% 30%);
+}
+
+.project-thumb-initial {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.project-grid[data-layout="list"] .project-thumb-initial {
+  font-size: 16px;
+}

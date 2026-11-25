@@ -1,4 +1,6 @@
 import { getRecentEntries, getState } from "../store.js";
+import { hasCardExtras, readCardExtras } from "../cardExtensions.js";
+import { renderCardExtras } from "./cardExtras.js";
 
 export function renderRecentList(refs) {
   if (!refs.recentList || !refs.recentSection) {
@@ -195,6 +197,10 @@ export function fillCardForm(refs, card) {
     card?.groupOnlyGreetings?.length || card?.depthPrompt?.prompt || (card?.talkativeness ?? 0.5) !== 0.5
   );
   renderCardAvatar(refs, card?.avatarDataUrl ?? "");
+
+  const extras = readCardExtras(card?.extensions);
+  renderCardExtras(refs.cardExtras, extras);
+  refs.cardExtrasDetails.open = hasCardExtras(extras);
 
   const options = [{ value: "", label: "No linked lorebook" }];
 

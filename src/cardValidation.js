@@ -1,4 +1,5 @@
 import { CARD_PERMANENT_WARN_TOKENS, buildCardTokenReport } from "./cardTokens.js";
+import { checkCardExtras, readCardExtras } from "./cardExtensions.js";
 
 export const CARD_ISSUE_LABELS = Object.freeze({
   "missing-name": "Missing name",
@@ -10,7 +11,12 @@ export const CARD_ISSUE_LABELS = Object.freeze({
   "missing-book": "Linked lorebook missing",
   "heavy-permanent": "Heavy always-sent text",
   "bad-depth": "Invalid depth prompt",
-  "orphan-depth-prompt": "Depth prompt has no text"
+  "orphan-depth-prompt": "Depth prompt has no text",
+  "bad-regex-script": "Invalid regex script",
+  "empty-regex-script": "Regex script without a pattern",
+  "regex-script-no-placement": "Regex script applies nowhere",
+  "asset-no-uri": "Asset without a URI",
+  "asset-unsafe-uri": "Asset with a script URI"
 });
 
 const LEGACY_MACRO = /<(user|bot|char)>/i;
@@ -86,6 +92,10 @@ export function validateCardRecord(card, { bookExists = () => true, count = null
     if (!depth.prompt?.trim() && (depth.depth !== 4 || depth.role !== "system")) {
       add("orphan-depth-prompt", "info", "depthPrompt", "The depth prompt has settings but no text, so it is not exported.");
     }
+  }
+
+  for (const issue of checkCardExtras(readCardExtras(card.extensions))) {
+    add(issue.code, "warning", "extensions", issue.message);
   }
 
   if (count) {

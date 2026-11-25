@@ -4,6 +4,11 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ## [Unreleased]
 
+### Added
+
+- Card extension editors: a "Frontend extensions" section on the card page edits the attached world name, favourite flag, regex scripts, V3 assets, source links and multilingual creator notes, keeps every field it does not show, and flags broken regex patterns and assets.
+- Library thumbnails: lorebooks get a book glyph tinted by a stable colour from their name, and cards without art show their initial.
+
 ## [0.8.2] - 2026-11-25
 
 ### Fixed

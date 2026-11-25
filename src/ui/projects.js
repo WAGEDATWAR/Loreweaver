@@ -1,4 +1,5 @@
 import { routeHref } from "../views.js";
+import { thumbHue, thumbInitial } from "../projects.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -84,14 +85,18 @@ function createTile(item, activeIds, pinnedIds, selection) {
   link.dataset.projectKind = item.kind;
 
   thumb.className = "project-thumb";
+  thumb.style.setProperty("--thumb-hue", String(thumbHue(item.name)));
 
   if (item.kind === "card" && item.avatarDataUrl) {
     const img = document.createElement("img");
     img.alt = "";
     img.src = item.avatarDataUrl;
     thumb.append(img);
+  } else if (item.kind === "card") {
+    thumb.classList.add("is-initial");
+    thumb.append(span("project-thumb-initial", thumbInitial(item.name)));
   } else {
-    thumb.append(icon(item.kind));
+    thumb.append(icon("book"));
   }
 
   body.className = "project-body";

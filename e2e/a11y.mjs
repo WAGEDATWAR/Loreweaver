@@ -194,6 +194,16 @@ const states = [
     await page.click('#hub-layout [data-layout="list"]');
     await page.waitFor('document.querySelector("#project-list").dataset.layout === "list"');
   } },
+  { name: "card extension editors", setup: async (page) => {
+    await openPage(page, "library");
+    await page.click("#new-card-btn");
+    await page.waitFor('!document.querySelector("#page-card")?.hidden');
+    await page.click("#card-extras-summary");
+    await page.click("#card-ext-regex-add");
+    await page.click("#card-ext-asset-add");
+    await page.click("#card-ext-note-add");
+    await page.waitFor('document.querySelectorAll("#card-extras [data-ext-kind]").length === 3');
+  } },
   { name: "app menu", setup: async (page) => {
     await page.click("#app-menu-btn");
     await page.waitFor('!document.querySelector("#app-menu")?.hidden');

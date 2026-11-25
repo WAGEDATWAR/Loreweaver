@@ -14,7 +14,8 @@ export const CARD_FIELD_TARGETS = Object.freeze({
   systemPrompt: "card-system-prompt",
   postHistoryInstructions: "card-post-history",
   bookId: "card-link-book",
-  depthPrompt: "card-depth-prompt"
+  depthPrompt: "card-depth-prompt",
+  extensions: "card-extras-summary"
 });
 
 const SEVERITY_ORDER = { error: 0, warning: 1, info: 2 };

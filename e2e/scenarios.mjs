@@ -1113,6 +1113,48 @@ export const scenarios = [
     }
   },
   {
+    name: "edits frontend extensions on a card and flags a broken regex script",
+    timeout: 50000,
+    async run(page) {
+      await resetApp(page);
+      await openPage(page, "library");
+      await page.click("#new-card-btn");
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      await setValue(page, "#card-name", "Extras");
+      await page.click("#card-extras-summary");
+      await page.waitFor('document.querySelector("#card-extras-details").open');
+
+      await setValue(page, '#card-extras [data-ext="world"]', "Aurora Vale");
+      await page.click("#card-ext-regex-add");
+      await page.waitFor('document.querySelectorAll("#card-extras [data-ext-kind=regex]").length === 1');
+      await setValue(page, '#card-extras [data-ext-kind=regex] [data-ext="scriptName"]', "Broken");
+      await setValue(page, '#card-extras [data-ext-kind=regex] [data-ext="findRegex"]', "(");
+      await page.click("#card-ext-asset-add");
+      await page.waitFor('document.querySelectorAll("#card-extras [data-ext-kind=asset]").length === 1');
+      await sleep(500);
+
+      await page.click("#nav-back");
+      await page.waitFor('!document.querySelector("#page-library")?.hidden');
+      await page.click("#project-list .project-tile[data-kind=card] .project-open");
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      assert.equal(await page.evaluate('document.querySelector("#card-extras-details").open'), true);
+      assert.equal(await page.evaluate(`document.querySelector('#card-extras [data-ext="world"]').value`), "Aurora Vale");
+      assert.equal(await page.evaluate(`document.querySelector('#card-extras [data-ext="scriptName"]').value`), "Broken");
+
+      await page.click('#app-nav a[data-view="card-review"]');
+      await page.waitFor('!document.querySelector("#page-review")?.hidden');
+      await page.waitFor('document.querySelectorAll("#review-body [data-review-field=extensions]").length >= 2');
+      assert.match(await page.evaluate('document.querySelector("#review-body").textContent'), /Invalid regex script/);
+      await page.click("#review-body [data-review-field=extensions]");
+      await page.waitFor('!document.querySelector("#page-card")?.hidden');
+      assert.equal(await page.evaluate('document.activeElement?.id'), "card-extras-summary");
+
+      await page.click('#card-extras [data-ext-remove="regex"]');
+      await page.waitFor('document.querySelectorAll("#card-extras [data-ext-kind=regex]").length === 0');
+      assert.deepEqual(page.errors, []);
+    }
+  },
+  {
     name: "creates, links and exports a character card",
     async run(page) {
       await resetApp(page);

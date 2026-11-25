@@ -72,6 +72,23 @@ export function collectTags(items) {
     .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag, undefined, { sensitivity: "base" }));
 }
 
+/** A stable hue (0-359) from a project's name, so each lorebook keeps its own colour on the Library. */
+export function thumbHue(name) {
+  const text = String(name ?? "").trim().toLowerCase();
+  let hash = 5381;
+
+  for (let index = 0; index < text.length; index += 1) {
+    hash = ((hash << 5) + hash + text.charCodeAt(index)) >>> 0;
+  }
+
+  return hash % 360;
+}
+
+export function thumbInitial(name) {
+  const [first] = [...String(name ?? "").trim()];
+  return first ? first.toLocaleUpperCase() : "?";
+}
+
 export function filterProjects(items, { query = "", kind = "all", tag = "" } = {}) {
   const needle = query.trim().toLowerCase();
 
