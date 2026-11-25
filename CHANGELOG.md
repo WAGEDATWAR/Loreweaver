@@ -4,17 +4,12 @@ All notable changes to Loreweaver are documented here. The format is based on [K
 
 ## [Unreleased]
 
-### Changed
+## [0.8.0] - 2026-11-25
 
-- Overview, Simulate and Issues are now pages of a lorebook (`#/book/<id>/overview`, `/simulate`, `/issues`) instead of dialogs; the editor menu links to them. History stays a dialog.
+Mobile preview builds, bulk authoring tools and the completed scale phase, plus the Library hub, character-card parity and the UI redesign.
 
-- **One interchange model, shared with Synthesis (Y-17).** The canonical entry/book model and the
-  SillyTavern, Chub, character-book and interchange adapters now live once in `src/content-format/`;
-  `src/formats/*` adapt them to a project. Synthesis vendors the same modules, so a lorebook authored
-  in either app opens in the other. Fixed: an entry's `title` was ignored when no `name`/`comment` was
-  present (the first key became the title), and canonical `secondaryKeys` did not read back on a
-  round trip.
-- New export target: **Interchange lorebook** (the canonical file any frontend can read).
+**Earlier milestone preview APK (before the Library hub and UI redesign):** `android/dist/loreweaver-preview_debug_20261108-032416_375066a.apk`
+(build 26, version 0.8.0).
 
 ### Added
 
@@ -101,15 +96,6 @@ All notable changes to Loreweaver are documented here. The format is based on [K
   shell, so the app installs and opens offline (DEF-041). Deployment automation: `deploy.yml` runs the
   gates on `v*` tags and publishes the `www/` bundle to GitHub Pages (DEF-042).
 
-## [0.8.0] - 2026-11-08
-
-Mobile preview builds, bulk authoring tools and the completed scale phase.
-
-**Milestone preview APK:** `android/dist/loreweaver-preview_debug_20261108-032416_375066a.apk`
-(build 26, version 0.8.0).
-
-### Added
-
 - A virtualized entry list above 120 rows: only the visible window plus an overscan renders, with a
   pure `src/windowing.js` module and `test/windowing.test.js`. Focus, keyboard navigation and reordering
   still work across the full list.
@@ -129,6 +115,16 @@ Mobile preview builds, bulk authoring tools and the completed scale phase.
 - `npm run deferrals` (ledger check) and `npm run deferral-scan` (prose check), with the ledger gate wired into CI.
 
 ### Changed
+
+- Overview, Simulate and Issues are now pages of a lorebook (`#/book/<id>/overview`, `/simulate`, `/issues`) instead of dialogs; the editor menu links to them. History stays a dialog.
+
+- **One interchange model, shared with Synthesis (Y-17).** The canonical entry/book model and the
+  SillyTavern, Chub, character-book and interchange adapters now live once in `src/content-format/`;
+  `src/formats/*` adapt them to a project. Synthesis vendors the same modules, so a lorebook authored
+  in either app opens in the other. Fixed: an entry's `title` was ignored when no `name`/`comment` was
+  present (the first key became the title), and canonical `secondaryKeys` did not read back on a
+  round trip.
+- New export target: **Interchange lorebook** (the canonical file any frontend can read).
 
 - Token counts are cached by content in a bounded LRU (`src/tokenCache.js`) and survive re-renders.
 - SillyTavern World Info v2 is the primary export target and sorts first in the export dialog.
